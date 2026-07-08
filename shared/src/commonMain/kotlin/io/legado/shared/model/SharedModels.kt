@@ -49,6 +49,17 @@ data class SharedBookSource(
 }
 
 @Serializable
+data class SharedExploreKind(
+    val title: String = "",
+    val url: String? = null,
+    val type: String = "url",
+    val action: String? = null,
+    val chars: List<String> = emptyList(),
+    val default: String? = null,
+    val viewName: String? = null
+)
+
+@Serializable
 data class SharedSearchRule(
     val bookList: String? = null,
     val name: String? = null,

@@ -252,6 +252,44 @@ class LegadoRuntimeTest {
         assertEquals(emptyList(), runtime.loadSearchKeywords())
     }
 
+    @Test
+    fun loadsExploreKindsAndExplorePageThroughRuntime() = runBlocking {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    assertEquals("https://explore.test/rank?page=1", request.url)
+                    return SharedHttpResponse(
+                        finalUrl = request.url,
+                        statusCode = 200,
+                        body = "book|Explore Book|/book/1"
+                    )
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+        val source = runtime.importAndSaveBookSources(
+            """
+            {
+              "bookSourceUrl":"https://explore.test",
+              "bookSourceName":"Explore",
+              "exploreUrl":"Rank::/rank?page={{page}}",
+              "ruleExplore":{
+                "bookList":"book\\|([^|]+)\\|([^\\n]+)",
+                "name":"${'$'}1",
+                "bookUrl":"${'$'}2"
+              }
+            }
+            """.trimIndent()
+        ).single()
+
+        val kind = runtime.loadExploreKinds(source).single()
+        val page = runtime.loadExplorePage(source, kind, page = 1)
+
+        assertEquals(listOf("Explore"), runtime.loadExploreSources().map { it.bookSourceName })
+        assertEquals("Rank", kind.title)
+        assertEquals("Explore Book", page.books.single().name)
+    }
+
     private class InMemoryCacheStore : CacheStorePort {
         private val values = mutableMapOf<String, String>()
 

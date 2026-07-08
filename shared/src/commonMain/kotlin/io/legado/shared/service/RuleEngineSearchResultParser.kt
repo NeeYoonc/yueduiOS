@@ -29,7 +29,11 @@ class RuleEngineSearchResultParser(
             baseUrl = source.bookSourceUrl
         )
         val books = mutableListOf<SharedSearchBook>()
-        RuleAnalyzer.selectBlocks(body, bookListRule).forEach { block ->
+        val blocks = RuleAnalyzer.selectBlocks(body, bookListRule)
+        if (blocks.isEmpty() && !bookListRule.trim().startsWith("$") && !RuleAnalyzer.looksLikeHtmlRule(bookListRule)) {
+            return fallbackParser.parse(source, body)
+        }
+        blocks.forEach { block ->
             val variables = context.variables.toMutableMap()
             val book = SharedSearchBook(
                 name = ruleEngine.evaluateString(block, rule.name, context, variables).orEmpty(),
@@ -47,6 +51,9 @@ class RuleEngineSearchResultParser(
             if (book.name.isNotBlank() || book.bookUrl.isNotBlank()) {
                 books.add(book)
             }
+        }
+        if (books.isEmpty() && !bookListRule.trim().startsWith("$") && !RuleAnalyzer.looksLikeHtmlRule(bookListRule)) {
+            return fallbackParser.parse(source, body)
         }
         return books
     }

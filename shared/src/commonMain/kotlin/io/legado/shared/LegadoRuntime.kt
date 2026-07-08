@@ -7,6 +7,7 @@ import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedBookmark
 import io.legado.shared.model.SharedDataSnapshot
 import io.legado.shared.model.SharedDictRule
+import io.legado.shared.model.SharedExploreKind
 import io.legado.shared.model.SharedHttpTts
 import io.legado.shared.model.SharedReplaceRule
 import io.legado.shared.model.SharedRssArticle
@@ -26,6 +27,7 @@ import io.legado.shared.backup.DataBackupService
 import io.legado.shared.bookmark.BookmarkRepository
 import io.legado.shared.config.DictRuleRepository
 import io.legado.shared.config.HttpTtsRepository
+import io.legado.shared.explore.ExploreService
 import io.legado.shared.local.LocalTextBookService
 import io.legado.shared.local.LocalTextImportResult
 import io.legado.shared.platform.CacheStorePort
@@ -41,6 +43,7 @@ import io.legado.shared.service.RuleEngineChapterContentParser
 import io.legado.shared.service.RuleEngineChapterListParser
 import io.legado.shared.service.RuleEngineSearchResultParser
 import io.legado.shared.service.ReadingFlowResult
+import io.legado.shared.service.SearchPageResult
 import io.legado.shared.source.DefaultDataImporter
 import io.legado.shared.source.DefaultDataPayload
 import io.legado.shared.source.SourceDebugResult
@@ -73,6 +76,7 @@ open class LegadoRuntime(
     val chapterRepository: ChapterRepository = ChapterRepository(client, libraryStore, bookshelfService)
     val sourceRepository: SourceRepository = SourceRepository(libraryStore)
     val sourceDebugService: SourceDebugService = SourceDebugService(client)
+    val exploreService: ExploreService = ExploreService(client, libraryStore)
     val rssService: RssService = RssService(httpFetcher, libraryStore)
     val localTextBookService: LocalTextBookService = LocalTextBookService(libraryStore, bookshelfService)
     val replacementRepository: ReplacementRepository = ReplacementRepository(libraryStore)
@@ -94,6 +98,14 @@ open class LegadoRuntime(
         return libraryStore.loadDataSnapshot().rssSources.sortedWith(
             compareBy<SharedRssSource> { it.customOrder }.thenBy { it.sourceName }
         )
+    }
+
+    fun loadExploreSources(): List<SharedBookSource> {
+        return exploreService.listExploreSources()
+    }
+
+    fun loadExploreKinds(source: SharedBookSource): List<SharedExploreKind> {
+        return exploreService.listKinds(source)
     }
 
     fun loadRssArticles(source: SharedRssSource? = null): List<SharedRssArticle> {
@@ -311,6 +323,14 @@ open class LegadoRuntime(
         page: Int = 1
     ): SourceDebugResult {
         return sourceDebugService.debugFirstContent(source, key, page)
+    }
+
+    suspend fun loadExplorePage(
+        source: SharedBookSource,
+        kind: SharedExploreKind,
+        page: Int = 1
+    ): SearchPageResult {
+        return exploreService.loadExplore(source, kind, page)
     }
 
     suspend fun refreshRssArticles(

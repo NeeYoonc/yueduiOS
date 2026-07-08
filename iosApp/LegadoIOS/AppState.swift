@@ -24,6 +24,10 @@ final class AppState: ObservableObject {
     @Published private(set) var httpTts: [SharedHttpTts] = []
     @Published private(set) var rssSources: [SharedRssSource] = []
     @Published private(set) var rssArticles: [SharedRssArticle] = []
+    @Published private(set) var exploreSources: [SharedBookSource] = []
+    @Published private(set) var selectedExploreSource: SharedBookSource?
+    @Published private(set) var exploreKinds: [SharedExploreKind] = []
+    @Published private(set) var exploreResults: [SharedSearchBook] = []
     @Published private(set) var selectedRssSource: SharedRssSource?
     @Published private(set) var selectedRssArticle: SharedRssArticle?
     @Published private(set) var rssContent: String = ""
@@ -63,6 +67,7 @@ final class AppState: ObservableObject {
         dictRules = runtime.loadDictRules() as? [SharedDictRule] ?? []
         httpTts = runtime.loadHttpTts() as? [SharedHttpTts] ?? []
         rssSources = runtime.loadRssSources() as? [SharedRssSource] ?? []
+        exploreSources = runtime.loadExploreSources() as? [SharedBookSource] ?? []
         searchKeywords = runtime.loadSearchKeywords() as? [SharedSearchKeyword] ?? []
         if selectedSourceIndex >= sources.count {
             selectedSourceIndex = sources.isEmpty ? -1 : 0
@@ -319,6 +324,31 @@ final class AppState: ObservableObject {
         } catch {
             rssArticles = runtime.loadRssArticles(source: source) as? [SharedRssArticle] ?? []
             selectedRssSource = source
+            message = error.localizedDescription
+        }
+    }
+
+    func openExploreSource(_ source: SharedBookSource) {
+        selectedExploreSource = source
+        exploreKinds = runtime.loadExploreKinds(source: source) as? [SharedExploreKind] ?? []
+        exploreResults = []
+        message = exploreKinds.isEmpty ? "No explore categories" : nil
+    }
+
+    func openExploreKind(_ kind: SharedExploreKind) async {
+        guard let source = selectedExploreSource else {
+            message = "Explore source not selected"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            let page = try await runtime.loadExplorePage(source: source, kind: kind, page: 1)
+            exploreResults = page.books as? [SharedSearchBook] ?? []
+            message = exploreResults.isEmpty ? "No explore results" : nil
+        } catch {
+            exploreResults = []
             message = error.localizedDescription
         }
     }
