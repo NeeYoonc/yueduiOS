@@ -215,6 +215,9 @@ final class AppState: ObservableObject {
         guard let source = source(for: book) else {
             selectedBook = book
             chapters = runtime.loadBookChapters(book: book) as? [SharedBookChapter] ?? []
+            activeSource = nil
+            currentChapter = nil
+            currentContent = ""
             message = chapters.isEmpty ? "Source not found" : nil
             return
         }
@@ -250,10 +253,6 @@ final class AppState: ObservableObject {
             message = "No book selected"
             return
         }
-        guard let source = activeSource ?? source(for: book) else {
-            message = "Source not found"
-            return
-        }
         guard chapters.indices.contains(index) else {
             message = "Chapter not found"
             return
@@ -262,6 +261,22 @@ final class AppState: ObservableObject {
         defer { isLoading = false }
 
         do {
+            guard let source = activeSource ?? source(for: book) else {
+                let result = try runtime.loadCachedChapter(
+                    book: book,
+                    chapterIndex: Int32(index),
+                    position: 0,
+                    nowMillis: nowMillis()
+                )
+                selectedBook = result.book
+                chapters = result.chapters as? [SharedBookChapter] ?? chapters
+                currentChapter = result.chapter
+                currentChapterIndex = Int(result.chapterIndex)
+                currentContent = result.content.content
+                refreshLibrary()
+                message = currentContent.isEmpty ? "No content" : nil
+                return
+            }
             let result = try await runtime.loadChapter(
                 source: source,
                 book: book,
@@ -281,6 +296,29 @@ final class AppState: ObservableObject {
         } catch {
             message = error.localizedDescription
         }
+    }
+
+    func importLocalTextFile(fileName: String, text: String) {
+        do {
+            let result = try runtime.importLocalTextBook(
+                fileName: fileName,
+                text: text,
+                nowMillis: nowMillis()
+            )
+            selectedBook = result.book
+            chapters = result.chapters as? [SharedBookChapter] ?? []
+            activeSource = nil
+            currentChapter = nil
+            currentContent = ""
+            refreshLibrary()
+            message = "Imported \(result.book.name)"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func showMessage(_ text: String) {
+        message = text
     }
 
     func clearMessage() {

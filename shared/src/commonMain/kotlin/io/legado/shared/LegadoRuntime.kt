@@ -9,10 +9,13 @@ import io.legado.shared.model.SharedSearchBook
 import io.legado.shared.book.BookDetailCoordinator
 import io.legado.shared.book.BookDetailResult
 import io.legado.shared.book.BookshelfService
+import io.legado.shared.book.CachedChapterReadResult
 import io.legado.shared.book.ChapterReadResult
 import io.legado.shared.book.ChapterRepository
 import io.legado.shared.book.SearchCoordinator
 import io.legado.shared.book.SearchCoordinatorResult
+import io.legado.shared.local.LocalTextBookService
+import io.legado.shared.local.LocalTextImportResult
 import io.legado.shared.platform.CacheStorePort
 import io.legado.shared.platform.HttpFetcher
 import io.legado.shared.platform.ScriptRuntime
@@ -57,6 +60,7 @@ open class LegadoRuntime(
     val sourceRepository: SourceRepository = SourceRepository(libraryStore)
     val sourceDebugService: SourceDebugService = SourceDebugService(client)
     val rssService: RssService = RssService(httpFetcher, libraryStore)
+    val localTextBookService: LocalTextBookService = LocalTextBookService(libraryStore, bookshelfService)
 
     @Throws(IllegalArgumentException::class)
     fun importAndSaveBookSources(json: String): List<SharedBookSource> {
@@ -103,6 +107,15 @@ open class LegadoRuntime(
 
     fun loadBookChapters(book: SharedBook): List<SharedBookChapter> {
         return libraryStore.loadBookChapters(book)
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun importLocalTextBook(
+        fileName: String,
+        text: String,
+        nowMillis: Long = 0L
+    ): LocalTextImportResult {
+        return localTextBookService.importTextFile(fileName, text, nowMillis)
     }
 
     suspend fun searchEnabledSources(
@@ -175,6 +188,16 @@ open class LegadoRuntime(
             nowMillis = nowMillis,
             preloadAdjacent = preloadAdjacent
         )
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun loadCachedChapter(
+        book: SharedBook,
+        chapterIndex: Int,
+        position: Int = 0,
+        nowMillis: Long = 0L
+    ): CachedChapterReadResult {
+        return chapterRepository.loadCachedChapter(book, chapterIndex, position, nowMillis)
     }
 
     suspend fun openFirstSearchResult(

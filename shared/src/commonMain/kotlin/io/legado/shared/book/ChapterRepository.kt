@@ -46,6 +46,28 @@ class ChapterRepository(
         )
     }
 
+    fun loadCachedChapter(
+        book: SharedBook,
+        chapterIndex: Int,
+        position: Int = 0,
+        nowMillis: Long = 0L
+    ): CachedChapterReadResult {
+        val chapters = libraryStore.loadBookChapters(book)
+        val chapter = chapters.getOrNull(chapterIndex)
+            ?: throw IllegalArgumentException("Chapter index $chapterIndex is out of range")
+        val content = libraryStore.loadChapterContent(book, chapter)
+            ?: SharedChapterContent(title = chapter.title)
+        val updatedBook = bookshelfService.updateProgress(book, chapter, position, nowMillis)
+        return CachedChapterReadResult(
+            book = updatedBook,
+            chapters = chapters,
+            chapter = chapter,
+            chapterIndex = chapter.index,
+            content = content,
+            wasCached = true
+        )
+    }
+
     private suspend fun loadChapters(
         source: SharedBookSource,
         book: SharedBook
@@ -78,4 +100,13 @@ data class ChapterReadResult(
     val chapterIndex: Int,
     val content: SharedChapterContent,
     val wasCached: Boolean = false
+)
+
+data class CachedChapterReadResult(
+    val book: SharedBook,
+    val chapters: List<SharedBookChapter>,
+    val chapter: SharedBookChapter,
+    val chapterIndex: Int,
+    val content: SharedChapterContent,
+    val wasCached: Boolean = true
 )

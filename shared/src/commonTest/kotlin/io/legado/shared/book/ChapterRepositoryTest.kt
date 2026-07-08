@@ -5,6 +5,7 @@ import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookChapter
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedContentRule
+import io.legado.shared.model.SharedChapterContent
 import io.legado.shared.platform.CacheStorePort
 import io.legado.shared.platform.HttpFetcher
 import io.legado.shared.platform.SharedHttpRequest
@@ -15,6 +16,33 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ChapterRepositoryTest {
+    @Test
+    fun loadsCachedChapterWithoutSourceAndUpdatesProgress() {
+        val store = SharedLibraryStore(InMemoryCacheStore())
+        val bookshelf = BookshelfService(store)
+        val repository = ChapterRepository(LegadoSharedClient(NoopFetcher), store, bookshelf)
+        val book = SharedBook(
+            name = "Local",
+            bookUrl = "local://book",
+            origin = "loc_book"
+        )
+        val chapters = listOf(
+            SharedBookChapter(title = "One", url = "local://book#0", index = 0, bookUrl = book.bookUrl),
+            SharedBookChapter(title = "Two", url = "local://book#1", index = 1, bookUrl = book.bookUrl)
+        )
+        bookshelf.upsertBook(book)
+        store.saveBookChapters(book, chapters)
+        store.saveChapterContent(book, chapters[1], SharedChapterContent(content = "Cached body"))
+
+        val result = repository.loadCachedChapter(book, chapterIndex = 1, nowMillis = 77L)
+
+        assertEquals(chapters[1], result.chapter)
+        assertEquals("Cached body", result.content.content)
+        assertEquals("Two", bookshelf.listBooks().single().durChapterTitle)
+        assertEquals(1, bookshelf.listBooks().single().durChapterIndex)
+        assertEquals(77L, bookshelf.listBooks().single().durChapterTime)
+    }
+
     @Test
     fun loadsChapterCachesAdjacentChaptersAndUpdatesProgress() = runBlocking {
         val requestedUrls = mutableListOf<String>()
@@ -74,6 +102,12 @@ class ChapterRepositoryTest {
 
         override fun putText(key: String, value: String) {
             values[key] = value
+        }
+    }
+
+    private object NoopFetcher : HttpFetcher {
+        override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+            error("Network should not be used for cached local chapters")
         }
     }
 }
