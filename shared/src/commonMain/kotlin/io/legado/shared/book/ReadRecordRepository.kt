@@ -36,4 +36,19 @@ class ReadRecordRepository(
         libraryStore.saveDataSnapshot(snapshot.copy(readRecords = records.sortedByDescending { it.lastRead }))
         return list()
     }
+
+    fun delete(deviceId: String, bookName: String): List<SharedReadRecord> {
+        val snapshot = libraryStore.loadDataSnapshot()
+        val records = snapshot.readRecords.filterNot {
+            it.deviceId == deviceId && it.bookName == bookName
+        }
+        libraryStore.saveDataSnapshot(snapshot.copy(readRecords = records.sortedByDescending { it.lastRead }))
+        return list()
+    }
+
+    fun clear(): List<SharedReadRecord> {
+        val snapshot = libraryStore.loadDataSnapshot()
+        libraryStore.saveDataSnapshot(snapshot.copy(readRecords = emptyList()))
+        return emptyList()
+    }
 }

@@ -239,6 +239,14 @@ open class LegadoRuntime(
         return readRecordRepository.record(book, durationMillis, nowMillis, deviceId)
     }
 
+    fun deleteReadRecord(deviceId: String, bookName: String): List<SharedReadRecord> {
+        return readRecordRepository.delete(deviceId, bookName)
+    }
+
+    fun clearReadRecords(): List<SharedReadRecord> {
+        return readRecordRepository.clear()
+    }
+
     fun deleteSearchKeyword(word: String): List<SharedSearchKeyword> {
         return searchCoordinator.deleteKeyword(word)
     }

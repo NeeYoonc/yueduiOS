@@ -66,6 +66,12 @@ struct SettingsHomeView: View {
                     }
 
                     NavigationLink {
+                        ReadRecordListView()
+                    } label: {
+                        Label("Read records", systemImage: "clock")
+                    }
+
+                    NavigationLink {
                         TxtTocRuleListView()
                     } label: {
                         Label("TXT TOC rules", systemImage: "list.bullet.rectangle")

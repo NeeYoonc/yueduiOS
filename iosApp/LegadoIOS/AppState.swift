@@ -817,6 +817,16 @@ final class AppState: ObservableObject {
         refreshLibrary()
     }
 
+    func deleteReadRecord(_ record: SharedReadRecord) {
+        readRecords = runtime.deleteReadRecord(deviceId: record.deviceId, bookName: record.bookName) as? [SharedReadRecord] ?? []
+        refreshLibrary()
+    }
+
+    func clearReadRecords() {
+        readRecords = runtime.clearReadRecords() as? [SharedReadRecord] ?? []
+        refreshLibrary()
+    }
+
     func deleteBookmark(_ bookmark: SharedBookmark) {
         bookmarks = runtime.deleteBookmark(time: bookmark.time) as? [SharedBookmark] ?? []
         refreshLibrary()

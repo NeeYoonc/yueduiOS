@@ -37,6 +37,20 @@ class ReadRecordRepositoryTest {
         assertEquals(emptyList(), repository.list())
     }
 
+    @Test
+    fun deletesAndClearsReadRecords() {
+        val repository = ReadRecordRepository(SharedLibraryStore(InMemoryCacheStore()))
+        val first = SharedBook(name = "Book A", bookUrl = "https://book.test/a")
+        val second = SharedBook(name = "Book B", bookUrl = "https://book.test/b")
+        repository.record(first, durationMillis = 1_000L, nowMillis = 10L, deviceId = "ios")
+        repository.record(second, durationMillis = 2_000L, nowMillis = 20L, deviceId = "ios")
+
+        val afterDelete = repository.delete(deviceId = "ios", bookName = "Book A")
+
+        assertEquals(listOf("Book B"), afterDelete.map { it.bookName })
+        assertEquals(emptyList(), repository.clear())
+    }
+
     private class InMemoryCacheStore : CacheStorePort {
         private val values = mutableMapOf<String, String>()
 

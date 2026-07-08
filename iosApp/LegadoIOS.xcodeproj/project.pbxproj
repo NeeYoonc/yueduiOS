@@ -52,6 +52,7 @@
 		D10000000000000000000004 /* RawConfigEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000000000000000000014 /* RawConfigEditorView.swift */; };
 		D10000000000000000000005 /* RssSourceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000000000000000000015 /* RssSourceListView.swift */; };
 		D10000000000000000000006 /* RssSourceEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000000000000000000016 /* RssSourceEditorView.swift */; };
+		D10000000000000000000007 /* ReadRecordListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000000000000000000017 /* ReadRecordListView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -101,6 +102,7 @@
 		D10000000000000000000014 /* RawConfigEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RawConfigEditorView.swift; sourceTree = "<group>"; };
 		D10000000000000000000015 /* RssSourceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RssSourceListView.swift; sourceTree = "<group>"; };
 		D10000000000000000000016 /* RssSourceEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RssSourceEditorView.swift; sourceTree = "<group>"; };
+		D10000000000000000000017 /* ReadRecordListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ReadRecordListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,6 +156,7 @@
 				C10000000000000000000016 /* HttpTtsListView.swift */,
 				C10000000000000000000017 /* HttpTtsEditorView.swift */,
 				C10000000000000000000018 /* BookmarkListView.swift */,
+				D10000000000000000000017 /* ReadRecordListView.swift */,
 				C10000000000000000000019 /* BookGroupListView.swift */,
 				C1000000000000000000001B /* TxtTocRuleListView.swift */,
 				C1000000000000000000001C /* TxtTocRuleEditorView.swift */,
@@ -315,6 +318,7 @@
 				C10000000000000000000006 /* HttpTtsListView.swift in Sources */,
 				C10000000000000000000007 /* HttpTtsEditorView.swift in Sources */,
 				C10000000000000000000008 /* BookmarkListView.swift in Sources */,
+				D10000000000000000000007 /* ReadRecordListView.swift in Sources */,
 				C10000000000000000000009 /* BookGroupListView.swift in Sources */,
 				C1000000000000000000000B /* TxtTocRuleListView.swift in Sources */,
 				C1000000000000000000000C /* TxtTocRuleEditorView.swift in Sources */,
