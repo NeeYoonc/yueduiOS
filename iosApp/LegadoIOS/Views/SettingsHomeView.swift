@@ -36,6 +36,12 @@ struct SettingsHomeView: View {
                     } label: {
                         Label("Import and export", systemImage: "doc.text")
                     }
+
+                    NavigationLink {
+                        RssSourceListView()
+                    } label: {
+                        Label("Manage RSS sources", systemImage: "dot.radiowaves.left.and.right")
+                    }
                 }
 
                 Section("Reading") {

@@ -34,6 +34,12 @@ struct RssHomeView: View {
             }
             .navigationTitle("RSS")
             .toolbar {
+                NavigationLink {
+                    RssSourceListView()
+                } label: {
+                    Image(systemName: "tray.full")
+                }
+
                 Button {
                     app.refreshLibrary()
                 } label: {

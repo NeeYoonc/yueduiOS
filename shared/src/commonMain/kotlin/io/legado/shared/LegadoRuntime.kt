@@ -50,6 +50,7 @@ import io.legado.shared.rule.RuleWebViewRuntime
 import io.legado.shared.replacement.ReplacementRepository
 import io.legado.shared.rss.RssArticlePage
 import io.legado.shared.rss.RssService
+import io.legado.shared.rss.RssSourceRepository
 import io.legado.shared.service.RuleEngineBookInfoParser
 import io.legado.shared.service.RuleEngineChapterContentParser
 import io.legado.shared.service.RuleEngineChapterListParser
@@ -90,6 +91,7 @@ open class LegadoRuntime(
     val sourceDebugService: SourceDebugService = SourceDebugService(client)
     val exploreService: ExploreService = ExploreService(client, libraryStore)
     val rssService: RssService = RssService(httpFetcher, libraryStore)
+    val rssSourceRepository: RssSourceRepository = RssSourceRepository(libraryStore)
     val localTextBookService: LocalTextBookService = LocalTextBookService(libraryStore, bookshelfService)
     val replacementRepository: ReplacementRepository = ReplacementRepository(libraryStore)
     val dataBackupService: DataBackupService = DataBackupService(libraryStore)
@@ -113,9 +115,7 @@ open class LegadoRuntime(
     }
 
     fun loadRssSources(): List<SharedRssSource> {
-        return libraryStore.loadDataSnapshot().rssSources.sortedWith(
-            compareBy<SharedRssSource> { it.customOrder }.thenBy { it.sourceName }
-        )
+        return rssSourceRepository.list()
     }
 
     fun loadExploreSources(): List<SharedBookSource> {
@@ -128,6 +128,27 @@ open class LegadoRuntime(
 
     fun loadRssArticles(source: SharedRssSource? = null): List<SharedRssArticle> {
         return rssService.listCachedArticles(source)
+    }
+
+    fun upsertRssSource(source: SharedRssSource): SharedRssSource {
+        return rssSourceRepository.upsert(source)
+    }
+
+    fun setRssSourceEnabled(sourceUrl: String, enabled: Boolean): SharedRssSource? {
+        return rssSourceRepository.setEnabled(sourceUrl, enabled)
+    }
+
+    fun deleteRssSource(sourceUrl: String): List<SharedRssSource> {
+        return rssSourceRepository.delete(sourceUrl)
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun importAndSaveRssSources(json: String, replace: Boolean = false): List<SharedRssSource> {
+        return rssSourceRepository.importJson(json, replace)
+    }
+
+    fun exportRssSourcesJson(): String {
+        return rssSourceRepository.exportJson()
     }
 
     fun loadReplaceRules(): List<SharedReplaceRule> {

@@ -13,6 +13,7 @@ final class AppState: ObservableObject {
     @Published var keyboardAssistJson: String = ""
     @Published var ruleSubJson: String = ""
     @Published var rawConfigJson: String = ""
+    @Published var rssSourceJson: String = ""
     @Published var keyword: String = ""
     @Published var dictionaryKeyword: String = ""
     @Published var selectedSourceIndex: Int = -1
@@ -358,6 +359,42 @@ final class AppState: ObservableObject {
 
     func deleteRawConfig(_ entry: SharedRawConfigEntry) {
         rawConfigs = runtime.deleteRawConfig(key: entry.key) as? [SharedRawConfigEntry] ?? []
+        refreshLibrary()
+    }
+
+    func importRssSources(replace: Bool = false) {
+        let rawJson = rssSourceJson.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "RSS source JSON is empty"
+            return
+        }
+        do {
+            rssSources = try runtime.importAndSaveRssSources(json: rawJson, replace: replace) as? [SharedRssSource] ?? []
+            refreshLibrary()
+            message = rssSources.isEmpty ? "No usable RSS sources" : "Imported \(rssSources.count) RSS source(s)"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func exportRssSourcesToEditor() {
+        rssSourceJson = runtime.exportRssSourcesJson()
+        message = "Exported \(rssSources.count) RSS source(s)"
+    }
+
+    func setRssSourceEnabled(_ source: SharedRssSource, enabled: Bool) {
+        _ = runtime.setRssSourceEnabled(sourceUrl: source.sourceUrl, enabled: enabled)
+        refreshLibrary()
+    }
+
+    func deleteRssSource(_ source: SharedRssSource) {
+        rssSources = runtime.deleteRssSource(sourceUrl: source.sourceUrl) as? [SharedRssSource] ?? []
+        if selectedRssSource?.sourceUrl == source.sourceUrl {
+            selectedRssSource = nil
+            selectedRssArticle = nil
+            rssArticles = []
+            rssContent = ""
+        }
         refreshLibrary()
     }
 
