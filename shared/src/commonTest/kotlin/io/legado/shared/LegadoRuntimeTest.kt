@@ -165,6 +165,35 @@ class LegadoRuntimeTest {
         assertEquals(22L, runtime.loadBooks().single().durChapterTime)
     }
 
+    @Test
+    fun managesBookSourcesThroughRuntimeRepository() {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    error("No network expected")
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+        runtime.importAndSaveBookSources(
+            """
+            [
+              {"bookSourceUrl":"https://one.test","bookSourceName":"One"},
+              {"bookSourceUrl":"https://two.test","bookSourceName":"Two"}
+            ]
+            """.trimIndent()
+        )
+
+        runtime.setBookSourceEnabled("https://two.test", false)
+        assertEquals(false, runtime.loadBookSources().first { it.bookSourceUrl == "https://two.test" }.enabled)
+
+        val exported = runtime.exportBookSourcesJson()
+        assertEquals(true, exported.contains("https://one.test"))
+
+        runtime.deleteBookSource("https://one.test")
+        assertEquals(listOf("https://two.test"), runtime.loadBookSources().map { it.bookSourceUrl })
+    }
+
     private class InMemoryCacheStore : CacheStorePort {
         private val values = mutableMapOf<String, String>()
 

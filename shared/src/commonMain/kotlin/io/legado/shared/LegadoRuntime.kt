@@ -23,6 +23,9 @@ import io.legado.shared.service.RuleEngineSearchResultParser
 import io.legado.shared.service.ReadingFlowResult
 import io.legado.shared.source.DefaultDataImporter
 import io.legado.shared.source.DefaultDataPayload
+import io.legado.shared.source.SourceDebugResult
+import io.legado.shared.source.SourceDebugService
+import io.legado.shared.source.SourceRepository
 import io.legado.shared.storage.SharedLibraryStore
 
 open class LegadoRuntime(
@@ -47,16 +50,32 @@ open class LegadoRuntime(
     val searchCoordinator: SearchCoordinator = SearchCoordinator(client, libraryStore)
     val bookDetailCoordinator: BookDetailCoordinator = BookDetailCoordinator(client, bookshelfService, libraryStore)
     val chapterRepository: ChapterRepository = ChapterRepository(client, libraryStore, bookshelfService)
+    val sourceRepository: SourceRepository = SourceRepository(libraryStore)
+    val sourceDebugService: SourceDebugService = SourceDebugService(client)
 
     @Throws(IllegalArgumentException::class)
     fun importAndSaveBookSources(json: String): List<SharedBookSource> {
-        return client.importBookSources(json).also { sources ->
-            libraryStore.saveBookSources(sources)
-        }
+        return sourceRepository.importJson(json, replace = true)
     }
 
     fun loadBookSources(): List<SharedBookSource> {
-        return libraryStore.loadBookSources()
+        return sourceRepository.list()
+    }
+
+    fun upsertBookSource(source: SharedBookSource): SharedBookSource {
+        return sourceRepository.upsert(source)
+    }
+
+    fun setBookSourceEnabled(bookSourceUrl: String, enabled: Boolean): SharedBookSource? {
+        return sourceRepository.setEnabled(bookSourceUrl, enabled)
+    }
+
+    fun deleteBookSource(bookSourceUrl: String): List<SharedBookSource> {
+        return sourceRepository.delete(bookSourceUrl)
+    }
+
+    fun exportBookSourcesJson(): String {
+        return sourceRepository.exportJson()
     }
 
     fun saveBooks(books: List<SharedBook>) {
@@ -83,8 +102,16 @@ open class LegadoRuntime(
         val snapshot = DefaultDataImporter.importSnapshot(payload)
         libraryStore.saveDataSnapshot(snapshot)
         if (snapshot.bookSources.isNotEmpty()) {
-            libraryStore.saveBookSources(snapshot.bookSources)
+            sourceRepository.saveAll(snapshot.bookSources)
         }
+    }
+
+    suspend fun debugSourceFirstContent(
+        source: SharedBookSource,
+        key: String,
+        page: Int = 1
+    ): SourceDebugResult {
+        return sourceDebugService.debugFirstContent(source, key, page)
     }
 
     suspend fun openSearchBook(
