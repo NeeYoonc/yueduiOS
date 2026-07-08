@@ -16,6 +16,15 @@ interface ChapterContentParser {
     ): SharedChapterContent
 }
 
+fun interface SuspendChapterContentParser {
+    suspend fun parse(
+        source: SharedBookSource,
+        book: SharedBook,
+        chapter: SharedBookChapter,
+        body: String
+    ): SharedChapterContent
+}
+
 object RegexChapterContentParser : ChapterContentParser {
 
     override fun parse(

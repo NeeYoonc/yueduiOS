@@ -10,6 +10,10 @@ interface BookInfoParser {
     fun parse(source: SharedBookSource, book: SharedBook, body: String): SharedBook
 }
 
+fun interface SuspendBookInfoParser {
+    suspend fun parse(source: SharedBookSource, book: SharedBook, body: String): SharedBook
+}
+
 object RegexBookInfoParser : BookInfoParser {
     override fun parse(source: SharedBookSource, book: SharedBook, body: String): SharedBook {
         val rule = source.ruleBookInfo ?: return book

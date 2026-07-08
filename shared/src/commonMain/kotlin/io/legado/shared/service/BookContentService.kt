@@ -11,6 +11,7 @@ import io.legado.shared.platform.SharedHttpResponse
 class BookContentService(
     private val httpFetcher: HttpFetcher,
     private val chapterContentParser: ChapterContentParser = RegexChapterContentParser,
+    private val suspendChapterContentParser: SuspendChapterContentParser? = null,
     private val maxContentPages: Int = 20
 ) {
     suspend fun getContent(
@@ -64,13 +65,14 @@ class BookContentService(
         )
     }
 
-    private fun parseAndNormalize(
+    private suspend fun parseAndNormalize(
         source: SharedBookSource,
         book: SharedBook,
         chapter: SharedBookChapter,
         response: SharedHttpResponse
     ): SharedChapterContent {
-        val content = chapterContentParser.parse(source, book, chapter, response.body)
+        val content = suspendChapterContentParser?.parse(source, book, chapter, response.body)
+            ?: chapterContentParser.parse(source, book, chapter, response.body)
         return content.copy(
             nextContentUrls = SharedUrlResolver.resolveAll(
                 response.finalUrl,

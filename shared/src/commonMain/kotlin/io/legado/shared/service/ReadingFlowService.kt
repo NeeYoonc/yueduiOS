@@ -16,14 +16,16 @@ class ReadingFlowService(
         searchResultParser: SearchResultParser = RuleAwareSearchResultParser,
         suspendSearchResultParser: SuspendSearchResultParser? = null,
         bookInfoParser: BookInfoParser = RegexBookInfoParser,
+        suspendBookInfoParser: SuspendBookInfoParser? = null,
         chapterListParser: ChapterListParser = RegexChapterListParser,
         suspendChapterListParser: SuspendChapterListParser? = null,
-        chapterContentParser: ChapterContentParser = RegexChapterContentParser
+        chapterContentParser: ChapterContentParser = RegexChapterContentParser,
+        suspendChapterContentParser: SuspendChapterContentParser? = null
     ) : this(
         searchService = BookSearchService(httpFetcher, searchResultParser, suspendSearchResultParser),
-        bookInfoService = BookInfoService(httpFetcher, bookInfoParser),
+        bookInfoService = BookInfoService(httpFetcher, bookInfoParser, suspendBookInfoParser),
         tocService = BookTocService(httpFetcher, chapterListParser, suspendChapterListParser),
-        contentService = BookContentService(httpFetcher, chapterContentParser)
+        contentService = BookContentService(httpFetcher, chapterContentParser, suspendChapterContentParser)
     )
 
     suspend fun search(

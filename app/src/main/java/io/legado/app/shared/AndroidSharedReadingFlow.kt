@@ -16,6 +16,8 @@ import io.legado.shared.service.RegexBookInfoParser
 import io.legado.shared.service.RegexChapterContentParser
 import io.legado.shared.service.RegexChapterListParser
 import io.legado.shared.service.RuleAwareSearchResultParser
+import io.legado.shared.service.RuleEngineBookInfoParser
+import io.legado.shared.service.RuleEngineChapterContentParser
 import io.legado.shared.service.RuleEngineChapterListParser
 import io.legado.shared.service.RuleEngineSearchResultParser
 import io.legado.shared.service.SearchPageResult
@@ -47,13 +49,23 @@ class AndroidSharedReadingFlow(
             null
         },
         bookInfoParser = bookInfoParser,
+        suspendBookInfoParser = if (useRuleEngine && bookInfoParser === RegexBookInfoParser) {
+            ruleEngine?.let { RuleEngineBookInfoParser(it, fallbackParser = bookInfoParser) }
+        } else {
+            null
+        },
         chapterListParser = chapterListParser,
         suspendChapterListParser = if (useRuleEngine && chapterListParser === RegexChapterListParser) {
             ruleEngine?.let { RuleEngineChapterListParser(it, fallbackParser = chapterListParser) }
         } else {
             null
         },
-        chapterContentParser = chapterContentParser
+        chapterContentParser = chapterContentParser,
+        suspendChapterContentParser = if (useRuleEngine && chapterContentParser === RegexChapterContentParser) {
+            ruleEngine?.let { RuleEngineChapterContentParser(it, fallbackParser = chapterContentParser) }
+        } else {
+            null
+        }
     )
 
     suspend fun search(

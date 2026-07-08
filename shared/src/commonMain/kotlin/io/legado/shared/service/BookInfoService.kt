@@ -8,14 +8,16 @@ import io.legado.shared.platform.SharedHttpResponse
 
 class BookInfoService(
     private val httpFetcher: HttpFetcher,
-    private val bookInfoParser: BookInfoParser = RegexBookInfoParser
+    private val bookInfoParser: BookInfoParser = RegexBookInfoParser,
+    private val suspendBookInfoParser: SuspendBookInfoParser? = null
 ) {
     suspend fun getBookInfo(
         source: SharedBookSource,
         book: SharedBook
     ): BookInfoResult {
         val response = httpFetcher.fetch(SharedRequestBuilder.build(book.bookUrl))
-        val parsedBook = bookInfoParser.parse(source, book, response.body)
+        val parsedBook = suspendBookInfoParser?.parse(source, book, response.body)
+            ?: bookInfoParser.parse(source, book, response.body)
         return BookInfoResult(
             source = source,
             inputBook = book,
