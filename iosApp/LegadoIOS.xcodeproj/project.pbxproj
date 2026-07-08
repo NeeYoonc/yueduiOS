@@ -46,8 +46,8 @@
 		C1000000000000000000000E /* ServerEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1000000000000000000001E /* ServerEditorView.swift */; };
 		C1000000000000000000000F /* KeyboardAssistListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1000000000000000000001F /* KeyboardAssistListView.swift */; };
 		C10000000000000000000010 /* KeyboardAssistEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000020 /* KeyboardAssistEditorView.swift */; };
-		C10000000000000000000011 /* RuleSubListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000021 /* RuleSubListView.swift */; };
-		C10000000000000000000012 /* RuleSubEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000022 /* RuleSubEditorView.swift */; };
+		D10000000000000000000001 /* RuleSubListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000021 /* RuleSubListView.swift */; };
+		D10000000000000000000002 /* RuleSubEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000022 /* RuleSubEditorView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -308,8 +308,8 @@
 				C1000000000000000000000E /* ServerEditorView.swift in Sources */,
 				C1000000000000000000000F /* KeyboardAssistListView.swift in Sources */,
 				C10000000000000000000010 /* KeyboardAssistEditorView.swift in Sources */,
-				C10000000000000000000011 /* RuleSubListView.swift in Sources */,
-				C10000000000000000000012 /* RuleSubEditorView.swift in Sources */,
+				D10000000000000000000001 /* RuleSubListView.swift in Sources */,
+				D10000000000000000000002 /* RuleSubEditorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
