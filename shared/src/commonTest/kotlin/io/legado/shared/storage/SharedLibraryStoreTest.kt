@@ -89,6 +89,27 @@ class SharedLibraryStoreTest {
     }
 
     @Test
+    fun savesAndLoadsBookChaptersByBook() {
+        val cache = InMemoryCacheStore()
+        val store = SharedLibraryStore(cache)
+        val book = SharedBook(
+            name = "Metal Story",
+            author = "Tester",
+            bookUrl = "https://source.test/book/1",
+            origin = "https://source.test"
+        )
+        val chapters = listOf(
+            SharedBookChapter(title = "Chapter 1", url = "https://source.test/1", index = 0),
+            SharedBookChapter(title = "Chapter 2", url = "https://source.test/2", index = 1)
+        )
+
+        store.saveBookChapters(book, chapters)
+
+        assertEquals(chapters, store.loadBookChapters(book))
+        assertEquals(emptyList(), store.loadBookChapters(book.copy(bookUrl = "https://source.test/missing")))
+    }
+
+    @Test
     fun savesAndLoadsVersionedDataSnapshot() {
         val cache = InMemoryCacheStore()
         val store = SharedLibraryStore(cache)

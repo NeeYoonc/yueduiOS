@@ -30,6 +30,17 @@ class SharedLibraryStore(
         return loadList(booksKey)
     }
 
+    fun saveBookChapters(
+        book: SharedBook,
+        chapters: List<SharedBookChapter>
+    ) {
+        cacheStore.putText(bookChaptersKey(book), json.encodeToString(chapters))
+    }
+
+    fun loadBookChapters(book: SharedBook): List<SharedBookChapter> {
+        return loadList(bookChaptersKey(book))
+    }
+
     fun saveDataSnapshot(snapshot: SharedDataSnapshot) {
         cacheStore.putText(dataSnapshotKey, json.encodeToString(snapshot))
     }
@@ -81,11 +92,18 @@ class SharedLibraryStore(
     }
 
     private fun chapterContentKey(book: SharedBook, chapter: SharedBookChapter): String {
-        val bookIdentity = listOf(book.origin, book.bookUrl)
+        val chapterIdentity = chapter.url.ifBlank { chapter.title }
+        return "$CHAPTER_CONTENT_KEY_PREFIX${bookIdentity(book).cacheKeyPart()}:${chapterIdentity.cacheKeyPart()}"
+    }
+
+    private fun bookChaptersKey(book: SharedBook): String {
+        return "$BOOK_CHAPTERS_KEY_PREFIX${bookIdentity(book).cacheKeyPart()}"
+    }
+
+    private fun bookIdentity(book: SharedBook): String {
+        return listOf(book.origin, book.bookUrl)
             .joinToString("|")
             .ifBlank { book.name }
-        val chapterIdentity = chapter.url.ifBlank { chapter.title }
-        return "$CHAPTER_CONTENT_KEY_PREFIX${bookIdentity.cacheKeyPart()}:${chapterIdentity.cacheKeyPart()}"
     }
 
     private fun String.cacheKeyPart(): String {
@@ -98,6 +116,7 @@ class SharedLibraryStore(
         const val DEFAULT_SOURCE_KEY = "legado.sources"
         const val DEFAULT_BOOKS_KEY = "legado.books"
         const val DEFAULT_DATA_SNAPSHOT_KEY = "legado.dataSnapshot"
+        const val BOOK_CHAPTERS_KEY_PREFIX = "legado.bookChapters."
         const val CHAPTER_CONTENT_KEY_PREFIX = "legado.chapterContent."
 
         private val json = Json {

@@ -85,6 +85,86 @@ class LegadoRuntimeTest {
         )
     }
 
+    @Test
+    fun opensSelectedSearchResultAndLoadsChosenChapter() = runBlocking {
+        val cache = InMemoryCacheStore()
+        val fetcher = object : HttpFetcher {
+            override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                return when (request.url) {
+                    "https://runtime-select.test/search?q=metal&page=1" -> SharedHttpResponse(
+                        finalUrl = request.url,
+                        statusCode = 200,
+                        body = """
+                            name=Metal Select
+                            author=Tester
+                            bookUrl=https://runtime-select.test/book/1
+                        """.trimIndent()
+                    )
+
+                    "https://runtime-select.test/book/1" -> SharedHttpResponse(
+                        finalUrl = request.url,
+                        statusCode = 200,
+                        body = """<a class="toc" href="/book/1/toc.html">toc</a>"""
+                    )
+
+                    "https://runtime-select.test/book/1/toc.html" -> SharedHttpResponse(
+                        finalUrl = request.url,
+                        statusCode = 200,
+                        body = """
+                            <a class="chapter" href="/book/1/chapter/1.html">Chapter 1</a>
+                            <a class="chapter" href="/book/1/chapter/2.html">Chapter 2</a>
+                        """.trimIndent()
+                    )
+
+                    "https://runtime-select.test/book/1/chapter/1.html" -> SharedHttpResponse(
+                        finalUrl = request.url,
+                        statusCode = 200,
+                        body = """<main>First chapter.</main>"""
+                    )
+
+                    "https://runtime-select.test/book/1/chapter/2.html" -> SharedHttpResponse(
+                        finalUrl = request.url,
+                        statusCode = 200,
+                        body = """<main>Second chapter.</main>"""
+                    )
+
+                    else -> error("Unexpected request URL: ${request.url}")
+                }
+            }
+        }
+        val runtime = LegadoRuntime(fetcher, cache)
+        val source = runtime.importAndSaveBookSources(
+            """
+            {
+              "bookSourceUrl": "https://runtime-select.test",
+              "bookSourceName": "Runtime Select",
+              "searchUrl": "https://runtime-select.test/search?q={{key}}&page={{page}}",
+              "ruleBookInfo": {
+                "tocUrl": "<a class=\"toc\" href=\"([^\"]+)\">"
+              },
+              "ruleToc": {
+                "chapterList": "<a class=\"chapter\" href=\"([^\"]+)\">([^<]+)</a>",
+                "chapterUrl": "${'$'}1",
+                "chapterName": "${'$'}2"
+              },
+              "ruleContent": {
+                "content": "<main>([\\s\\S]*?)</main>"
+              }
+            }
+            """.trimIndent()
+        ).single()
+
+        val search = runtime.client.search(source, "metal")
+        val detail = runtime.openSearchBook(source, search.books.single(), nowMillis = 11L)
+        val read = runtime.loadChapter(source, detail.book, chapterIndex = 1, nowMillis = 22L)
+
+        assertEquals(listOf("Chapter 1", "Chapter 2"), runtime.loadBookChapters(detail.book).map { it.title })
+        assertEquals("Second chapter.", read.content.content)
+        assertEquals("Chapter 2", runtime.loadBooks().single().durChapterTitle)
+        assertEquals(1, runtime.loadBooks().single().durChapterIndex)
+        assertEquals(22L, runtime.loadBooks().single().durChapterTime)
+    }
+
     private class InMemoryCacheStore : CacheStorePort {
         private val values = mutableMapOf<String, String>()
 
