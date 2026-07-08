@@ -1,0 +1,82 @@
+name: iOS CI
+
+on:
+  pull_request:
+    paths:
+      - 'shared/**'
+      - 'iosApp/**'
+      - 'gradle/**'
+      - 'build.gradle'
+      - 'settings.gradle'
+      - 'gradle.properties'
+      - '.github/workflows/ios-ci.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-ios:
+    runs-on: macos-15
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+
+      - name: Prepare Android SDK path
+        run: |
+          if [ -n "${ANDROID_HOME:-}" ]; then
+            echo "sdk.dir=$ANDROID_HOME" > local.properties
+          fi
+
+      - name: Print Apple toolchain
+        run: |
+          xcodebuild -version
+          xcrun simctl list runtimes
+
+      - name: Test shared JVM code
+        run: sh ./gradlew --no-daemon :shared:jvmTest
+
+      - name: Compile shared iOS targets
+        run: |
+          sh ./gradlew --no-daemon \
+            :shared:compileKotlinIosX64 \
+            :shared:compileTestKotlinIosX64 \
+            :shared:compileKotlinIosArm64 \
+            :shared:compileKotlinIosSimulatorArm64
+
+      - name: Build LegadoShared XCFramework
+        run: sh ./iosApp/scripts/build-shared-xcframework.sh
+
+      - name: Verify XCFramework output
+        run: test -d shared/build/XCFrameworks/debug/LegadoShared.xcframework
+
+      - name: Build iOS app
+        run: |
+          xcodebuild \
+            -project iosApp/LegadoIOS.xcodeproj \
+            -target LegadoIOS \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Upload XCFramework
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: LegadoShared-debug-xcframework
+          if-no-files-found: ignore
+          path: shared/build/XCFrameworks/debug/LegadoShared.xcframework

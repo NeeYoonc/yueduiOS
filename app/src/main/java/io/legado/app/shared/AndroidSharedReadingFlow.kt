@@ -1,0 +1,67 @@
+package io.legado.app.shared
+
+import io.legado.app.data.entities.Book
+import io.legado.app.data.entities.BookChapter
+import io.legado.app.data.entities.BookSource
+import io.legado.shared.platform.HttpFetcher
+import io.legado.shared.service.BookInfoParser
+import io.legado.shared.service.ChapterContentParser
+import io.legado.shared.service.ChapterContentResult
+import io.legado.shared.service.ChapterListParser
+import io.legado.shared.service.ChapterListResult
+import io.legado.shared.service.ReadingFlowResult
+import io.legado.shared.service.ReadingFlowService
+import io.legado.shared.service.RegexBookInfoParser
+import io.legado.shared.service.RegexChapterContentParser
+import io.legado.shared.service.RegexChapterListParser
+import io.legado.shared.service.RuleAwareSearchResultParser
+import io.legado.shared.service.SearchPageResult
+import io.legado.shared.service.SearchResultParser
+
+class AndroidSharedReadingFlow(
+    httpFetcher: HttpFetcher = AndroidHttpFetcher(),
+    searchResultParser: SearchResultParser = RuleAwareSearchResultParser,
+    bookInfoParser: BookInfoParser = RegexBookInfoParser,
+    chapterListParser: ChapterListParser = RegexChapterListParser,
+    chapterContentParser: ChapterContentParser = RegexChapterContentParser
+) {
+    private val readingFlowService = ReadingFlowService(
+        httpFetcher = httpFetcher,
+        searchResultParser = searchResultParser,
+        bookInfoParser = bookInfoParser,
+        chapterListParser = chapterListParser,
+        chapterContentParser = chapterContentParser
+    )
+
+    suspend fun search(
+        source: BookSource,
+        key: String,
+        page: Int = 1
+    ): SearchPageResult {
+        return readingFlowService.search(source.toSharedBookSource(), key, page)
+    }
+
+    suspend fun getChapterList(source: BookSource, book: Book): ChapterListResult {
+        return readingFlowService.getChapterList(source.toSharedBookSource(), book.toSharedBook())
+    }
+
+    suspend fun getContent(
+        source: BookSource,
+        book: Book,
+        chapter: BookChapter
+    ): ChapterContentResult {
+        return readingFlowService.getContent(
+            source.toSharedBookSource(),
+            book.toSharedBook(),
+            chapter.toSharedBookChapter()
+        )
+    }
+
+    suspend fun openFirstSearchResult(
+        source: BookSource,
+        key: String,
+        page: Int = 1
+    ): ReadingFlowResult {
+        return readingFlowService.openFirstSearchResult(source.toSharedBookSource(), key, page)
+    }
+}
