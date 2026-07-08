@@ -13,6 +13,7 @@
 		A10000000000000000000005 /* LegadoShared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A10000000000000000000015 /* LegadoShared.xcframework */; };
 		A10000000000000000000006 /* DefaultDataBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000016 /* DefaultDataBundle.swift */; };
 		A10000000000000000000007 /* DefaultData in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000017 /* DefaultData */; };
+		A10000000000000000000008 /* SpeechController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000018 /* SpeechController.swift */; };
 		B10000000000000000000001 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000011 /* AppState.swift */; };
 		B10000000000000000000002 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000012 /* MainTabView.swift */; };
 		B10000000000000000000003 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000013 /* EmptyStateView.swift */; };
@@ -32,6 +33,10 @@
 		C10000000000000000000001 /* ReplaceRuleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000011 /* ReplaceRuleListView.swift */; };
 		C10000000000000000000002 /* ReplaceRuleEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000012 /* ReplaceRuleEditorView.swift */; };
 		C10000000000000000000003 /* BackupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000013 /* BackupView.swift */; };
+		C10000000000000000000004 /* DictRuleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000014 /* DictRuleListView.swift */; };
+		C10000000000000000000005 /* DictRuleEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000015 /* DictRuleEditorView.swift */; };
+		C10000000000000000000006 /* HttpTtsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000016 /* HttpTtsListView.swift */; };
+		C10000000000000000000007 /* HttpTtsEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000017 /* HttpTtsEditorView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +47,7 @@
 		A10000000000000000000015 /* LegadoShared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = LegadoShared.xcframework; path = ../shared/build/XCFrameworks/debug/LegadoShared.xcframework; sourceTree = SOURCE_ROOT; };
 		A10000000000000000000016 /* DefaultDataBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultDataBundle.swift; sourceTree = "<group>"; };
 		A10000000000000000000017 /* DefaultData */ = {isa = PBXFileReference; lastKnownFileType = folder; path = DefaultData; sourceTree = "<group>"; };
+		A10000000000000000000018 /* SpeechController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechController.swift; sourceTree = "<group>"; };
 		B10000000000000000000011 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		B10000000000000000000012 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MainTabView.swift; sourceTree = "<group>"; };
 		B10000000000000000000013 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/EmptyStateView.swift; sourceTree = "<group>"; };
@@ -61,6 +67,10 @@
 		C10000000000000000000011 /* ReplaceRuleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ReplaceRuleListView.swift; sourceTree = "<group>"; };
 		C10000000000000000000012 /* ReplaceRuleEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ReplaceRuleEditorView.swift; sourceTree = "<group>"; };
 		C10000000000000000000013 /* BackupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/BackupView.swift; sourceTree = "<group>"; };
+		C10000000000000000000014 /* DictRuleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/DictRuleListView.swift; sourceTree = "<group>"; };
+		C10000000000000000000015 /* DictRuleEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/DictRuleEditorView.swift; sourceTree = "<group>"; };
+		C10000000000000000000016 /* HttpTtsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/HttpTtsListView.swift; sourceTree = "<group>"; };
+		C10000000000000000000017 /* HttpTtsEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/HttpTtsEditorView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,6 +100,7 @@
 				A10000000000000000000011 /* LegadoIOSApp.swift */,
 				A10000000000000000000012 /* ContentView.swift */,
 				B10000000000000000000011 /* AppState.swift */,
+				A10000000000000000000018 /* SpeechController.swift */,
 				B10000000000000000000012 /* MainTabView.swift */,
 				B10000000000000000000013 /* EmptyStateView.swift */,
 				B10000000000000000000014 /* BookshelfView.swift */,
@@ -105,6 +116,10 @@
 				C10000000000000000000011 /* ReplaceRuleListView.swift */,
 				C10000000000000000000012 /* ReplaceRuleEditorView.swift */,
 				C10000000000000000000013 /* BackupView.swift */,
+				C10000000000000000000014 /* DictRuleListView.swift */,
+				C10000000000000000000015 /* DictRuleEditorView.swift */,
+				C10000000000000000000016 /* HttpTtsListView.swift */,
+				C10000000000000000000017 /* HttpTtsEditorView.swift */,
 				B1000000000000000000001C /* SourceListView.swift */,
 				B1000000000000000000001D /* SourceEditorView.swift */,
 				B1000000000000000000001E /* SourceDebugView.swift */,
@@ -227,6 +242,7 @@
 				A10000000000000000000002 /* ContentView.swift in Sources */,
 				A10000000000000000000004 /* DefaultSource.swift in Sources */,
 				A10000000000000000000006 /* DefaultDataBundle.swift in Sources */,
+				A10000000000000000000008 /* SpeechController.swift in Sources */,
 				B10000000000000000000001 /* AppState.swift in Sources */,
 				B10000000000000000000002 /* MainTabView.swift in Sources */,
 				B10000000000000000000003 /* EmptyStateView.swift in Sources */,
@@ -246,6 +262,10 @@
 				C10000000000000000000001 /* ReplaceRuleListView.swift in Sources */,
 				C10000000000000000000002 /* ReplaceRuleEditorView.swift in Sources */,
 				C10000000000000000000003 /* BackupView.swift in Sources */,
+				C10000000000000000000004 /* DictRuleListView.swift in Sources */,
+				C10000000000000000000005 /* DictRuleEditorView.swift in Sources */,
+				C10000000000000000000006 /* HttpTtsListView.swift in Sources */,
+				C10000000000000000000007 /* HttpTtsEditorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -6,12 +6,16 @@ final class AppState: ObservableObject {
     @Published var sourceJson: String = DefaultSource.json
     @Published var replaceRuleJson: String = ""
     @Published var backupJson: String = ""
+    @Published var dictRuleJson: String = ""
+    @Published var httpTtsJson: String = ""
     @Published var keyword: String = ""
     @Published var selectedSourceIndex: Int = -1
 
     @Published private(set) var sources: [SharedBookSource] = []
     @Published private(set) var books: [SharedBook] = []
     @Published private(set) var replaceRules: [SharedReplaceRule] = []
+    @Published private(set) var dictRules: [SharedDictRule] = []
+    @Published private(set) var httpTts: [SharedHttpTts] = []
     @Published private(set) var rssSources: [SharedRssSource] = []
     @Published private(set) var rssArticles: [SharedRssArticle] = []
     @Published private(set) var selectedRssSource: SharedRssSource?
@@ -44,6 +48,8 @@ final class AppState: ObservableObject {
         sources = runtime.loadBookSources() as? [SharedBookSource] ?? []
         books = runtime.loadBooks() as? [SharedBook] ?? []
         replaceRules = runtime.loadReplaceRules() as? [SharedReplaceRule] ?? []
+        dictRules = runtime.loadDictRules() as? [SharedDictRule] ?? []
+        httpTts = runtime.loadHttpTts() as? [SharedHttpTts] ?? []
         rssSources = runtime.loadRssSources() as? [SharedRssSource] ?? []
         if selectedSourceIndex >= sources.count {
             selectedSourceIndex = sources.isEmpty ? -1 : 0
@@ -100,6 +106,61 @@ final class AppState: ObservableObject {
     func exportBackupToEditor() {
         backupJson = runtime.exportBackupJson(nowMillis: nowMillis())
         message = "Exported backup"
+    }
+
+    func importDictRules(replace: Bool = false) {
+        let rawJson = dictRuleJson.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Dictionary rule JSON is empty"
+            return
+        }
+        do {
+            dictRules = try runtime.importAndSaveDictRules(json: rawJson, replace: replace) as? [SharedDictRule] ?? []
+            refreshLibrary()
+            message = dictRules.isEmpty ? "No usable dictionary rules" : "Imported \(dictRules.count) dictionary rule(s)"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func exportDictRulesToEditor() {
+        dictRuleJson = runtime.exportDictRulesJson()
+        message = "Exported \(dictRules.count) dictionary rule(s)"
+    }
+
+    func setDictRuleEnabled(_ rule: SharedDictRule, enabled: Bool) {
+        _ = runtime.setDictRuleEnabled(name: rule.name, enabled: enabled)
+        refreshLibrary()
+    }
+
+    func deleteDictRule(_ rule: SharedDictRule) {
+        _ = runtime.deleteDictRule(name: rule.name)
+        refreshLibrary()
+    }
+
+    func importHttpTts(replace: Bool = false) {
+        let rawJson = httpTtsJson.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "HTTP TTS JSON is empty"
+            return
+        }
+        do {
+            httpTts = try runtime.importAndSaveHttpTts(json: rawJson, replace: replace) as? [SharedHttpTts] ?? []
+            refreshLibrary()
+            message = httpTts.isEmpty ? "No usable HTTP TTS engines" : "Imported \(httpTts.count) HTTP TTS engine(s)"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func exportHttpTtsToEditor() {
+        httpTtsJson = runtime.exportHttpTtsJson()
+        message = "Exported \(httpTts.count) HTTP TTS engine(s)"
+    }
+
+    func deleteHttpTts(_ engine: SharedHttpTts) {
+        _ = runtime.deleteHttpTts(id: engine.id)
+        refreshLibrary()
     }
 
     func importBackupFromEditor() {

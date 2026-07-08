@@ -11,6 +11,8 @@ struct SettingsHomeView: View {
                     LabeledContent("Books", value: "\(app.books.count)")
                     LabeledContent("RSS", value: "\(app.rssSources.count)")
                     LabeledContent("Replacements", value: "\(app.replaceRules.count)")
+                    LabeledContent("Dictionaries", value: "\(app.dictRules.count)")
+                    LabeledContent("HTTP TTS", value: "\(app.httpTts.count)")
                     LabeledContent("Results", value: "\(app.searchResults.count)")
                 }
 
@@ -33,6 +35,20 @@ struct SettingsHomeView: View {
                         ReplaceRuleListView()
                     } label: {
                         Label("Replacement rules", systemImage: "wand.and.stars")
+                    }
+                }
+
+                Section("Tools") {
+                    NavigationLink {
+                        DictRuleListView()
+                    } label: {
+                        Label("Dictionaries", systemImage: "character.book.closed")
+                    }
+
+                    NavigationLink {
+                        HttpTtsListView()
+                    } label: {
+                        Label("HTTP TTS", systemImage: "speaker.wave.2")
                     }
                 }
 

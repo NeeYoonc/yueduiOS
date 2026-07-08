@@ -4,6 +4,8 @@ import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookChapter
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedDataSnapshot
+import io.legado.shared.model.SharedDictRule
+import io.legado.shared.model.SharedHttpTts
 import io.legado.shared.model.SharedReplaceRule
 import io.legado.shared.model.SharedRssArticle
 import io.legado.shared.model.SharedRssSource
@@ -17,6 +19,8 @@ import io.legado.shared.book.ChapterRepository
 import io.legado.shared.book.SearchCoordinator
 import io.legado.shared.book.SearchCoordinatorResult
 import io.legado.shared.backup.DataBackupService
+import io.legado.shared.config.DictRuleRepository
+import io.legado.shared.config.HttpTtsRepository
 import io.legado.shared.local.LocalTextBookService
 import io.legado.shared.local.LocalTextImportResult
 import io.legado.shared.platform.CacheStorePort
@@ -67,6 +71,8 @@ open class LegadoRuntime(
     val localTextBookService: LocalTextBookService = LocalTextBookService(libraryStore, bookshelfService)
     val replacementRepository: ReplacementRepository = ReplacementRepository(libraryStore)
     val dataBackupService: DataBackupService = DataBackupService(libraryStore)
+    val dictRuleRepository: DictRuleRepository = DictRuleRepository(libraryStore)
+    val httpTtsRepository: HttpTtsRepository = HttpTtsRepository(libraryStore)
 
     @Throws(IllegalArgumentException::class)
     fun importAndSaveBookSources(json: String): List<SharedBookSource> {
@@ -89,6 +95,14 @@ open class LegadoRuntime(
 
     fun loadReplaceRules(): List<SharedReplaceRule> {
         return replacementRepository.list()
+    }
+
+    fun loadDictRules(): List<SharedDictRule> {
+        return dictRuleRepository.list()
+    }
+
+    fun loadHttpTts(): List<SharedHttpTts> {
+        return httpTtsRepository.list()
     }
 
     fun upsertBookSource(source: SharedBookSource): SharedBookSource {
@@ -126,6 +140,36 @@ open class LegadoRuntime(
 
     fun exportReplaceRulesJson(): String {
         return replacementRepository.exportJson()
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun importAndSaveDictRules(json: String, replace: Boolean = false): List<SharedDictRule> {
+        return dictRuleRepository.importJson(json, replace)
+    }
+
+    fun setDictRuleEnabled(name: String, enabled: Boolean): SharedDictRule? {
+        return dictRuleRepository.setEnabled(name, enabled)
+    }
+
+    fun deleteDictRule(name: String): List<SharedDictRule> {
+        return dictRuleRepository.delete(name)
+    }
+
+    fun exportDictRulesJson(): String {
+        return dictRuleRepository.exportJson()
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun importAndSaveHttpTts(json: String, replace: Boolean = false): List<SharedHttpTts> {
+        return httpTtsRepository.importJson(json, replace)
+    }
+
+    fun deleteHttpTts(id: Long): List<SharedHttpTts> {
+        return httpTtsRepository.delete(id)
+    }
+
+    fun exportHttpTtsJson(): String {
+        return httpTtsRepository.exportJson()
     }
 
     fun exportBackupJson(nowMillis: Long = 0L): String {

@@ -4,6 +4,7 @@ struct ReaderView: View {
     @EnvironmentObject private var app: AppState
     let initialChapterIndex: Int
     @State private var hasLoaded = false
+    @StateObject private var speech = SpeechController()
 
     var body: some View {
         ScrollView {
@@ -31,6 +32,19 @@ struct ReaderView: View {
         .navigationTitle(app.currentChapter?.title ?? "Reader")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    if speech.isSpeaking {
+                        speech.stop()
+                    } else {
+                        speech.speak(app.currentContent)
+                    }
+                } label: {
+                    Image(systemName: speech.isSpeaking ? "stop.fill" : "speaker.wave.2")
+                }
+                .disabled(app.currentContent.isEmpty)
+            }
+
             ToolbarItemGroup(placement: .bottomBar) {
                 Button {
                     Task {
@@ -65,6 +79,9 @@ struct ReaderView: View {
             }
             hasLoaded = true
             await loadChapter(initialChapterIndex)
+        }
+        .onDisappear {
+            speech.stop()
         }
     }
 
