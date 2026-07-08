@@ -55,9 +55,15 @@ struct SettingsHomeView: View {
 
                 Section("Tools") {
                     NavigationLink {
+                        DictionaryLookupView()
+                    } label: {
+                        Label("Dictionary lookup", systemImage: "text.magnifyingglass")
+                    }
+
+                    NavigationLink {
                         DictRuleListView()
                     } label: {
-                        Label("Dictionaries", systemImage: "character.book.closed")
+                        Label("Dictionary rules", systemImage: "character.book.closed")
                     }
 
                     NavigationLink {

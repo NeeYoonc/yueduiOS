@@ -29,6 +29,13 @@ class RuleAnalyzerTest {
     }
 
     @Test
+    fun extractsLegacyTagSelectorHtml() {
+        val html = "<html><body><h1>Metal</h1><p>tank adventure</p></body></html>"
+
+        assertEquals("<h1>Metal</h1><p>tank adventure</p>", RuleAnalyzer.getString(html, "tag.body@all"))
+    }
+
+    @Test
     fun evaluatesChainedHtmlRules() {
         val html = """
             <section class="book"><div class="meta"><a href="/one"><span class="name">One</span></a></div></section>

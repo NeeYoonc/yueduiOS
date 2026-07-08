@@ -39,7 +39,7 @@ object RuleAnalyzer {
 
     fun looksLikeHtmlRule(rule: String?): Boolean {
         val trimmed = rule?.trim()?.removeModePrefix("@css:") ?: return false
-        val selector = trimmed.substringBefore("@").trim()
+        val selector = normalizeLegacySelector(trimmed.substringBefore("@").trim())
         return selector.startsWith(".") ||
             selector.startsWith("#") ||
             htmlTagRegex.matches(selector) ||
@@ -396,7 +396,7 @@ object RuleAnalyzer {
     }
 
     private fun isHtmlSelector(rule: String): Boolean {
-        val selector = rule.trim().substringBefore("@").trim()
+        val selector = normalizeLegacySelector(rule.trim().substringBefore("@").trim())
         return selector.startsWith(".") ||
             selector.startsWith("#") ||
             htmlTagRegex.matches(selector) ||
@@ -415,10 +415,20 @@ object RuleAnalyzer {
         companion object {
             fun parse(rule: String): HtmlRule {
                 val normalized = rule.trim().removePrefix("@css:")
-                val selector = normalized.substringBefore("@").trim()
+                val selector = normalizeLegacySelector(normalized.substringBefore("@").trim())
                 val attr = normalized.substringAfter("@", "text").trim().ifEmpty { "text" }
                 return HtmlRule(selector, attr)
             }
+        }
+    }
+
+    private fun normalizeLegacySelector(selector: String): String {
+        val trimmed = selector.trim()
+        return when {
+            trimmed.startsWith("tag.", ignoreCase = true) -> trimmed.substringAfter(".").trim()
+            trimmed.startsWith("class.", ignoreCase = true) -> "." + trimmed.substringAfter(".").trim()
+            trimmed.startsWith("id.", ignoreCase = true) -> "#" + trimmed.substringAfter(".").trim()
+            else -> trimmed
         }
     }
 

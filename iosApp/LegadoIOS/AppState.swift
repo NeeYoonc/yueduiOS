@@ -9,6 +9,7 @@ final class AppState: ObservableObject {
     @Published var dictRuleJson: String = ""
     @Published var httpTtsJson: String = ""
     @Published var keyword: String = ""
+    @Published var dictionaryKeyword: String = ""
     @Published var selectedSourceIndex: Int = -1
 
     @Published private(set) var sources: [SharedBookSource] = []
@@ -21,6 +22,7 @@ final class AppState: ObservableObject {
     @Published private(set) var bookmarks: [SharedBookmark] = []
     @Published private(set) var replaceRules: [SharedReplaceRule] = []
     @Published private(set) var dictRules: [SharedDictRule] = []
+    @Published private(set) var dictionaryLookupResults: [SharedDictionaryLookupResult] = []
     @Published private(set) var httpTts: [SharedHttpTts] = []
     @Published private(set) var rssSources: [SharedRssSource] = []
     @Published private(set) var rssArticles: [SharedRssArticle] = []
@@ -154,6 +156,34 @@ final class AppState: ObservableObject {
     func deleteDictRule(_ rule: SharedDictRule) {
         _ = runtime.deleteDictRule(name: rule.name)
         refreshLibrary()
+    }
+
+    func lookupDictionary() async {
+        let text = dictionaryKeyword.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else {
+            message = "Dictionary keyword is empty"
+            return
+        }
+        guard dictRules.contains(where: { $0.enabled }) else {
+            dictionaryLookupResults = []
+            message = "No enabled dictionary rules"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            dictionaryLookupResults = try await runtime.lookupDictionary(word: text) as? [SharedDictionaryLookupResult] ?? []
+            if dictionaryLookupResults.isEmpty {
+                message = "No dictionary results"
+            } else {
+                let errors = dictionaryLookupResults.filter { $0.errorMessage != nil }.count
+                message = errors == 0 ? nil : "\(errors) dictionary rule(s) failed"
+            }
+        } catch {
+            dictionaryLookupResults = []
+            message = error.localizedDescription
+        }
     }
 
     func importHttpTts(replace: Bool = false) {

@@ -271,6 +271,16 @@ data class SharedDictRule(
 )
 
 @Serializable
+data class SharedDictionaryLookupResult(
+    val ruleName: String = "",
+    val word: String = "",
+    val url: String = "",
+    val content: String = "",
+    val statusCode: Int = 0,
+    val errorMessage: String? = null
+)
+
+@Serializable
 data class SharedKeyboardAssist(
     val type: Int = 0,
     val key: String = "",

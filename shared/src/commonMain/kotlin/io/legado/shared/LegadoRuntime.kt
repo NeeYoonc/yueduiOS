@@ -7,6 +7,7 @@ import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedBookmark
 import io.legado.shared.model.SharedDataSnapshot
 import io.legado.shared.model.SharedDictRule
+import io.legado.shared.model.SharedDictionaryLookupResult
 import io.legado.shared.model.SharedExploreKind
 import io.legado.shared.model.SharedHttpTts
 import io.legado.shared.model.SharedReplaceRule
@@ -25,6 +26,7 @@ import io.legado.shared.book.SearchCoordinator
 import io.legado.shared.book.SearchCoordinatorResult
 import io.legado.shared.backup.DataBackupService
 import io.legado.shared.bookmark.BookmarkRepository
+import io.legado.shared.config.DictionaryLookupService
 import io.legado.shared.config.DictRuleRepository
 import io.legado.shared.config.HttpTtsRepository
 import io.legado.shared.explore.ExploreService
@@ -52,7 +54,7 @@ import io.legado.shared.source.SourceRepository
 import io.legado.shared.storage.SharedLibraryStore
 
 open class LegadoRuntime(
-    httpFetcher: HttpFetcher,
+    private val httpFetcher: HttpFetcher,
     cacheStore: CacheStorePort,
     scriptRuntime: ScriptRuntime? = null,
     webViewRuntime: RuleWebViewRuntime? = null
@@ -82,6 +84,7 @@ open class LegadoRuntime(
     val replacementRepository: ReplacementRepository = ReplacementRepository(libraryStore)
     val dataBackupService: DataBackupService = DataBackupService(libraryStore)
     val dictRuleRepository: DictRuleRepository = DictRuleRepository(libraryStore)
+    val dictionaryLookupService: DictionaryLookupService = DictionaryLookupService(httpFetcher, dictRuleRepository, ruleEngine)
     val httpTtsRepository: HttpTtsRepository = HttpTtsRepository(libraryStore)
     val bookmarkRepository: BookmarkRepository = BookmarkRepository(libraryStore)
 
@@ -205,6 +208,10 @@ open class LegadoRuntime(
 
     fun exportDictRulesJson(): String {
         return dictRuleRepository.exportJson()
+    }
+
+    suspend fun lookupDictionary(word: String): List<SharedDictionaryLookupResult> {
+        return dictionaryLookupService.lookup(word)
     }
 
     @Throws(IllegalArgumentException::class)

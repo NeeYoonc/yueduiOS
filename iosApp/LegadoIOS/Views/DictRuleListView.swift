@@ -27,6 +27,12 @@ struct DictRuleListView: View {
         .navigationTitle("Dictionaries")
         .toolbar {
             NavigationLink {
+                DictionaryLookupView()
+            } label: {
+                Image(systemName: "magnifyingglass")
+            }
+
+            NavigationLink {
                 DictRuleEditorView()
             } label: {
                 Image(systemName: "doc.text")

@@ -39,6 +39,7 @@
 		C10000000000000000000007 /* HttpTtsEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000017 /* HttpTtsEditorView.swift */; };
 		C10000000000000000000008 /* BookmarkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000018 /* BookmarkListView.swift */; };
 		C10000000000000000000009 /* BookGroupListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000019 /* BookGroupListView.swift */; };
+		C1000000000000000000000A /* DictionaryLookupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1000000000000000000001A /* DictionaryLookupView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -75,6 +76,7 @@
 		C10000000000000000000017 /* HttpTtsEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/HttpTtsEditorView.swift; sourceTree = "<group>"; };
 		C10000000000000000000018 /* BookmarkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/BookmarkListView.swift; sourceTree = "<group>"; };
 		C10000000000000000000019 /* BookGroupListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/BookGroupListView.swift; sourceTree = "<group>"; };
+		C1000000000000000000001A /* DictionaryLookupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/DictionaryLookupView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +124,7 @@
 				C10000000000000000000013 /* BackupView.swift */,
 				C10000000000000000000014 /* DictRuleListView.swift */,
 				C10000000000000000000015 /* DictRuleEditorView.swift */,
+				C1000000000000000000001A /* DictionaryLookupView.swift */,
 				C10000000000000000000016 /* HttpTtsListView.swift */,
 				C10000000000000000000017 /* HttpTtsEditorView.swift */,
 				C10000000000000000000018 /* BookmarkListView.swift */,
@@ -270,6 +273,7 @@
 				C10000000000000000000003 /* BackupView.swift in Sources */,
 				C10000000000000000000004 /* DictRuleListView.swift in Sources */,
 				C10000000000000000000005 /* DictRuleEditorView.swift in Sources */,
+				C1000000000000000000000A /* DictionaryLookupView.swift in Sources */,
 				C10000000000000000000006 /* HttpTtsListView.swift in Sources */,
 				C10000000000000000000007 /* HttpTtsEditorView.swift in Sources */,
 				C10000000000000000000008 /* BookmarkListView.swift in Sources */,
