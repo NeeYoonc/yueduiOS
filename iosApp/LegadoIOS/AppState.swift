@@ -18,6 +18,8 @@ final class AppState: ObservableObject {
     @Published private(set) var currentChapter: SharedBookChapter?
     @Published private(set) var currentChapterIndex: Int = 0
     @Published private(set) var currentContent: String = ""
+    @Published private(set) var debugSteps: [SourceDebugStep] = []
+    @Published private(set) var debugContent: String = ""
     @Published private(set) var message: String?
     @Published private(set) var isLoading: Bool = false
 
@@ -59,6 +61,46 @@ final class AppState: ObservableObject {
             refreshLibrary()
             message = sources.isEmpty ? "No usable sources" : "Imported \(sources.count) source(s)"
         } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func exportSourcesToEditor() {
+        sourceJson = runtime.exportBookSourcesJson()
+        message = "Exported \(sources.count) source(s)"
+    }
+
+    func setSourceEnabled(_ source: SharedBookSource, enabled: Bool) {
+        _ = runtime.setBookSourceEnabled(bookSourceUrl: source.bookSourceUrl, enabled: enabled)
+        refreshLibrary()
+    }
+
+    func deleteSource(_ source: SharedBookSource) {
+        _ = runtime.deleteBookSource(bookSourceUrl: source.bookSourceUrl)
+        refreshLibrary()
+    }
+
+    func debugSource(_ source: SharedBookSource) async {
+        let text = keyword.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else {
+            message = "Keyword is empty"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            let result = try await runtime.debugSourceFirstContent(
+                source: source,
+                key: text,
+                page: 1
+            )
+            debugSteps = result.steps as? [SourceDebugStep] ?? []
+            debugContent = result.content?.content.content ?? ""
+            message = debugSteps.isEmpty ? "No debug steps" : nil
+        } catch {
+            debugSteps = []
+            debugContent = ""
             message = error.localizedDescription
         }
     }

@@ -24,6 +24,9 @@
 		B10000000000000000000009 /* ReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000019 /* ReaderView.swift */; };
 		B1000000000000000000000A /* RssHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001A /* RssHomeView.swift */; };
 		B1000000000000000000000B /* SettingsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001B /* SettingsHomeView.swift */; };
+		B1000000000000000000000C /* SourceListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001C /* SourceListView.swift */; };
+		B1000000000000000000000D /* SourceEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001D /* SourceEditorView.swift */; };
+		B1000000000000000000000E /* SourceDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001E /* SourceDebugView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +48,9 @@
 		B10000000000000000000019 /* ReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ReaderView.swift; sourceTree = "<group>"; };
 		B1000000000000000000001A /* RssHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RssHomeView.swift; sourceTree = "<group>"; };
 		B1000000000000000000001B /* SettingsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SettingsHomeView.swift; sourceTree = "<group>"; };
+		B1000000000000000000001C /* SourceListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SourceListView.swift; sourceTree = "<group>"; };
+		B1000000000000000000001D /* SourceEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SourceEditorView.swift; sourceTree = "<group>"; };
+		B1000000000000000000001E /* SourceDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SourceDebugView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +90,9 @@
 				B10000000000000000000019 /* ReaderView.swift */,
 				B1000000000000000000001A /* RssHomeView.swift */,
 				B1000000000000000000001B /* SettingsHomeView.swift */,
+				B1000000000000000000001C /* SourceListView.swift */,
+				B1000000000000000000001D /* SourceEditorView.swift */,
+				B1000000000000000000001E /* SourceDebugView.swift */,
 				A10000000000000000000014 /* DefaultSource.swift */,
 				A10000000000000000000016 /* DefaultDataBundle.swift */,
 				A10000000000000000000017 /* DefaultData */,
@@ -214,6 +223,9 @@
 				B10000000000000000000009 /* ReaderView.swift in Sources */,
 				B1000000000000000000000A /* RssHomeView.swift in Sources */,
 				B1000000000000000000000B /* SettingsHomeView.swift in Sources */,
+				B1000000000000000000000C /* SourceListView.swift in Sources */,
+				B1000000000000000000000D /* SourceEditorView.swift in Sources */,
+				B1000000000000000000000E /* SourceDebugView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

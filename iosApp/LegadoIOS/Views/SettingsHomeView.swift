@@ -14,20 +14,16 @@ struct SettingsHomeView: View {
                 }
 
                 Section("Sources") {
-                    Button {
-                        app.importBundledDefaultData()
+                    NavigationLink {
+                        SourceListView()
                     } label: {
-                        Label("Import bundled data", systemImage: "square.and.arrow.down")
+                        Label("Manage sources", systemImage: "tray.full")
                     }
 
-                    TextEditor(text: $app.sourceJson)
-                        .font(.system(.footnote, design: .monospaced))
-                        .frame(minHeight: 140)
-
-                    Button {
-                        app.importSources()
+                    NavigationLink {
+                        SourceEditorView()
                     } label: {
-                        Label("Import JSON", systemImage: "tray.and.arrow.down")
+                        Label("Import and export", systemImage: "doc.text")
                     }
                 }
 
