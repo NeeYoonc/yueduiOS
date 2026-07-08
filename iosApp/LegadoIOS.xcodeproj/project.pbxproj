@@ -139,7 +139,6 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/../shared/build/XCFrameworks/debug/LegadoShared.xcframework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
