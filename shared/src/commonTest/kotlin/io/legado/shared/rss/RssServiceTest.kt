@@ -67,6 +67,42 @@ class RssServiceTest {
         assertEquals(listOf("Article 1"), store.loadDataSnapshot().rssArticles.map { it.title })
     }
 
+    @Test
+    fun refreshedAndCachedArticlesApplyReadState() = runBlocking {
+        val fetcher = object : HttpFetcher {
+            override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                return SharedHttpResponse(
+                    finalUrl = request.url,
+                    statusCode = 200,
+                    body = """{"items":[{"title":"Read article","link":"/read","desc":"Intro"}]}"""
+                )
+            }
+        }
+        val store = SharedLibraryStore(InMemoryCacheStore())
+        val stateRepository = RssArticleStateRepository(store)
+        val source = SharedRssSource(
+            sourceUrl = "https://rss.test/feed",
+            sourceName = "RSS",
+            ruleArticles = "$.items",
+            ruleTitle = "$.title",
+            ruleLink = "$.link",
+            ruleDescription = "$.desc"
+        )
+        val original = SharedRssArticle(
+            origin = source.sourceUrl,
+            sort = "default",
+            title = "Read article",
+            link = "https://rss.test/read"
+        )
+        stateRepository.markRead(original, read = true, nowMillis = 100L)
+        val service = RssService(fetcher, store)
+
+        val page = service.refreshArticles(source)
+
+        assertEquals(true, page.articles.single().read)
+        assertEquals(true, service.listCachedArticles(source).single().read)
+    }
+
     private class InMemoryCacheStore : CacheStorePort {
         private val values = mutableMapOf<String, String>()
 

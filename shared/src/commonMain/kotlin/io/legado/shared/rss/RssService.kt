@@ -10,7 +10,8 @@ import io.legado.shared.storage.SharedLibraryStore
 class RssService(
     private val httpFetcher: HttpFetcher,
     private val libraryStore: SharedLibraryStore? = null,
-    private val parser: RssRuleParser = RssRuleParser()
+    private val parser: RssRuleParser = RssRuleParser(),
+    private val stateRepository: RssArticleStateRepository? = libraryStore?.let { RssArticleStateRepository(it) }
 ) {
     suspend fun refreshArticles(
         source: SharedRssSource,
@@ -33,7 +34,7 @@ class RssService(
             body = response.body,
             baseUrl = response.finalUrl,
             sort = sortName
-        )
+        ).withState()
         saveArticles(articles)
         return RssArticlePage(
             source = source,
@@ -50,13 +51,13 @@ class RssService(
             return article
         }
         val response = httpFetcher.fetch(SharedRequestBuilder.build(article.link))
-        val parsed = parser.parseContent(source, article, response.body)
+        val parsed = parser.parseContent(source, article, response.body).withState()
         saveArticles(listOf(parsed))
         return parsed
     }
 
     fun listCachedArticles(source: SharedRssSource? = null): List<SharedRssArticle> {
-        val articles = libraryStore?.loadDataSnapshot()?.rssArticles.orEmpty()
+        val articles = libraryStore?.loadDataSnapshot()?.rssArticles.orEmpty().withState()
         return if (source == null) {
             articles
         } else {
@@ -87,6 +88,14 @@ class RssService(
             articles.any { it.origin == old.origin && it.link == old.link && it.sort == old.sort }
         }
         store.saveDataSnapshot(snapshot.copy(rssArticles = merged))
+    }
+
+    private fun SharedRssArticle.withState(): SharedRssArticle {
+        return stateRepository?.applyState(this) ?: this
+    }
+
+    private fun List<SharedRssArticle>.withState(): List<SharedRssArticle> {
+        return stateRepository?.applyState(this) ?: this
     }
 }
 

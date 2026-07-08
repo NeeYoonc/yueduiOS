@@ -12,6 +12,7 @@ struct SettingsHomeView: View {
                     LabeledContent("Book Groups", value: "\(app.bookGroups.count)")
                     LabeledContent("Bookmarks", value: "\(app.bookmarks.count)")
                     LabeledContent("RSS", value: "\(app.rssSources.count)")
+                    LabeledContent("RSS Stars", value: "\(app.rssStars.count)")
                     LabeledContent("Replacements", value: "\(app.replaceRules.count)")
                     LabeledContent("TXT TOC Rules", value: "\(app.txtTocRules.count)")
                     LabeledContent("Dictionaries", value: "\(app.dictRules.count)")

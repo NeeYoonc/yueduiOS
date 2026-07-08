@@ -37,6 +37,8 @@ final class AppState: ObservableObject {
     @Published private(set) var rawConfigs: [SharedRawConfigEntry] = []
     @Published private(set) var rssSources: [SharedRssSource] = []
     @Published private(set) var rssArticles: [SharedRssArticle] = []
+    @Published private(set) var rssReadRecords: [SharedRssReadRecord] = []
+    @Published private(set) var rssStars: [SharedRssStar] = []
     @Published private(set) var exploreSources: [SharedBookSource] = []
     @Published private(set) var selectedExploreSource: SharedBookSource?
     @Published private(set) var exploreKinds: [SharedExploreKind] = []
@@ -85,6 +87,8 @@ final class AppState: ObservableObject {
         ruleSubs = runtime.loadRuleSubs() as? [SharedRuleSub] ?? []
         rawConfigs = runtime.loadRawConfigs() as? [SharedRawConfigEntry] ?? []
         rssSources = runtime.loadRssSources() as? [SharedRssSource] ?? []
+        rssReadRecords = runtime.loadRssReadRecords() as? [SharedRssReadRecord] ?? []
+        rssStars = runtime.loadRssStars() as? [SharedRssStar] ?? []
         exploreSources = runtime.loadExploreSources() as? [SharedBookSource] ?? []
         searchKeywords = runtime.loadSearchKeywords() as? [SharedSearchKeyword] ?? []
         if selectedSourceIndex >= sources.count {
@@ -398,6 +402,27 @@ final class AppState: ObservableObject {
         refreshLibrary()
     }
 
+    func setRssArticleRead(_ article: SharedRssArticle, read: Bool) {
+        let updated = runtime.markRssArticleRead(article: article, read: read, nowMillis: nowMillis())
+        replaceRssArticle(updated)
+        if let selected = selectedRssArticle, sameRssArticle(selected, updated) {
+            selectedRssArticle = updated
+            rssContent = updated.readableContent
+        }
+        refreshLibrary()
+    }
+
+    func setRssArticleStarred(_ article: SharedRssArticle, starred: Bool) {
+        rssStars = runtime.setRssArticleStarred(article: article, starred: starred, nowMillis: nowMillis()) as? [SharedRssStar] ?? []
+        refreshLibrary()
+    }
+
+    func isRssArticleStarred(_ article: SharedRssArticle) -> Bool {
+        return rssStars.contains { star in
+            star.origin == article.origin && star.sort == article.sort && star.link == article.link
+        }
+    }
+
     func importBackupFromEditor() {
         let rawJson = backupJson.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !rawJson.isEmpty else {
@@ -580,12 +605,16 @@ final class AppState: ObservableObject {
 
         do {
             let parsed = try await runtime.loadRssContent(source: source, article: article)
-            selectedRssArticle = parsed
-            rssContent = parsed.readableContent
+            let read = runtime.markRssArticleRead(article: parsed, read: true, nowMillis: nowMillis())
+            selectedRssArticle = read
+            rssContent = read.readableContent
+            replaceRssArticle(read)
             refreshLibrary()
         } catch {
-            selectedRssArticle = article
-            rssContent = article.readableContent
+            let read = runtime.markRssArticleRead(article: article, read: true, nowMillis: nowMillis())
+            selectedRssArticle = read
+            rssContent = read.readableContent
+            replaceRssArticle(read)
             message = error.localizedDescription
         }
     }
@@ -820,6 +849,16 @@ final class AppState: ObservableObject {
             return source
         }
         return sources.first { $0.bookSourceUrl == book.bookUrl || $0.bookSourceName == book.originName }
+    }
+
+    private func replaceRssArticle(_ article: SharedRssArticle) {
+        if let index = rssArticles.firstIndex(where: { sameRssArticle($0, article) }) {
+            rssArticles[index] = article
+        }
+    }
+
+    private func sameRssArticle(_ lhs: SharedRssArticle, _ rhs: SharedRssArticle) -> Bool {
+        return lhs.origin == rhs.origin && lhs.sort == rhs.sort && lhs.link == rhs.link
     }
 
     private func nowMillis() -> Int64 {

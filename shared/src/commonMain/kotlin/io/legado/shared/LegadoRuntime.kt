@@ -14,7 +14,9 @@ import io.legado.shared.model.SharedKeyboardAssist
 import io.legado.shared.model.SharedRawConfigEntry
 import io.legado.shared.model.SharedReplaceRule
 import io.legado.shared.model.SharedRssArticle
+import io.legado.shared.model.SharedRssReadRecord
 import io.legado.shared.model.SharedRssSource
+import io.legado.shared.model.SharedRssStar
 import io.legado.shared.model.SharedRuleSub
 import io.legado.shared.model.SharedSearchBook
 import io.legado.shared.model.SharedSearchKeyword
@@ -49,6 +51,7 @@ import io.legado.shared.rule.AnalyzeRuleEngine
 import io.legado.shared.rule.RuleWebViewRuntime
 import io.legado.shared.replacement.ReplacementRepository
 import io.legado.shared.rss.RssArticlePage
+import io.legado.shared.rss.RssArticleStateRepository
 import io.legado.shared.rss.RssService
 import io.legado.shared.rss.RssSourceRepository
 import io.legado.shared.service.RuleEngineBookInfoParser
@@ -90,7 +93,8 @@ open class LegadoRuntime(
     val sourceRepository: SourceRepository = SourceRepository(libraryStore)
     val sourceDebugService: SourceDebugService = SourceDebugService(client)
     val exploreService: ExploreService = ExploreService(client, libraryStore)
-    val rssService: RssService = RssService(httpFetcher, libraryStore)
+    val rssArticleStateRepository: RssArticleStateRepository = RssArticleStateRepository(libraryStore)
+    val rssService: RssService = RssService(httpFetcher, libraryStore, stateRepository = rssArticleStateRepository)
     val rssSourceRepository: RssSourceRepository = RssSourceRepository(libraryStore)
     val localTextBookService: LocalTextBookService = LocalTextBookService(libraryStore, bookshelfService)
     val replacementRepository: ReplacementRepository = ReplacementRepository(libraryStore)
@@ -128,6 +132,34 @@ open class LegadoRuntime(
 
     fun loadRssArticles(source: SharedRssSource? = null): List<SharedRssArticle> {
         return rssService.listCachedArticles(source)
+    }
+
+    fun loadRssReadRecords(): List<SharedRssReadRecord> {
+        return rssArticleStateRepository.listReadRecords()
+    }
+
+    fun loadRssStars(): List<SharedRssStar> {
+        return rssArticleStateRepository.listStars()
+    }
+
+    fun markRssArticleRead(
+        article: SharedRssArticle,
+        read: Boolean,
+        nowMillis: Long = 0L
+    ): SharedRssArticle {
+        return rssArticleStateRepository.markRead(article, read, nowMillis)
+    }
+
+    fun setRssArticleStarred(
+        article: SharedRssArticle,
+        starred: Boolean,
+        nowMillis: Long = 0L
+    ): List<SharedRssStar> {
+        return rssArticleStateRepository.setStarred(article, starred, nowMillis)
+    }
+
+    fun isRssArticleStarred(article: SharedRssArticle): Boolean {
+        return rssArticleStateRepository.isStarred(article)
     }
 
     fun upsertRssSource(source: SharedRssSource): SharedRssSource {

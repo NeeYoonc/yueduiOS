@@ -48,5 +48,18 @@ struct RssReaderView: View {
         }
         .navigationTitle(article.title.isEmpty ? "RSS" : article.title)
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            Button {
+                app.setRssArticleStarred(displayedArticle, starred: !app.isRssArticleStarred(displayedArticle))
+            } label: {
+                Image(systemName: app.isRssArticleStarred(displayedArticle) ? "star.fill" : "star")
+            }
+
+            Button {
+                app.setRssArticleRead(displayedArticle, read: !displayedArticle.read)
+            } label: {
+                Image(systemName: displayedArticle.read ? "envelope" : "checkmark.circle")
+            }
+        }
     }
 }
