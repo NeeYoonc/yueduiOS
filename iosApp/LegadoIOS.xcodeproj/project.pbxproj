@@ -38,6 +38,7 @@
 		C10000000000000000000006 /* HttpTtsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000016 /* HttpTtsListView.swift */; };
 		C10000000000000000000007 /* HttpTtsEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000017 /* HttpTtsEditorView.swift */; };
 		C10000000000000000000008 /* BookmarkListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000018 /* BookmarkListView.swift */; };
+		C10000000000000000000009 /* BookGroupListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000019 /* BookGroupListView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -73,6 +74,7 @@
 		C10000000000000000000016 /* HttpTtsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/HttpTtsListView.swift; sourceTree = "<group>"; };
 		C10000000000000000000017 /* HttpTtsEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/HttpTtsEditorView.swift; sourceTree = "<group>"; };
 		C10000000000000000000018 /* BookmarkListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/BookmarkListView.swift; sourceTree = "<group>"; };
+		C10000000000000000000019 /* BookGroupListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/BookGroupListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,6 +125,7 @@
 				C10000000000000000000016 /* HttpTtsListView.swift */,
 				C10000000000000000000017 /* HttpTtsEditorView.swift */,
 				C10000000000000000000018 /* BookmarkListView.swift */,
+				C10000000000000000000019 /* BookGroupListView.swift */,
 				B1000000000000000000001C /* SourceListView.swift */,
 				B1000000000000000000001D /* SourceEditorView.swift */,
 				B1000000000000000000001E /* SourceDebugView.swift */,
@@ -270,6 +273,7 @@
 				C10000000000000000000006 /* HttpTtsListView.swift in Sources */,
 				C10000000000000000000007 /* HttpTtsEditorView.swift in Sources */,
 				C10000000000000000000008 /* BookmarkListView.swift in Sources */,
+				C10000000000000000000009 /* BookGroupListView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

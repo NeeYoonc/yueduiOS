@@ -2,6 +2,7 @@ package io.legado.app.shared
 
 import io.legado.app.data.entities.Book
 import io.legado.app.data.entities.BookChapter
+import io.legado.app.data.entities.BookGroup
 import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.SearchBook
 import io.legado.app.data.entities.rule.BookInfoRule
@@ -284,5 +285,30 @@ class AndroidSharedMappersTest {
         assertEquals("2026-07-07", shared.tag)
         assertEquals("""{"page":"10"}""", shared.variable)
         assertEquals("10", shared.variableMap["page"])
+    }
+
+    @Test
+    fun mapsBookGroupToSharedBookGroup() {
+        val group = BookGroup(
+            groupId = 4L,
+            groupName = "Favorites",
+            cover = "https://source.test/group.jpg",
+            order = 6,
+            enableRefresh = false,
+            show = false,
+            bookSort = 2,
+            onlyUpdateRead = true
+        )
+
+        val shared = group.toSharedBookGroup()
+
+        assertEquals(4L, shared.groupId)
+        assertEquals("Favorites", shared.groupName)
+        assertEquals("https://source.test/group.jpg", shared.cover)
+        assertEquals(6, shared.order)
+        assertEquals(false, shared.enableRefresh)
+        assertEquals(false, shared.show)
+        assertEquals(2, shared.bookSort)
+        assertEquals(true, shared.onlyUpdateRead)
     }
 }

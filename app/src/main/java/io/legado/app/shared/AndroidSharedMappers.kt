@@ -2,6 +2,7 @@ package io.legado.app.shared
 
 import io.legado.app.data.entities.Book
 import io.legado.app.data.entities.BookChapter
+import io.legado.app.data.entities.BookGroup
 import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.SearchBook
 import io.legado.app.data.entities.rule.BookInfoRule
@@ -12,6 +13,7 @@ import io.legado.app.data.entities.rule.SearchRule
 import io.legado.app.data.entities.rule.TocRule
 import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookChapter
+import io.legado.shared.model.SharedBookGroup
 import io.legado.shared.model.SharedBookInfoRule
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedContentRule
@@ -173,6 +175,17 @@ fun Book.toSharedBook(): SharedBook = SharedBook(
     readConfig = readConfig?.toSharedReadConfig(),
     syncTime = syncTime,
     variableMap = variableMap
+)
+
+fun BookGroup.toSharedBookGroup(): SharedBookGroup = SharedBookGroup(
+    groupId = groupId,
+    groupName = groupName,
+    cover = cover,
+    order = order,
+    enableRefresh = enableRefresh,
+    show = show,
+    bookSort = bookSort,
+    onlyUpdateRead = onlyUpdateRead
 )
 
 fun Book.ReadConfig.toSharedReadConfig(): SharedReadConfig = SharedReadConfig(

@@ -1,5 +1,7 @@
 package io.legado.shared
 
+import io.legado.shared.model.SharedBook
+import io.legado.shared.model.SharedBookGroup
 import io.legado.shared.platform.CacheStorePort
 import io.legado.shared.platform.HttpFetcher
 import io.legado.shared.platform.SharedHttpRequest
@@ -192,6 +194,33 @@ class LegadoRuntimeTest {
 
         runtime.deleteBookSource("https://one.test")
         assertEquals(listOf("https://two.test"), runtime.loadBookSources().map { it.bookSourceUrl })
+    }
+
+    @Test
+    fun managesBookGroupsThroughRuntimeRepository() {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    error("No network expected")
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+        runtime.saveBooks(
+            listOf(
+                SharedBook(name = "A", bookUrl = "a", group = 0L),
+                SharedBook(name = "B", bookUrl = "b", group = 0L)
+            )
+        )
+
+        val group = runtime.upsertBookGroup(SharedBookGroup(groupId = 0L, groupName = "Favorites"))
+        runtime.setBookGroupEnabled(runtime.loadBooks().first(), group.groupId, enabled = true)
+
+        assertEquals("All", runtime.loadBookGroups().first().groupName)
+        assertEquals(listOf("A"), runtime.loadBooksForGroup(group.groupId).map { it.name })
+
+        runtime.deleteBookGroup(group.groupId)
+        assertEquals(0L, runtime.loadBooks().first { it.name == "A" }.group)
     }
 
     private class InMemoryCacheStore : CacheStorePort {

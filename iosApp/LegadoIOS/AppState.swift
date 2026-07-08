@@ -13,6 +13,11 @@ final class AppState: ObservableObject {
 
     @Published private(set) var sources: [SharedBookSource] = []
     @Published private(set) var books: [SharedBook] = []
+    @Published private(set) var visibleBooks: [SharedBook] = []
+    @Published private(set) var bookGroups: [SharedBookGroup] = []
+    @Published private(set) var visibleBookGroups: [SharedBookGroup] = []
+    @Published private(set) var selectableBookGroups: [SharedBookGroup] = []
+    @Published var selectedBookGroupId: Int64 = -1
     @Published private(set) var bookmarks: [SharedBookmark] = []
     @Published private(set) var replaceRules: [SharedReplaceRule] = []
     @Published private(set) var dictRules: [SharedDictRule] = []
@@ -48,6 +53,10 @@ final class AppState: ObservableObject {
     func refreshLibrary() {
         sources = runtime.loadBookSources() as? [SharedBookSource] ?? []
         books = runtime.loadBooks() as? [SharedBook] ?? []
+        bookGroups = runtime.loadBookGroups() as? [SharedBookGroup] ?? []
+        visibleBookGroups = bookGroups.filter { $0.show }
+        selectableBookGroups = runtime.loadSelectableBookGroups() as? [SharedBookGroup] ?? []
+        visibleBooks = runtime.loadBooksForGroup(groupId: selectedBookGroupId) as? [SharedBook] ?? books
         bookmarks = runtime.loadBookmarks() as? [SharedBookmark] ?? []
         replaceRules = runtime.loadReplaceRules() as? [SharedReplaceRule] ?? []
         dictRules = runtime.loadDictRules() as? [SharedDictRule] ?? []
@@ -213,6 +222,58 @@ final class AppState: ObservableObject {
             currentChapter = nil
             currentContent = ""
         }
+        refreshLibrary()
+    }
+
+    func selectBookGroup(_ group: SharedBookGroup) {
+        selectedBookGroupId = group.groupId
+        visibleBooks = runtime.loadBooksForGroup(groupId: group.groupId) as? [SharedBook] ?? books
+    }
+
+    func createBookGroup(name: String) {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            message = "Group name is empty"
+            return
+        }
+        _ = runtime.upsertBookGroup(
+            group: SharedBookGroup(
+                groupId: Int64(0),
+                groupName: trimmed,
+                cover: nil,
+                order: Int32(0),
+                enableRefresh: true,
+                show: true,
+                bookSort: Int32(-1),
+                onlyUpdateRead: false
+            )
+        )
+        refreshLibrary()
+        message = "Group created"
+    }
+
+    func setBookGroupVisible(_ group: SharedBookGroup, show: Bool) {
+        _ = runtime.setBookGroupVisible(groupId: group.groupId, show: show)
+        if !show && selectedBookGroupId == group.groupId {
+            selectedBookGroupId = -1
+        }
+        refreshLibrary()
+    }
+
+    func deleteBookGroup(_ group: SharedBookGroup) {
+        _ = runtime.deleteBookGroup(groupId: group.groupId)
+        if selectedBookGroupId == group.groupId {
+            selectedBookGroupId = -1
+        }
+        refreshLibrary()
+    }
+
+    func setSelectedBookGroup(_ group: SharedBookGroup, enabled: Bool) {
+        guard let book = selectedBook else {
+            message = "No book selected"
+            return
+        }
+        selectedBook = runtime.setBookGroupEnabled(book: book, groupId: group.groupId, enabled: enabled)
         refreshLibrary()
     }
 

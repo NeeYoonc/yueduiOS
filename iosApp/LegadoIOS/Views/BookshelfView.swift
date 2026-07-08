@@ -9,12 +9,35 @@ struct BookshelfView: View {
     var body: some View {
         NavigationStack {
             List {
+                Section("Groups") {
+                    if app.visibleBookGroups.isEmpty {
+                        EmptyStateView(title: "No groups", systemImage: "folder")
+                    } else {
+                        ForEach(app.visibleBookGroups.indices, id: \.self) { index in
+                            let group = app.visibleBookGroups[index]
+                            Button {
+                                app.selectBookGroup(group)
+                            } label: {
+                                HStack {
+                                    Label(group.groupName, systemImage: groupIcon(group))
+                                    Spacer()
+                                    if app.selectedBookGroupId == group.groupId {
+                                        Image(systemName: "checkmark")
+                                            .foregroundStyle(.tint)
+                                    }
+                                }
+                            }
+                            .foregroundStyle(.primary)
+                        }
+                    }
+                }
+
                 Section {
-                    if app.books.isEmpty {
+                    if app.visibleBooks.isEmpty {
                         EmptyStateView(title: "No books", systemImage: "books.vertical")
                     } else {
-                        ForEach(app.books.indices, id: \.self) { index in
-                            let book = app.books[index]
+                        ForEach(app.visibleBooks.indices, id: \.self) { index in
+                            let book = app.visibleBooks[index]
                             NavigationLink {
                                 BookDetailView()
                                     .task {
@@ -26,7 +49,7 @@ struct BookshelfView: View {
                         }
                         .onDelete { offsets in
                             offsets
-                                .map { app.books[$0] }
+                                .map { app.visibleBooks[$0] }
                                 .forEach(app.deleteBook)
                         }
                     }
@@ -54,6 +77,21 @@ struct BookshelfView: View {
             ) { result in
                 handleImport(result)
             }
+        }
+    }
+
+    private func groupIcon(_ group: SharedBookGroup) -> String {
+        switch group.groupId {
+        case -2:
+            return "doc.text"
+        case -3:
+            return "waveform"
+        case -6:
+            return "play.rectangle"
+        case -11:
+            return "exclamationmark.triangle"
+        default:
+            return group.groupId > 0 ? "folder" : "books.vertical"
         }
     }
 

@@ -33,6 +33,22 @@ struct BookDetailView: View {
                     .padding(.vertical, 4)
                 }
 
+                Section("Groups") {
+                    if app.selectableBookGroups.isEmpty {
+                        EmptyStateView(title: "No custom groups", systemImage: "folder")
+                    } else {
+                        ForEach(app.selectableBookGroups.indices, id: \.self) { index in
+                            let group = app.selectableBookGroups[index]
+                            Toggle(isOn: Binding(
+                                get: { ((app.selectedBook?.group ?? 0) & group.groupId) > 0 },
+                                set: { app.setSelectedBookGroup(group, enabled: $0) }
+                            )) {
+                                Text(group.groupName)
+                            }
+                        }
+                    }
+                }
+
                 Section("Catalog") {
                     if app.chapters.isEmpty {
                         EmptyStateView(title: "No chapters", systemImage: "list.bullet")

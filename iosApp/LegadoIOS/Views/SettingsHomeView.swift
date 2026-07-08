@@ -9,6 +9,7 @@ struct SettingsHomeView: View {
                 Section("Library") {
                     LabeledContent("Sources", value: "\(app.sources.count)")
                     LabeledContent("Books", value: "\(app.books.count)")
+                    LabeledContent("Book Groups", value: "\(app.bookGroups.count)")
                     LabeledContent("Bookmarks", value: "\(app.bookmarks.count)")
                     LabeledContent("RSS", value: "\(app.rssSources.count)")
                     LabeledContent("Replacements", value: "\(app.replaceRules.count)")
@@ -32,6 +33,12 @@ struct SettingsHomeView: View {
                 }
 
                 Section("Reading") {
+                    NavigationLink {
+                        BookGroupListView()
+                    } label: {
+                        Label("Book groups", systemImage: "folder")
+                    }
+
                     NavigationLink {
                         ReplaceRuleListView()
                     } label: {

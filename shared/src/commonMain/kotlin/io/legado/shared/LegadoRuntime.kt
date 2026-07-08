@@ -2,6 +2,7 @@ package io.legado.shared
 
 import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookChapter
+import io.legado.shared.model.SharedBookGroup
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedBookmark
 import io.legado.shared.model.SharedDataSnapshot
@@ -13,6 +14,7 @@ import io.legado.shared.model.SharedRssSource
 import io.legado.shared.model.SharedSearchBook
 import io.legado.shared.book.BookDetailCoordinator
 import io.legado.shared.book.BookDetailResult
+import io.legado.shared.book.BookGroupRepository
 import io.legado.shared.book.BookshelfService
 import io.legado.shared.book.CachedChapterReadResult
 import io.legado.shared.book.ChapterReadResult
@@ -64,6 +66,7 @@ open class LegadoRuntime(
     )
     val libraryStore: SharedLibraryStore = SharedLibraryStore(cacheStore)
     val bookshelfService: BookshelfService = BookshelfService(libraryStore)
+    val bookGroupRepository: BookGroupRepository = BookGroupRepository(libraryStore)
     val searchCoordinator: SearchCoordinator = SearchCoordinator(client, libraryStore)
     val bookDetailCoordinator: BookDetailCoordinator = BookDetailCoordinator(client, bookshelfService, libraryStore)
     val chapterRepository: ChapterRepository = ChapterRepository(client, libraryStore, bookshelfService)
@@ -110,6 +113,14 @@ open class LegadoRuntime(
 
     fun loadBookmarks(): List<SharedBookmark> {
         return bookmarkRepository.list()
+    }
+
+    fun loadBookGroups(): List<SharedBookGroup> {
+        return bookGroupRepository.list()
+    }
+
+    fun loadSelectableBookGroups(): List<SharedBookGroup> {
+        return bookGroupRepository.listSelectable()
     }
 
     fun upsertBookSource(source: SharedBookSource): SharedBookSource {
@@ -199,6 +210,37 @@ open class LegadoRuntime(
     fun removeBook(book: SharedBook): List<SharedBook> {
         bookshelfService.removeBook(book)
         return loadBooks()
+    }
+
+    fun loadBooksForGroup(groupId: Long): List<SharedBook> {
+        return bookGroupRepository.booksForGroup(groupId)
+    }
+
+    fun upsertBookGroup(group: SharedBookGroup): SharedBookGroup {
+        return bookGroupRepository.upsert(group)
+    }
+
+    fun setBookGroupVisible(groupId: Long, show: Boolean): SharedBookGroup? {
+        return bookGroupRepository.setVisible(groupId, show)
+    }
+
+    fun deleteBookGroup(groupId: Long): List<SharedBookGroup> {
+        return bookGroupRepository.delete(groupId)
+    }
+
+    fun setBookGroupEnabled(
+        book: SharedBook,
+        groupId: Long,
+        enabled: Boolean
+    ): SharedBook {
+        return bookGroupRepository.setBookGroupEnabled(book, groupId, enabled)
+    }
+
+    fun setBookGroupMask(
+        book: SharedBook,
+        groupMask: Long
+    ): SharedBook {
+        return bookGroupRepository.setBookGroupMask(book, groupMask)
     }
 
     fun loadBookChapters(book: SharedBook): List<SharedBookChapter> {
