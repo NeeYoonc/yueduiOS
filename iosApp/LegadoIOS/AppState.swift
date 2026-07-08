@@ -138,11 +138,11 @@ final class AppState: ObservableObject {
         do {
             let parsed = try await runtime.loadRssContent(source: source, article: article)
             selectedRssArticle = parsed
-            rssContent = parsed.content ?? parsed.description ?? ""
+            rssContent = parsed.readableContent
             refreshLibrary()
         } catch {
             selectedRssArticle = article
-            rssContent = article.content ?? article.description ?? ""
+            rssContent = article.readableContent
             message = error.localizedDescription
         }
     }

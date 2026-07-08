@@ -62,8 +62,8 @@ private struct RssArticleRow: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
-            if let description = article.description, !description.isEmpty {
-                Text(description)
+            if !article.summary.isEmpty {
+                Text(article.summary)
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .lineLimit(3)

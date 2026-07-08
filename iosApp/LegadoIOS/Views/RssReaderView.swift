@@ -13,7 +13,7 @@ struct RssReaderView: View {
         if !app.rssContent.isEmpty {
             return app.rssContent
         }
-        return article.description ?? ""
+        return article.readableContent
     }
 
     var body: some View {

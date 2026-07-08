@@ -1,6 +1,7 @@
 package io.legado.shared.rss
 
 import io.legado.shared.model.SharedRssSource
+import io.legado.shared.model.SharedRssArticle
 import io.legado.shared.platform.CacheStorePort
 import io.legado.shared.platform.HttpFetcher
 import io.legado.shared.platform.SharedHttpRequest
@@ -11,6 +12,16 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class RssServiceTest {
+    @Test
+    fun articlePresentationFieldsAvoidPlatformNameCollisions() {
+        val introOnly = SharedRssArticle(title = "Title", description = "Intro")
+        val fullContent = introOnly.copy(content = "Full content")
+
+        assertEquals("Intro", introOnly.summary)
+        assertEquals("Intro", introOnly.readableContent)
+        assertEquals("Full content", fullContent.readableContent)
+    }
+
     @Test
     fun refreshesArticlesParsesRulesAndLoadsContent() = runBlocking {
         val fetcher = object : HttpFetcher {

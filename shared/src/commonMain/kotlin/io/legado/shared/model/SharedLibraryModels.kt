@@ -158,7 +158,13 @@ data class SharedRssArticle(
     val variable: String? = null,
     val type: Int = 0,
     val durPos: Int = 0
-)
+) {
+    val summary: String
+        get() = description.orEmpty()
+
+    val readableContent: String
+        get() = content ?: summary
+}
 
 @Serializable
 data class SharedRssReadRecord(
