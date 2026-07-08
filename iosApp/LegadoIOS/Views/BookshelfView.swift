@@ -24,11 +24,11 @@ struct BookshelfView: View {
                                 BookRow(book: book)
                             }
                         }
-                    }
-                    .onDelete { offsets in
-                        offsets
-                            .map { app.books[$0] }
-                            .forEach(app.deleteBook)
+                        .onDelete { offsets in
+                            offsets
+                                .map { app.books[$0] }
+                                .forEach(app.deleteBook)
+                        }
                     }
                 }
             }
