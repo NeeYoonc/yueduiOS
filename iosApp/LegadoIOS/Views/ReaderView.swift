@@ -33,16 +33,25 @@ struct ReaderView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    if speech.isSpeaking {
-                        speech.stop()
-                    } else {
-                        speech.speak(app.currentContent)
+                HStack {
+                    Button {
+                        app.addCurrentBookmark()
+                    } label: {
+                        Image(systemName: "bookmark")
                     }
-                } label: {
-                    Image(systemName: speech.isSpeaking ? "stop.fill" : "speaker.wave.2")
+                    .disabled(app.currentContent.isEmpty)
+
+                    Button {
+                        if speech.isSpeaking {
+                            speech.stop()
+                        } else {
+                            speech.speak(app.currentContent)
+                        }
+                    } label: {
+                        Image(systemName: speech.isSpeaking ? "stop.fill" : "speaker.wave.2")
+                    }
+                    .disabled(app.currentContent.isEmpty)
                 }
-                .disabled(app.currentContent.isEmpty)
             }
 
             ToolbarItemGroup(placement: .bottomBar) {

@@ -13,6 +13,7 @@ final class AppState: ObservableObject {
 
     @Published private(set) var sources: [SharedBookSource] = []
     @Published private(set) var books: [SharedBook] = []
+    @Published private(set) var bookmarks: [SharedBookmark] = []
     @Published private(set) var replaceRules: [SharedReplaceRule] = []
     @Published private(set) var dictRules: [SharedDictRule] = []
     @Published private(set) var httpTts: [SharedHttpTts] = []
@@ -47,6 +48,7 @@ final class AppState: ObservableObject {
     func refreshLibrary() {
         sources = runtime.loadBookSources() as? [SharedBookSource] ?? []
         books = runtime.loadBooks() as? [SharedBook] ?? []
+        bookmarks = runtime.loadBookmarks() as? [SharedBookmark] ?? []
         replaceRules = runtime.loadReplaceRules() as? [SharedReplaceRule] ?? []
         dictRules = runtime.loadDictRules() as? [SharedDictRule] ?? []
         httpTts = runtime.loadHttpTts() as? [SharedHttpTts] ?? []
@@ -200,6 +202,17 @@ final class AppState: ObservableObject {
 
     func deleteSource(_ source: SharedBookSource) {
         _ = runtime.deleteBookSource(bookSourceUrl: source.bookSourceUrl)
+        refreshLibrary()
+    }
+
+    func deleteBook(_ book: SharedBook) {
+        books = runtime.removeBook(book: book) as? [SharedBook] ?? []
+        if selectedBook?.bookUrl == book.bookUrl {
+            selectedBook = nil
+            chapters = []
+            currentChapter = nil
+            currentContent = ""
+        }
         refreshLibrary()
     }
 
@@ -416,6 +429,28 @@ final class AppState: ObservableObject {
         } catch {
             message = error.localizedDescription
         }
+    }
+
+    func addCurrentBookmark() {
+        guard let book = selectedBook, let chapter = currentChapter else {
+            message = "No chapter selected"
+            return
+        }
+        _ = runtime.addBookmark(
+            book: book,
+            chapter: chapter,
+            bookText: String(currentContent.prefix(240)),
+            note: "",
+            position: 0,
+            nowMillis: nowMillis()
+        )
+        refreshLibrary()
+        message = "Bookmark added"
+    }
+
+    func deleteBookmark(_ bookmark: SharedBookmark) {
+        bookmarks = runtime.deleteBookmark(time: bookmark.time) as? [SharedBookmark] ?? []
+        refreshLibrary()
     }
 
     func importLocalTextFile(fileName: String, text: String) {

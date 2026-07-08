@@ -3,6 +3,7 @@ package io.legado.shared
 import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookChapter
 import io.legado.shared.model.SharedBookSource
+import io.legado.shared.model.SharedBookmark
 import io.legado.shared.model.SharedDataSnapshot
 import io.legado.shared.model.SharedDictRule
 import io.legado.shared.model.SharedHttpTts
@@ -19,6 +20,7 @@ import io.legado.shared.book.ChapterRepository
 import io.legado.shared.book.SearchCoordinator
 import io.legado.shared.book.SearchCoordinatorResult
 import io.legado.shared.backup.DataBackupService
+import io.legado.shared.bookmark.BookmarkRepository
 import io.legado.shared.config.DictRuleRepository
 import io.legado.shared.config.HttpTtsRepository
 import io.legado.shared.local.LocalTextBookService
@@ -73,6 +75,7 @@ open class LegadoRuntime(
     val dataBackupService: DataBackupService = DataBackupService(libraryStore)
     val dictRuleRepository: DictRuleRepository = DictRuleRepository(libraryStore)
     val httpTtsRepository: HttpTtsRepository = HttpTtsRepository(libraryStore)
+    val bookmarkRepository: BookmarkRepository = BookmarkRepository(libraryStore)
 
     @Throws(IllegalArgumentException::class)
     fun importAndSaveBookSources(json: String): List<SharedBookSource> {
@@ -103,6 +106,10 @@ open class LegadoRuntime(
 
     fun loadHttpTts(): List<SharedHttpTts> {
         return httpTtsRepository.list()
+    }
+
+    fun loadBookmarks(): List<SharedBookmark> {
+        return bookmarkRepository.list()
     }
 
     fun upsertBookSource(source: SharedBookSource): SharedBookSource {
@@ -189,8 +196,28 @@ open class LegadoRuntime(
         return libraryStore.loadBooks()
     }
 
+    fun removeBook(book: SharedBook): List<SharedBook> {
+        bookshelfService.removeBook(book)
+        return loadBooks()
+    }
+
     fun loadBookChapters(book: SharedBook): List<SharedBookChapter> {
         return libraryStore.loadBookChapters(book)
+    }
+
+    fun addBookmark(
+        book: SharedBook,
+        chapter: SharedBookChapter,
+        bookText: String,
+        note: String = "",
+        position: Int = 0,
+        nowMillis: Long = 0L
+    ): SharedBookmark {
+        return bookmarkRepository.add(book, chapter, bookText, note, position, nowMillis)
+    }
+
+    fun deleteBookmark(time: Long): List<SharedBookmark> {
+        return bookmarkRepository.delete(time)
     }
 
     @Throws(IllegalArgumentException::class)

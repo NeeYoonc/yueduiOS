@@ -25,6 +25,11 @@ struct BookshelfView: View {
                             }
                         }
                     }
+                    .onDelete { offsets in
+                        offsets
+                            .map { app.books[$0] }
+                            .forEach(app.deleteBook)
+                    }
                 }
             }
             .navigationTitle("Legado")

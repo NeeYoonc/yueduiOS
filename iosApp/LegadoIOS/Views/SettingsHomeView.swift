@@ -9,6 +9,7 @@ struct SettingsHomeView: View {
                 Section("Library") {
                     LabeledContent("Sources", value: "\(app.sources.count)")
                     LabeledContent("Books", value: "\(app.books.count)")
+                    LabeledContent("Bookmarks", value: "\(app.bookmarks.count)")
                     LabeledContent("RSS", value: "\(app.rssSources.count)")
                     LabeledContent("Replacements", value: "\(app.replaceRules.count)")
                     LabeledContent("Dictionaries", value: "\(app.dictRules.count)")
@@ -35,6 +36,12 @@ struct SettingsHomeView: View {
                         ReplaceRuleListView()
                     } label: {
                         Label("Replacement rules", systemImage: "wand.and.stars")
+                    }
+
+                    NavigationLink {
+                        BookmarkListView()
+                    } label: {
+                        Label("Bookmarks", systemImage: "bookmark")
                     }
                 }
 
