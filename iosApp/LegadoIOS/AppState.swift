@@ -11,6 +11,7 @@ final class AppState: ObservableObject {
     @Published var txtTocRuleJson: String = ""
     @Published var serverJson: String = ""
     @Published var keyboardAssistJson: String = ""
+    @Published var ruleSubJson: String = ""
     @Published var keyword: String = ""
     @Published var dictionaryKeyword: String = ""
     @Published var selectedSourceIndex: Int = -1
@@ -30,6 +31,7 @@ final class AppState: ObservableObject {
     @Published private(set) var txtTocRules: [SharedTxtTocRule] = []
     @Published private(set) var servers: [SharedServer] = []
     @Published private(set) var keyboardAssists: [SharedKeyboardAssist] = []
+    @Published private(set) var ruleSubs: [SharedRuleSub] = []
     @Published private(set) var rssSources: [SharedRssSource] = []
     @Published private(set) var rssArticles: [SharedRssArticle] = []
     @Published private(set) var exploreSources: [SharedBookSource] = []
@@ -77,6 +79,7 @@ final class AppState: ObservableObject {
         txtTocRules = runtime.loadTxtTocRules() as? [SharedTxtTocRule] ?? []
         servers = runtime.loadServers() as? [SharedServer] ?? []
         keyboardAssists = runtime.loadKeyboardAssists() as? [SharedKeyboardAssist] ?? []
+        ruleSubs = runtime.loadRuleSubs() as? [SharedRuleSub] ?? []
         rssSources = runtime.loadRssSources() as? [SharedRssSource] ?? []
         exploreSources = runtime.loadExploreSources() as? [SharedBookSource] ?? []
         searchKeywords = runtime.loadSearchKeywords() as? [SharedSearchKeyword] ?? []
@@ -297,6 +300,36 @@ final class AppState: ObservableObject {
 
     func deleteKeyboardAssist(_ assist: SharedKeyboardAssist) {
         keyboardAssists = runtime.deleteKeyboardAssist(type: assist.type, key: assist.key) as? [SharedKeyboardAssist] ?? []
+        refreshLibrary()
+    }
+
+    func importRuleSubs(replace: Bool = false) {
+        let rawJson = ruleSubJson.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Rule subscription JSON is empty"
+            return
+        }
+        do {
+            ruleSubs = try runtime.importAndSaveRuleSubs(json: rawJson, replace: replace) as? [SharedRuleSub] ?? []
+            refreshLibrary()
+            message = ruleSubs.isEmpty ? "No usable rule subscriptions" : "Imported \(ruleSubs.count) rule subscription(s)"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func exportRuleSubsToEditor() {
+        ruleSubJson = runtime.exportRuleSubsJson()
+        message = "Exported \(ruleSubs.count) rule subscription(s)"
+    }
+
+    func setRuleSubAutoUpdate(_ ruleSub: SharedRuleSub, autoUpdate: Bool) {
+        _ = runtime.setRuleSubAutoUpdate(id: ruleSub.id, autoUpdate: autoUpdate)
+        refreshLibrary()
+    }
+
+    func deleteRuleSub(_ ruleSub: SharedRuleSub) {
+        ruleSubs = runtime.deleteRuleSub(id: ruleSub.id) as? [SharedRuleSub] ?? []
         refreshLibrary()
     }
 

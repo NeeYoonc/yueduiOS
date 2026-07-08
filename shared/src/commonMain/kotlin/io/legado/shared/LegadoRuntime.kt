@@ -14,6 +14,7 @@ import io.legado.shared.model.SharedKeyboardAssist
 import io.legado.shared.model.SharedReplaceRule
 import io.legado.shared.model.SharedRssArticle
 import io.legado.shared.model.SharedRssSource
+import io.legado.shared.model.SharedRuleSub
 import io.legado.shared.model.SharedSearchBook
 import io.legado.shared.model.SharedSearchKeyword
 import io.legado.shared.model.SharedServer
@@ -33,6 +34,7 @@ import io.legado.shared.config.DictionaryLookupService
 import io.legado.shared.config.DictRuleRepository
 import io.legado.shared.config.HttpTtsRepository
 import io.legado.shared.config.KeyboardAssistRepository
+import io.legado.shared.config.RuleSubRepository
 import io.legado.shared.config.ServerRepository
 import io.legado.shared.config.TxtTocRuleRepository
 import io.legado.shared.explore.ExploreService
@@ -95,6 +97,7 @@ open class LegadoRuntime(
     val txtTocRuleRepository: TxtTocRuleRepository = TxtTocRuleRepository(libraryStore)
     val serverRepository: ServerRepository = ServerRepository(libraryStore)
     val keyboardAssistRepository: KeyboardAssistRepository = KeyboardAssistRepository(libraryStore)
+    val ruleSubRepository: RuleSubRepository = RuleSubRepository(libraryStore)
     val bookmarkRepository: BookmarkRepository = BookmarkRepository(libraryStore)
 
     @Throws(IllegalArgumentException::class)
@@ -146,6 +149,10 @@ open class LegadoRuntime(
 
     fun loadKeyboardAssists(): List<SharedKeyboardAssist> {
         return keyboardAssistRepository.list()
+    }
+
+    fun loadRuleSubs(): List<SharedRuleSub> {
+        return ruleSubRepository.list()
     }
 
     fun loadBookmarks(): List<SharedBookmark> {
@@ -301,6 +308,27 @@ open class LegadoRuntime(
 
     fun exportKeyboardAssistsJson(): String {
         return keyboardAssistRepository.exportJson()
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun importAndSaveRuleSubs(json: String, replace: Boolean = false): List<SharedRuleSub> {
+        return ruleSubRepository.importJson(json, replace)
+    }
+
+    fun upsertRuleSub(ruleSub: SharedRuleSub): SharedRuleSub {
+        return ruleSubRepository.upsert(ruleSub)
+    }
+
+    fun setRuleSubAutoUpdate(id: Long, autoUpdate: Boolean): SharedRuleSub? {
+        return ruleSubRepository.setAutoUpdate(id, autoUpdate)
+    }
+
+    fun deleteRuleSub(id: Long): List<SharedRuleSub> {
+        return ruleSubRepository.delete(id)
+    }
+
+    fun exportRuleSubsJson(): String {
+        return ruleSubRepository.exportJson()
     }
 
     fun exportBackupJson(nowMillis: Long = 0L): String {

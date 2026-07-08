@@ -18,6 +18,7 @@ struct SettingsHomeView: View {
                     LabeledContent("HTTP TTS", value: "\(app.httpTts.count)")
                     LabeledContent("Servers", value: "\(app.servers.count)")
                     LabeledContent("Keyboard Assists", value: "\(app.keyboardAssists.count)")
+                    LabeledContent("Rule Subscriptions", value: "\(app.ruleSubs.count)")
                     LabeledContent("Search History", value: "\(app.searchKeywords.count)")
                     LabeledContent("Results", value: "\(app.searchResults.count)")
                 }
@@ -91,6 +92,12 @@ struct SettingsHomeView: View {
                         KeyboardAssistListView()
                     } label: {
                         Label("Keyboard assists", systemImage: "keyboard")
+                    }
+
+                    NavigationLink {
+                        RuleSubListView()
+                    } label: {
+                        Label("Rule subscriptions", systemImage: "arrow.triangle.2.circlepath")
                     }
                 }
 
