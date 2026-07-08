@@ -16,6 +16,10 @@ class RssArticleStateRepository(
         return libraryStore.loadDataSnapshot().rssStars.sortedByDescending { it.starTime }
     }
 
+    fun listStarredArticles(): List<SharedRssArticle> {
+        return applyState(listStars().map { it.toArticle() })
+    }
+
     fun markRead(
         article: SharedRssArticle,
         read: Boolean,
@@ -106,6 +110,23 @@ class RssArticleStateRepository(
             sort = sort,
             title = title,
             starTime = nowMillis,
+            link = link,
+            pubDate = pubDate,
+            description = description,
+            content = content,
+            image = image,
+            group = group,
+            variable = variable,
+            type = type,
+            durPos = durPos
+        )
+    }
+
+    private fun SharedRssStar.toArticle(): SharedRssArticle {
+        return SharedRssArticle(
+            origin = origin,
+            sort = sort,
+            title = title,
             link = link,
             pubDate = pubDate,
             description = description,

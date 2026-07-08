@@ -40,6 +40,7 @@ final class AppState: ObservableObject {
     @Published private(set) var rssArticles: [SharedRssArticle] = []
     @Published private(set) var rssReadRecords: [SharedRssReadRecord] = []
     @Published private(set) var rssStars: [SharedRssStar] = []
+    @Published private(set) var rssStarredArticles: [SharedRssArticle] = []
     @Published private(set) var exploreSources: [SharedBookSource] = []
     @Published private(set) var selectedExploreSource: SharedBookSource?
     @Published private(set) var exploreKinds: [SharedExploreKind] = []
@@ -91,6 +92,7 @@ final class AppState: ObservableObject {
         rssSources = runtime.loadRssSources() as? [SharedRssSource] ?? []
         rssReadRecords = runtime.loadRssReadRecords() as? [SharedRssReadRecord] ?? []
         rssStars = runtime.loadRssStars() as? [SharedRssStar] ?? []
+        rssStarredArticles = runtime.loadRssStarredArticles() as? [SharedRssArticle] ?? []
         exploreSources = runtime.loadExploreSources() as? [SharedBookSource] ?? []
         searchKeywords = runtime.loadSearchKeywords() as? [SharedSearchKeyword] ?? []
         if selectedSourceIndex >= sources.count {
@@ -416,6 +418,7 @@ final class AppState: ObservableObject {
 
     func setRssArticleStarred(_ article: SharedRssArticle, starred: Bool) {
         rssStars = runtime.setRssArticleStarred(article: article, starred: starred, nowMillis: nowMillis()) as? [SharedRssStar] ?? []
+        rssStarredArticles = runtime.loadRssStarredArticles() as? [SharedRssArticle] ?? []
         refreshLibrary()
     }
 
@@ -598,7 +601,7 @@ final class AppState: ObservableObject {
     }
 
     func openRssArticle(_ article: SharedRssArticle) async {
-        guard let source = selectedRssSource ?? rssSources.first(where: { $0.sourceUrl == article.origin }) else {
+        guard let source = rssSources.first(where: { $0.sourceUrl == article.origin }) ?? selectedRssSource else {
             message = "RSS source not found"
             return
         }

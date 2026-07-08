@@ -40,6 +40,12 @@ struct RssHomeView: View {
                     Image(systemName: "tray.full")
                 }
 
+                NavigationLink {
+                    RssStarListView()
+                } label: {
+                    Image(systemName: "star")
+                }
+
                 Button {
                     app.refreshLibrary()
                 } label: {

@@ -44,6 +44,12 @@ struct SettingsHomeView: View {
                     } label: {
                         Label("Manage RSS sources", systemImage: "dot.radiowaves.left.and.right")
                     }
+
+                    NavigationLink {
+                        RssStarListView()
+                    } label: {
+                        Label("RSS stars", systemImage: "star")
+                    }
                 }
 
                 Section("Reading") {

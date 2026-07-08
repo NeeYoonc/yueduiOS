@@ -48,6 +48,21 @@ class RssArticleStateRepositoryTest {
     }
 
     @Test
+    fun listsStarredArticlesForReaderEntry() {
+        val repository = RssArticleStateRepository(SharedLibraryStore(InMemoryCacheStore()))
+        val article = article(link = "https://rss.test/starred", title = "Starred")
+            .copy(content = "Full text")
+
+        repository.setStarred(article, starred = true, nowMillis = 60L)
+
+        val starred = repository.listStarredArticles()
+
+        assertEquals(listOf("Starred"), starred.map { it.title })
+        assertEquals("Full text", starred.single().content)
+        assertEquals("https://rss.test/starred", starred.single().link)
+    }
+
+    @Test
     fun preservesArticleCacheWhenChangingState() {
         val store = SharedLibraryStore(InMemoryCacheStore())
         val repository = RssArticleStateRepository(store)

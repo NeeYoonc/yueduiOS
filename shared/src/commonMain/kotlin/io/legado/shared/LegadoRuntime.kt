@@ -145,6 +145,10 @@ open class LegadoRuntime(
         return rssArticleStateRepository.listStars()
     }
 
+    fun loadRssStarredArticles(): List<SharedRssArticle> {
+        return rssArticleStateRepository.listStarredArticles()
+    }
+
     fun markRssArticleRead(
         article: SharedRssArticle,
         read: Boolean,
