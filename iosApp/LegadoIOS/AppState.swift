@@ -10,6 +10,7 @@ final class AppState: ObservableObject {
     @Published var httpTtsJson: String = ""
     @Published var txtTocRuleJson: String = ""
     @Published var serverJson: String = ""
+    @Published var keyboardAssistJson: String = ""
     @Published var keyword: String = ""
     @Published var dictionaryKeyword: String = ""
     @Published var selectedSourceIndex: Int = -1
@@ -28,6 +29,7 @@ final class AppState: ObservableObject {
     @Published private(set) var httpTts: [SharedHttpTts] = []
     @Published private(set) var txtTocRules: [SharedTxtTocRule] = []
     @Published private(set) var servers: [SharedServer] = []
+    @Published private(set) var keyboardAssists: [SharedKeyboardAssist] = []
     @Published private(set) var rssSources: [SharedRssSource] = []
     @Published private(set) var rssArticles: [SharedRssArticle] = []
     @Published private(set) var exploreSources: [SharedBookSource] = []
@@ -74,6 +76,7 @@ final class AppState: ObservableObject {
         httpTts = runtime.loadHttpTts() as? [SharedHttpTts] ?? []
         txtTocRules = runtime.loadTxtTocRules() as? [SharedTxtTocRule] ?? []
         servers = runtime.loadServers() as? [SharedServer] ?? []
+        keyboardAssists = runtime.loadKeyboardAssists() as? [SharedKeyboardAssist] ?? []
         rssSources = runtime.loadRssSources() as? [SharedRssSource] ?? []
         exploreSources = runtime.loadExploreSources() as? [SharedBookSource] ?? []
         searchKeywords = runtime.loadSearchKeywords() as? [SharedSearchKeyword] ?? []
@@ -269,6 +272,31 @@ final class AppState: ObservableObject {
 
     func deleteServer(_ server: SharedServer) {
         servers = runtime.deleteServer(id: server.id) as? [SharedServer] ?? []
+        refreshLibrary()
+    }
+
+    func importKeyboardAssists(replace: Bool = false) {
+        let rawJson = keyboardAssistJson.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Keyboard assist JSON is empty"
+            return
+        }
+        do {
+            keyboardAssists = try runtime.importAndSaveKeyboardAssists(json: rawJson, replace: replace) as? [SharedKeyboardAssist] ?? []
+            refreshLibrary()
+            message = keyboardAssists.isEmpty ? "No usable keyboard assists" : "Imported \(keyboardAssists.count) keyboard assist(s)"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func exportKeyboardAssistsToEditor() {
+        keyboardAssistJson = runtime.exportKeyboardAssistsJson()
+        message = "Exported \(keyboardAssists.count) keyboard assist(s)"
+    }
+
+    func deleteKeyboardAssist(_ assist: SharedKeyboardAssist) {
+        keyboardAssists = runtime.deleteKeyboardAssist(type: assist.type, key: assist.key) as? [SharedKeyboardAssist] ?? []
         refreshLibrary()
     }
 

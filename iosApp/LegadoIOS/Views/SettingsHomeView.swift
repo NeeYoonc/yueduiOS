@@ -17,6 +17,7 @@ struct SettingsHomeView: View {
                     LabeledContent("Dictionaries", value: "\(app.dictRules.count)")
                     LabeledContent("HTTP TTS", value: "\(app.httpTts.count)")
                     LabeledContent("Servers", value: "\(app.servers.count)")
+                    LabeledContent("Keyboard Assists", value: "\(app.keyboardAssists.count)")
                     LabeledContent("Search History", value: "\(app.searchKeywords.count)")
                     LabeledContent("Results", value: "\(app.searchResults.count)")
                 }
@@ -84,6 +85,12 @@ struct SettingsHomeView: View {
                         ServerListView()
                     } label: {
                         Label("Remote servers", systemImage: "server.rack")
+                    }
+
+                    NavigationLink {
+                        KeyboardAssistListView()
+                    } label: {
+                        Label("Keyboard assists", systemImage: "keyboard")
                     }
                 }
 

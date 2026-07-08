@@ -10,6 +10,7 @@ import io.legado.shared.model.SharedDictRule
 import io.legado.shared.model.SharedDictionaryLookupResult
 import io.legado.shared.model.SharedExploreKind
 import io.legado.shared.model.SharedHttpTts
+import io.legado.shared.model.SharedKeyboardAssist
 import io.legado.shared.model.SharedReplaceRule
 import io.legado.shared.model.SharedRssArticle
 import io.legado.shared.model.SharedRssSource
@@ -31,6 +32,7 @@ import io.legado.shared.bookmark.BookmarkRepository
 import io.legado.shared.config.DictionaryLookupService
 import io.legado.shared.config.DictRuleRepository
 import io.legado.shared.config.HttpTtsRepository
+import io.legado.shared.config.KeyboardAssistRepository
 import io.legado.shared.config.ServerRepository
 import io.legado.shared.config.TxtTocRuleRepository
 import io.legado.shared.explore.ExploreService
@@ -92,6 +94,7 @@ open class LegadoRuntime(
     val httpTtsRepository: HttpTtsRepository = HttpTtsRepository(libraryStore)
     val txtTocRuleRepository: TxtTocRuleRepository = TxtTocRuleRepository(libraryStore)
     val serverRepository: ServerRepository = ServerRepository(libraryStore)
+    val keyboardAssistRepository: KeyboardAssistRepository = KeyboardAssistRepository(libraryStore)
     val bookmarkRepository: BookmarkRepository = BookmarkRepository(libraryStore)
 
     @Throws(IllegalArgumentException::class)
@@ -139,6 +142,10 @@ open class LegadoRuntime(
 
     fun loadServers(): List<SharedServer> {
         return serverRepository.list()
+    }
+
+    fun loadKeyboardAssists(): List<SharedKeyboardAssist> {
+        return keyboardAssistRepository.list()
     }
 
     fun loadBookmarks(): List<SharedBookmark> {
@@ -277,6 +284,23 @@ open class LegadoRuntime(
 
     fun exportServersJson(): String {
         return serverRepository.exportJson()
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun importAndSaveKeyboardAssists(json: String, replace: Boolean = false): List<SharedKeyboardAssist> {
+        return keyboardAssistRepository.importJson(json, replace)
+    }
+
+    fun upsertKeyboardAssist(assist: SharedKeyboardAssist): SharedKeyboardAssist {
+        return keyboardAssistRepository.upsert(assist)
+    }
+
+    fun deleteKeyboardAssist(type: Int, key: String): List<SharedKeyboardAssist> {
+        return keyboardAssistRepository.delete(type, key)
+    }
+
+    fun exportKeyboardAssistsJson(): String {
+        return keyboardAssistRepository.exportJson()
     }
 
     fun exportBackupJson(nowMillis: Long = 0L): String {
