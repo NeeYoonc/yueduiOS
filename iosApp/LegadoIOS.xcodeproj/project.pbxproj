@@ -31,6 +31,7 @@
 		B10000000000000000000010 /* RssReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000020 /* RssReaderView.swift */; };
 		C10000000000000000000001 /* ReplaceRuleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000011 /* ReplaceRuleListView.swift */; };
 		C10000000000000000000002 /* ReplaceRuleEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000012 /* ReplaceRuleEditorView.swift */; };
+		C10000000000000000000003 /* BackupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000013 /* BackupView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -59,6 +60,7 @@
 		B10000000000000000000020 /* RssReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RssReaderView.swift; sourceTree = "<group>"; };
 		C10000000000000000000011 /* ReplaceRuleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ReplaceRuleListView.swift; sourceTree = "<group>"; };
 		C10000000000000000000012 /* ReplaceRuleEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ReplaceRuleEditorView.swift; sourceTree = "<group>"; };
+		C10000000000000000000013 /* BackupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/BackupView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,6 +104,7 @@
 				B1000000000000000000001B /* SettingsHomeView.swift */,
 				C10000000000000000000011 /* ReplaceRuleListView.swift */,
 				C10000000000000000000012 /* ReplaceRuleEditorView.swift */,
+				C10000000000000000000013 /* BackupView.swift */,
 				B1000000000000000000001C /* SourceListView.swift */,
 				B1000000000000000000001D /* SourceEditorView.swift */,
 				B1000000000000000000001E /* SourceDebugView.swift */,
@@ -242,6 +245,7 @@
 				B10000000000000000000010 /* RssReaderView.swift in Sources */,
 				C10000000000000000000001 /* ReplaceRuleListView.swift in Sources */,
 				C10000000000000000000002 /* ReplaceRuleEditorView.swift in Sources */,
+				C10000000000000000000003 /* BackupView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

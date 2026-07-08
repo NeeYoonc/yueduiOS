@@ -5,6 +5,7 @@ import LegadoShared
 final class AppState: ObservableObject {
     @Published var sourceJson: String = DefaultSource.json
     @Published var replaceRuleJson: String = ""
+    @Published var backupJson: String = ""
     @Published var keyword: String = ""
     @Published var selectedSourceIndex: Int = -1
 
@@ -94,6 +95,31 @@ final class AppState: ObservableObject {
     func exportReplaceRulesToEditor() {
         replaceRuleJson = runtime.exportReplaceRulesJson()
         message = "Exported \(replaceRules.count) rule(s)"
+    }
+
+    func exportBackupToEditor() {
+        backupJson = runtime.exportBackupJson(nowMillis: nowMillis())
+        message = "Exported backup"
+    }
+
+    func importBackupFromEditor() {
+        let rawJson = backupJson.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Backup JSON is empty"
+            return
+        }
+        do {
+            _ = try runtime.importBackupJson(json: rawJson)
+            selectedBook = nil
+            selectedSearchBook = nil
+            chapters = []
+            currentChapter = nil
+            currentContent = ""
+            refreshLibrary()
+            message = "Imported backup"
+        } catch {
+            message = error.localizedDescription
+        }
     }
 
     func setReplaceRuleEnabled(_ rule: SharedReplaceRule, enabled: Bool) {

@@ -36,6 +36,14 @@ struct SettingsHomeView: View {
                     }
                 }
 
+                Section("Data") {
+                    NavigationLink {
+                        BackupView()
+                    } label: {
+                        Label("Backup and restore", systemImage: "externaldrive")
+                    }
+                }
+
                 Section("Active Sources") {
                     if app.sources.isEmpty {
                         EmptyStateView(title: "No sources", systemImage: "tray")

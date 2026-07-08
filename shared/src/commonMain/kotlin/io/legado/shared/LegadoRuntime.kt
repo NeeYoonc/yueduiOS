@@ -3,6 +3,7 @@ package io.legado.shared
 import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookChapter
 import io.legado.shared.model.SharedBookSource
+import io.legado.shared.model.SharedDataSnapshot
 import io.legado.shared.model.SharedReplaceRule
 import io.legado.shared.model.SharedRssArticle
 import io.legado.shared.model.SharedRssSource
@@ -15,6 +16,7 @@ import io.legado.shared.book.ChapterReadResult
 import io.legado.shared.book.ChapterRepository
 import io.legado.shared.book.SearchCoordinator
 import io.legado.shared.book.SearchCoordinatorResult
+import io.legado.shared.backup.DataBackupService
 import io.legado.shared.local.LocalTextBookService
 import io.legado.shared.local.LocalTextImportResult
 import io.legado.shared.platform.CacheStorePort
@@ -64,6 +66,7 @@ open class LegadoRuntime(
     val rssService: RssService = RssService(httpFetcher, libraryStore)
     val localTextBookService: LocalTextBookService = LocalTextBookService(libraryStore, bookshelfService)
     val replacementRepository: ReplacementRepository = ReplacementRepository(libraryStore)
+    val dataBackupService: DataBackupService = DataBackupService(libraryStore)
 
     @Throws(IllegalArgumentException::class)
     fun importAndSaveBookSources(json: String): List<SharedBookSource> {
@@ -123,6 +126,15 @@ open class LegadoRuntime(
 
     fun exportReplaceRulesJson(): String {
         return replacementRepository.exportJson()
+    }
+
+    fun exportBackupJson(nowMillis: Long = 0L): String {
+        return dataBackupService.exportJson(nowMillis)
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun importBackupJson(json: String): SharedDataSnapshot {
+        return dataBackupService.importJson(json)
     }
 
     fun saveBooks(books: List<SharedBook>) {
