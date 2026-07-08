@@ -58,23 +58,23 @@ Expected: all commands pass.
 - Modify: `shared/src/commonMain/kotlin/io/legado/shared/platform/Ports.kt`
 - Create: `shared/src/commonTest/kotlin/io/legado/shared/storage/SharedDataStoreTest.kt`
 
-- [ ] **Step 1: Add shared data models for Android Room parity**
+- [x] **Step 1: Add shared data models for Android Room parity**
 
 Add serializable models for book groups, bookmarks, replace rules, search keywords, cookies, RSS sources/articles/stars/read records, TXT TOC rules, read records, HTTP TTS, cache entries, rule subscriptions, dictionary rules, keyboard assists, and servers.
 
-- [ ] **Step 2: Add versioned shared data snapshot**
+- [x] **Step 2: Add versioned shared data snapshot**
 
 Create a `SharedDataSnapshot` model with schema version, timestamp, and lists for every persisted product data type.
 
-- [ ] **Step 3: Add storage port methods**
+- [x] **Step 3: Add storage port methods**
 
 Extend the cache/storage port with key-value load/save/delete for larger JSON blobs so iOS can persist full library state without waiting for SQLDelight.
 
-- [ ] **Step 4: Write persistence tests**
+- [x] **Step 4: Write persistence tests**
 
 Test saving/loading a snapshot containing at least one item of each model. Test unknown/missing fields by decoding a minimal JSON fixture.
 
-- [ ] **Step 5: Verify**
+- [x] **Step 5: Verify**
 
 Run:
 

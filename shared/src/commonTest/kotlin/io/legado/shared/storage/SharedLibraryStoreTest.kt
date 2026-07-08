@@ -4,6 +4,8 @@ import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookChapter
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedChapterContent
+import io.legado.shared.model.SharedDataSnapshot
+import io.legado.shared.model.SharedSearchKeyword
 import io.legado.shared.platform.CacheStorePort
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -84,6 +86,22 @@ class SharedLibraryStoreTest {
                 chapter.copy(url = "https://source.test/book/1/chapter/missing.html")
             )
         )
+    }
+
+    @Test
+    fun savesAndLoadsVersionedDataSnapshot() {
+        val cache = InMemoryCacheStore()
+        val store = SharedLibraryStore(cache)
+        val snapshot = SharedDataSnapshot(
+            exportedAtMillis = 123L,
+            searchKeywords = listOf(SharedSearchKeyword(word = "metal", usage = 2))
+        )
+
+        store.saveDataSnapshot(snapshot)
+
+        assertEquals(snapshot, store.loadDataSnapshot())
+        store.clearDataSnapshot()
+        assertEquals(SharedDataSnapshot(), store.loadDataSnapshot())
     }
 
     private class InMemoryCacheStore : CacheStorePort {

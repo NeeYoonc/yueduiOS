@@ -6,6 +6,8 @@ import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.SearchBook
 import io.legado.app.data.entities.rule.BookInfoRule
 import io.legado.app.data.entities.rule.ContentRule
+import io.legado.app.data.entities.rule.ExploreRule
+import io.legado.app.data.entities.rule.ReviewRule
 import io.legado.app.data.entities.rule.SearchRule
 import io.legado.app.data.entities.rule.TocRule
 import org.junit.Assert.assertEquals
@@ -22,8 +24,10 @@ class AndroidSharedMappersTest {
             bookSourceGroup = "Group",
             bookSourceType = 0,
             bookUrlPattern = "https://source.test/book/.*",
+            customOrder = 7,
             enabled = true,
             enabledExplore = false,
+            jsLib = "function lib(){}",
             enabledCookieJar = false,
             concurrentRate = "2/1000",
             header = """{"User-Agent":"Legado"}""",
@@ -33,7 +37,17 @@ class AndroidSharedMappersTest {
             coverDecodeJs = "bytes",
             bookSourceComment = "comment",
             variableComment = "vars",
+            lastUpdateTime = 11L,
+            respondTime = 12L,
+            weight = 13,
             exploreUrl = "https://source.test/explore",
+            exploreScreen = "screen",
+            ruleExplore = ExploreRule(
+                bookList = ".explore",
+                name = ".explore-name",
+                author = ".explore-author",
+                bookUrl = ".explore-url"
+            ),
             searchUrl = "https://source.test/search?q={{key}}",
             ruleSearch = SearchRule(
                 bookList = ".book",
@@ -86,7 +100,14 @@ class AndroidSharedMappersTest {
                 imageDecode = "decode",
                 payAction = "pay",
                 callBackJs = "callback"
-            )
+            ),
+            ruleReview = ReviewRule(
+                reviewUrl = ".review@href",
+                avatarRule = ".avatar@src",
+                contentRule = ".review-content"
+            ),
+            eventListener = true,
+            customButton = true
         )
 
         val shared = source.toSharedBookSource()
@@ -94,8 +115,15 @@ class AndroidSharedMappersTest {
         assertEquals("https://source.test", shared.bookSourceUrl)
         assertEquals("Source", shared.bookSourceName)
         assertEquals("Group", shared.bookSourceGroup)
+        assertEquals(7, shared.customOrder)
         assertEquals(false, shared.enabledExplore)
+        assertEquals("function lib(){}", shared.jsLib)
         assertEquals(false, shared.enabledCookieJar)
+        assertEquals(11L, shared.lastUpdateTime)
+        assertEquals(12L, shared.respondTime)
+        assertEquals(13, shared.weight)
+        assertEquals("screen", shared.exploreScreen)
+        assertEquals(".explore", shared.ruleExplore?.bookList)
         assertEquals(".book", shared.ruleSearch?.bookList)
         assertEquals(".updated", shared.ruleSearch?.updateTime)
         assertEquals(".words", shared.ruleSearch?.wordCount)
@@ -116,6 +144,10 @@ class AndroidSharedMappersTest {
         assertEquals("decode", shared.ruleContent?.imageDecode)
         assertEquals("pay", shared.ruleContent?.payAction)
         assertEquals("callback", shared.ruleContent?.callBackJs)
+        assertEquals(".review@href", shared.ruleReview?.reviewUrl)
+        assertEquals(".avatar@src", shared.ruleReview?.avatarRule)
+        assertTrue(shared.eventListener)
+        assertTrue(shared.customButton)
     }
 
     @Test
@@ -126,11 +158,39 @@ class AndroidSharedMappersTest {
             bookUrl = "https://source.test/book/1",
             tocUrl = "https://source.test/book/1/toc",
             origin = "https://source.test",
+            originName = "Source",
             kind = "Sci-Fi",
+            customTag = "Custom Tag",
             latestChapterTitle = "Chapter 9",
+            latestChapterTime = 10L,
+            lastCheckTime = 11L,
+            lastCheckCount = 2,
+            totalChapterNum = 9,
+            durChapterTitle = "Chapter 3",
+            durChapterIndex = 3,
+            durVolumeIndex = 1,
+            chapterInVolumeIndex = 2,
+            durChapterPos = 99,
+            durChapterTime = 12L,
             intro = "Intro",
+            customIntro = "Custom Intro",
             coverUrl = "https://source.test/cover.jpg",
-            variable = """{"token":"abc"}"""
+            customCoverUrl = "https://source.test/custom-cover.jpg",
+            charset = "UTF-8",
+            type = 1,
+            group = 4L,
+            wordCount = "100K",
+            canUpdate = false,
+            order = 5,
+            originOrder = 6,
+            variable = """{"token":"abc"}""",
+            readConfig = Book.ReadConfig(
+                reverseToc = true,
+                imageStyle = "FULL",
+                ttsEngine = "native",
+                readSimulating = true
+            ),
+            syncTime = 13L
         )
 
         val sharedBook = book.toSharedBook()
@@ -138,6 +198,17 @@ class AndroidSharedMappersTest {
         assertEquals("Metal", sharedBook.name)
         assertEquals("Tester", sharedBook.author)
         assertEquals("https://source.test/book/1/toc", sharedBook.tocUrl)
+        assertEquals("Source", sharedBook.originName)
+        assertEquals("Custom Tag", sharedBook.customTag)
+        assertEquals(9, sharedBook.totalChapterNum)
+        assertEquals(3, sharedBook.durChapterIndex)
+        assertEquals(99, sharedBook.durChapterPos)
+        assertEquals("Custom Intro", sharedBook.customIntro)
+        assertEquals("https://source.test/custom-cover.jpg", sharedBook.customCoverUrl)
+        assertEquals("100K", sharedBook.wordCount)
+        assertEquals(false, sharedBook.canUpdate)
+        assertEquals("FULL", sharedBook.readConfig?.imageStyle)
+        assertEquals(true, sharedBook.readConfig?.readSimulating)
         assertEquals("abc", sharedBook.variableMap["token"])
 
         val searchBook = SearchBook(
@@ -148,7 +219,15 @@ class AndroidSharedMappersTest {
             kind = "Fantasy",
             latestChapterTitle = "Latest",
             intro = "Intro",
-            coverUrl = "https://source.test/result.jpg"
+            coverUrl = "https://source.test/result.jpg",
+            tocUrl = "https://source.test/book/2/toc",
+            type = 4,
+            wordCount = "200K",
+            variable = """{"result":"yes"}""",
+            originOrder = 8,
+            chapterWordCountText = "2K/chapter",
+            chapterWordCount = 2000,
+            respondTime = 300
         )
 
         val sharedSearchBook = searchBook.toSharedSearchBook()
@@ -157,6 +236,11 @@ class AndroidSharedMappersTest {
         assertEquals("Fantasy", sharedSearchBook.kind)
         assertEquals("Latest", sharedSearchBook.latestChapterTitle)
         assertEquals("https://source.test/result.jpg", sharedSearchBook.coverUrl)
+        assertEquals("https://source.test/book/2/toc", sharedSearchBook.tocUrl)
+        assertEquals(4, sharedSearchBook.type)
+        assertEquals("200K", sharedSearchBook.wordCount)
+        assertEquals(8, sharedSearchBook.originOrder)
+        assertEquals(2000, sharedSearchBook.chapterWordCount)
     }
 
     @Test
@@ -168,6 +252,15 @@ class AndroidSharedMappersTest {
             isVolume = true,
             isVip = true,
             isPay = false,
+            baseUrl = "https://source.test",
+            bookUrl = "https://source.test/book/1",
+            resourceUrl = "https://source.test/audio/1.mp3",
+            wordCount = "2K",
+            start = 10L,
+            end = 20L,
+            startFragmentId = "frag-a",
+            endFragmentId = "frag-b",
+            imgUrl = "https://source.test/image.jpg",
             tag = "2026-07-07",
             variable = """{"page":"10"}"""
         )
@@ -179,7 +272,17 @@ class AndroidSharedMappersTest {
         assertEquals(3, shared.index)
         assertTrue(shared.isVolume)
         assertTrue(shared.isVip)
+        assertEquals("https://source.test", shared.baseUrl)
+        assertEquals("https://source.test/book/1", shared.bookUrl)
+        assertEquals("https://source.test/audio/1.mp3", shared.resourceUrl)
+        assertEquals("2K", shared.wordCount)
+        assertEquals(10L, shared.start)
+        assertEquals(20L, shared.end)
+        assertEquals("frag-a", shared.startFragmentId)
+        assertEquals("frag-b", shared.endFragmentId)
+        assertEquals("https://source.test/image.jpg", shared.imgUrl)
         assertEquals("2026-07-07", shared.tag)
+        assertEquals("""{"page":"10"}""", shared.variable)
         assertEquals("10", shared.variableMap["page"])
     }
 }

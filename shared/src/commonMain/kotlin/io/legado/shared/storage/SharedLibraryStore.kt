@@ -4,13 +4,15 @@ import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookChapter
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedChapterContent
+import io.legado.shared.model.SharedDataSnapshot
 import io.legado.shared.platform.CacheStorePort
 import kotlinx.serialization.json.Json
 
 class SharedLibraryStore(
     private val cacheStore: CacheStorePort,
     private val sourceKey: String = DEFAULT_SOURCE_KEY,
-    private val booksKey: String = DEFAULT_BOOKS_KEY
+    private val booksKey: String = DEFAULT_BOOKS_KEY,
+    private val dataSnapshotKey: String = DEFAULT_DATA_SNAPSHOT_KEY
 ) {
     fun saveBookSources(sources: List<SharedBookSource>) {
         cacheStore.putText(sourceKey, json.encodeToString(sources))
@@ -26,6 +28,25 @@ class SharedLibraryStore(
 
     fun loadBooks(): List<SharedBook> {
         return loadList(booksKey)
+    }
+
+    fun saveDataSnapshot(snapshot: SharedDataSnapshot) {
+        cacheStore.putText(dataSnapshotKey, json.encodeToString(snapshot))
+    }
+
+    fun loadDataSnapshot(): SharedDataSnapshot {
+        val rawJson = cacheStore.getText(dataSnapshotKey)?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?: return SharedDataSnapshot()
+        return runCatching {
+            json.decodeFromString<SharedDataSnapshot>(rawJson)
+        }.getOrElse {
+            SharedDataSnapshot()
+        }
+    }
+
+    fun clearDataSnapshot() {
+        cacheStore.removeText(dataSnapshotKey)
     }
 
     fun saveChapterContent(
@@ -76,6 +97,7 @@ class SharedLibraryStore(
     companion object {
         const val DEFAULT_SOURCE_KEY = "legado.sources"
         const val DEFAULT_BOOKS_KEY = "legado.books"
+        const val DEFAULT_DATA_SNAPSHOT_KEY = "legado.dataSnapshot"
         const val CHAPTER_CONTENT_KEY_PREFIX = "legado.chapterContent."
 
         private val json = Json {

@@ -41,6 +41,9 @@ interface CookieStorePort {
 interface CacheStorePort {
     fun getText(key: String): String?
     fun putText(key: String, value: String)
+    fun removeText(key: String) {
+        putText(key, "")
+    }
 }
 
 interface RuleLogger {
