@@ -12,15 +12,6 @@ on:
       - 'settings.gradle'
       - 'gradle.properties'
       - '.github/workflows/ios-ci.yml'
-  pull_request:
-    paths:
-      - 'shared/**'
-      - 'iosApp/**'
-      - 'gradle/**'
-      - 'build.gradle'
-      - 'settings.gradle'
-      - 'gradle.properties'
-      - '.github/workflows/ios-ci.yml'
   workflow_dispatch:
 
 concurrency:
