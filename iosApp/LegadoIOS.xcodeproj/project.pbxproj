@@ -9,22 +9,42 @@
 /* Begin PBXBuildFile section */
 		A10000000000000000000001 /* LegadoIOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000011 /* LegadoIOSApp.swift */; };
 		A10000000000000000000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* ContentView.swift */; };
-		A10000000000000000000003 /* LegadoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* LegadoViewModel.swift */; };
 		A10000000000000000000004 /* DefaultSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000014 /* DefaultSource.swift */; };
 		A10000000000000000000005 /* LegadoShared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A10000000000000000000015 /* LegadoShared.xcframework */; };
 		A10000000000000000000006 /* DefaultDataBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000016 /* DefaultDataBundle.swift */; };
 		A10000000000000000000007 /* DefaultData in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000017 /* DefaultData */; };
+		B10000000000000000000001 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000011 /* AppState.swift */; };
+		B10000000000000000000002 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000012 /* MainTabView.swift */; };
+		B10000000000000000000003 /* EmptyStateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000013 /* EmptyStateView.swift */; };
+		B10000000000000000000004 /* BookshelfView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000014 /* BookshelfView.swift */; };
+		B10000000000000000000005 /* ExploreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000015 /* ExploreView.swift */; };
+		B10000000000000000000006 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000016 /* SearchView.swift */; };
+		B10000000000000000000007 /* BookDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000017 /* BookDetailView.swift */; };
+		B10000000000000000000008 /* ChapterListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000018 /* ChapterListView.swift */; };
+		B10000000000000000000009 /* ReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000019 /* ReaderView.swift */; };
+		B1000000000000000000000A /* RssHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001A /* RssHomeView.swift */; };
+		B1000000000000000000000B /* SettingsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001B /* SettingsHomeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		A10000000000000000000010 /* LegadoIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LegadoIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000011 /* LegadoIOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegadoIOSApp.swift; sourceTree = "<group>"; };
 		A10000000000000000000012 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		A10000000000000000000013 /* LegadoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegadoViewModel.swift; sourceTree = "<group>"; };
 		A10000000000000000000014 /* DefaultSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSource.swift; sourceTree = "<group>"; };
 		A10000000000000000000015 /* LegadoShared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = LegadoShared.xcframework; path = ../shared/build/XCFrameworks/debug/LegadoShared.xcframework; sourceTree = SOURCE_ROOT; };
 		A10000000000000000000016 /* DefaultDataBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultDataBundle.swift; sourceTree = "<group>"; };
 		A10000000000000000000017 /* DefaultData */ = {isa = PBXFileReference; lastKnownFileType = folder; path = DefaultData; sourceTree = "<group>"; };
+		B10000000000000000000011 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		B10000000000000000000012 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MainTabView.swift; sourceTree = "<group>"; };
+		B10000000000000000000013 /* EmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/EmptyStateView.swift; sourceTree = "<group>"; };
+		B10000000000000000000014 /* BookshelfView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/BookshelfView.swift; sourceTree = "<group>"; };
+		B10000000000000000000015 /* ExploreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ExploreView.swift; sourceTree = "<group>"; };
+		B10000000000000000000016 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SearchView.swift; sourceTree = "<group>"; };
+		B10000000000000000000017 /* BookDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/BookDetailView.swift; sourceTree = "<group>"; };
+		B10000000000000000000018 /* ChapterListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ChapterListView.swift; sourceTree = "<group>"; };
+		B10000000000000000000019 /* ReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ReaderView.swift; sourceTree = "<group>"; };
+		B1000000000000000000001A /* RssHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RssHomeView.swift; sourceTree = "<group>"; };
+		B1000000000000000000001B /* SettingsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SettingsHomeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,7 +73,17 @@
 			children = (
 				A10000000000000000000011 /* LegadoIOSApp.swift */,
 				A10000000000000000000012 /* ContentView.swift */,
-				A10000000000000000000013 /* LegadoViewModel.swift */,
+				B10000000000000000000011 /* AppState.swift */,
+				B10000000000000000000012 /* MainTabView.swift */,
+				B10000000000000000000013 /* EmptyStateView.swift */,
+				B10000000000000000000014 /* BookshelfView.swift */,
+				B10000000000000000000015 /* ExploreView.swift */,
+				B10000000000000000000016 /* SearchView.swift */,
+				B10000000000000000000017 /* BookDetailView.swift */,
+				B10000000000000000000018 /* ChapterListView.swift */,
+				B10000000000000000000019 /* ReaderView.swift */,
+				B1000000000000000000001A /* RssHomeView.swift */,
+				B1000000000000000000001B /* SettingsHomeView.swift */,
 				A10000000000000000000014 /* DefaultSource.swift */,
 				A10000000000000000000016 /* DefaultDataBundle.swift */,
 				A10000000000000000000017 /* DefaultData */,
@@ -171,9 +201,19 @@
 			files = (
 				A10000000000000000000001 /* LegadoIOSApp.swift in Sources */,
 				A10000000000000000000002 /* ContentView.swift in Sources */,
-				A10000000000000000000003 /* LegadoViewModel.swift in Sources */,
 				A10000000000000000000004 /* DefaultSource.swift in Sources */,
 				A10000000000000000000006 /* DefaultDataBundle.swift in Sources */,
+				B10000000000000000000001 /* AppState.swift in Sources */,
+				B10000000000000000000002 /* MainTabView.swift in Sources */,
+				B10000000000000000000003 /* EmptyStateView.swift in Sources */,
+				B10000000000000000000004 /* BookshelfView.swift in Sources */,
+				B10000000000000000000005 /* ExploreView.swift in Sources */,
+				B10000000000000000000006 /* SearchView.swift in Sources */,
+				B10000000000000000000007 /* BookDetailView.swift in Sources */,
+				B10000000000000000000008 /* ChapterListView.swift in Sources */,
+				B10000000000000000000009 /* ReaderView.swift in Sources */,
+				B1000000000000000000000A /* RssHomeView.swift in Sources */,
+				B1000000000000000000000B /* SettingsHomeView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
