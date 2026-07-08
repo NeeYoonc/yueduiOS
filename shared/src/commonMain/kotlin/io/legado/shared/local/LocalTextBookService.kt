@@ -192,7 +192,7 @@ class LocalTextBookService(
 
         private val fallbackChapterRegexes = listOf(
             Regex(
-                """^\s*(?:第[\d零〇一二三四五六七八九十百千万两]+[章节回卷集部篇].{0,60}|[Cc]hapter\s+\d+.{0,80}|[Ss]ection\s+\d+.{0,80}|[Pp]art\s+\d+.{0,80})\s*$""",
+                """^[ \t　]*(?:第[\d零〇一二三四五六七八九十百千万两]+[章节回卷集部篇].{0,60}|[0-9]+[、.．][ \t　]*.{0,80}|[Cc]hapter[ \t　]+\d+.{0,80}|[Ss]ection[ \t　]+\d+.{0,80}|[Pp]art[ \t　]+\d+.{0,80})[ \t　]*$""",
                 RegexOption.MULTILINE
             )
         )

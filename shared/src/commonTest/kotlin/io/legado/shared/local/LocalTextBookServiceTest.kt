@@ -65,6 +65,32 @@ class LocalTextBookServiceTest {
         assertEquals("Only body text.", store.loadChapterContent(result.book, result.chapters.single())?.content)
     }
 
+    @Test
+    fun importsChineseFilenameAuthorAndChapterHeadings() {
+        val store = SharedLibraryStore(InMemoryCacheStore())
+        val service = LocalTextBookService(store)
+
+        val result = service.importTextFile(
+            fileName = "剑来 作者：烽火戏诸侯.txt",
+            text = """
+                楔子
+                旧事如潮。
+
+                第一章 惊蛰
+                春雷响。
+
+                第2章 新雨
+                少年行。
+            """.trimIndent(),
+            nowMillis = 789L
+        )
+
+        assertEquals("剑来", result.book.name)
+        assertEquals("烽火戏诸侯", result.book.author)
+        assertEquals(listOf("Preface", "第一章 惊蛰", "第2章 新雨"), result.chapters.map { it.title })
+        assertEquals("春雷响。", store.loadChapterContent(result.book, result.chapters[1])?.content?.trim())
+    }
+
     private class InMemoryCacheStore : CacheStorePort {
         private val values = mutableMapOf<String, String>()
 
