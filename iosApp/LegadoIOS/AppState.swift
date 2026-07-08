@@ -14,6 +14,7 @@ final class AppState: ObservableObject {
     @Published var ruleSubJson: String = ""
     @Published var rawConfigJson: String = ""
     @Published var rssSourceJson: String = ""
+    @Published var webDavBackupFileName: String = "legado-backup.json"
     @Published var keyword: String = ""
     @Published var dictionaryKeyword: String = ""
     @Published var selectedSourceIndex: Int = -1
@@ -443,6 +444,59 @@ final class AppState: ObservableObject {
             currentContent = ""
             refreshLibrary()
             message = "Imported backup"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func uploadBackupToWebDav() async {
+        guard let server = servers.first(where: { $0.type.uppercased() == "WEBDAV" }) else {
+            message = "No WebDAV server configured"
+            return
+        }
+        let fileName = webDavBackupFileName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !fileName.isEmpty else {
+            message = "WebDAV backup file name is empty"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            let response = try await runtime.uploadBackupToWebDav(
+                server: server,
+                fileName: fileName,
+                nowMillis: nowMillis()
+            )
+            message = "Uploaded backup to \(server.name) (HTTP \(response.statusCode))"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func downloadBackupFromWebDav() async {
+        guard let server = servers.first(where: { $0.type.uppercased() == "WEBDAV" }) else {
+            message = "No WebDAV server configured"
+            return
+        }
+        let fileName = webDavBackupFileName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !fileName.isEmpty else {
+            message = "WebDAV backup file name is empty"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            _ = try await runtime.downloadBackupFromWebDav(server: server, fileName: fileName)
+            backupJson = runtime.exportBackupJson(nowMillis: nowMillis())
+            selectedBook = nil
+            selectedSearchBook = nil
+            chapters = []
+            currentChapter = nil
+            currentContent = ""
+            refreshLibrary()
+            message = "Downloaded and imported backup from \(server.name)"
         } catch {
             message = error.localizedDescription
         }

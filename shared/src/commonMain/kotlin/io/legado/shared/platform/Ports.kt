@@ -3,7 +3,10 @@ package io.legado.shared.platform
 enum class SharedHttpMethod {
     GET,
     POST,
-    HEAD
+    HEAD,
+    PUT,
+    DELETE,
+    PROPFIND
 }
 
 data class SharedHttpRequest(

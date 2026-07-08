@@ -25,6 +25,16 @@ class AndroidHttpFetcher(
                 SharedHttpMethod.GET -> get()
                 SharedHttpMethod.POST -> post((request.body ?: "").toRequestBody())
                 SharedHttpMethod.HEAD -> head()
+                SharedHttpMethod.PUT -> put((request.body ?: "").toRequestBody())
+                SharedHttpMethod.DELETE -> {
+                    val requestBody = request.body
+                    if (requestBody == null) {
+                        delete()
+                    } else {
+                        method("DELETE", requestBody.toRequestBody())
+                    }
+                }
+                SharedHttpMethod.PROPFIND -> method("PROPFIND", (request.body ?: "").toRequestBody())
             }
         }
         val body = if (request.method == SharedHttpMethod.HEAD) {

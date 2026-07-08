@@ -34,6 +34,7 @@ import io.legado.shared.book.SearchCoordinator
 import io.legado.shared.book.SearchCoordinatorResult
 import io.legado.shared.book.ReadRecordRepository
 import io.legado.shared.backup.DataBackupService
+import io.legado.shared.backup.WebDavBackupService
 import io.legado.shared.bookmark.BookmarkRepository
 import io.legado.shared.config.DictionaryLookupService
 import io.legado.shared.config.DictRuleRepository
@@ -49,6 +50,7 @@ import io.legado.shared.local.LocalTextImportResult
 import io.legado.shared.platform.CacheStorePort
 import io.legado.shared.platform.HttpFetcher
 import io.legado.shared.platform.ScriptRuntime
+import io.legado.shared.platform.SharedHttpResponse
 import io.legado.shared.rule.AnalyzeRuleEngine
 import io.legado.shared.rule.RuleWebViewRuntime
 import io.legado.shared.replacement.ReplacementRepository
@@ -102,6 +104,7 @@ open class LegadoRuntime(
     val localTextBookService: LocalTextBookService = LocalTextBookService(libraryStore, bookshelfService)
     val replacementRepository: ReplacementRepository = ReplacementRepository(libraryStore)
     val dataBackupService: DataBackupService = DataBackupService(libraryStore)
+    val webDavBackupService: WebDavBackupService = WebDavBackupService(httpFetcher)
     val dictRuleRepository: DictRuleRepository = DictRuleRepository(libraryStore)
     val dictionaryLookupService: DictionaryLookupService = DictionaryLookupService(httpFetcher, dictRuleRepository, ruleEngine)
     val httpTtsRepository: HttpTtsRepository = HttpTtsRepository(libraryStore)
@@ -438,6 +441,23 @@ open class LegadoRuntime(
 
     fun exportBackupJson(nowMillis: Long = 0L): String {
         return dataBackupService.exportJson(nowMillis)
+    }
+
+    suspend fun uploadBackupToWebDav(
+        server: SharedServer,
+        fileName: String,
+        nowMillis: Long = 0L
+    ): SharedHttpResponse {
+        val response = webDavBackupService.uploadBackup(server, fileName, exportBackupJson(nowMillis))
+        require(response.isSuccess) { "WebDAV upload failed: HTTP ${response.statusCode}" }
+        return response
+    }
+
+    suspend fun downloadBackupFromWebDav(
+        server: SharedServer,
+        fileName: String
+    ): SharedDataSnapshot {
+        return importBackupJson(webDavBackupService.downloadBackup(server, fileName))
     }
 
     @Throws(IllegalArgumentException::class)

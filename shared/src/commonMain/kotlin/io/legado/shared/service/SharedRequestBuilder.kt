@@ -68,6 +68,9 @@ object SharedRequestBuilder {
         return when (this?.uppercase()) {
             "POST" -> SharedHttpMethod.POST
             "HEAD" -> SharedHttpMethod.HEAD
+            "PUT" -> SharedHttpMethod.PUT
+            "DELETE" -> SharedHttpMethod.DELETE
+            "PROPFIND" -> SharedHttpMethod.PROPFIND
             else -> SharedHttpMethod.GET
         }
     }
