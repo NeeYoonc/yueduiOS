@@ -17,11 +17,12 @@ class ReadingFlowService(
         suspendSearchResultParser: SuspendSearchResultParser? = null,
         bookInfoParser: BookInfoParser = RegexBookInfoParser,
         chapterListParser: ChapterListParser = RegexChapterListParser,
+        suspendChapterListParser: SuspendChapterListParser? = null,
         chapterContentParser: ChapterContentParser = RegexChapterContentParser
     ) : this(
         searchService = BookSearchService(httpFetcher, searchResultParser, suspendSearchResultParser),
         bookInfoService = BookInfoService(httpFetcher, bookInfoParser),
-        tocService = BookTocService(httpFetcher, chapterListParser),
+        tocService = BookTocService(httpFetcher, chapterListParser, suspendChapterListParser),
         contentService = BookContentService(httpFetcher, chapterContentParser)
     )
 

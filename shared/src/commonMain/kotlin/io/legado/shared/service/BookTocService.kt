@@ -10,6 +10,7 @@ import io.legado.shared.platform.SharedHttpResponse
 class BookTocService(
     private val httpFetcher: HttpFetcher,
     private val chapterListParser: ChapterListParser = RegexChapterListParser,
+    private val suspendChapterListParser: SuspendChapterListParser? = null,
     private val maxTocPages: Int = 20
 ) {
     suspend fun getChapterList(
@@ -22,7 +23,7 @@ class BookTocService(
         val allChapters = mutableListOf<SharedBookChapter>()
         val firstResponse = httpFetcher.fetch(SharedRequestBuilder.build(requestUrl))
         visitedUrls.add(requestUrl)
-        val firstPage = parseAndNormalize(source, firstResponse)
+        val firstPage = parseAndNormalize(source, book, firstResponse)
         allChapters.addAll(firstPage.chapters)
         enqueueNextUrls(firstPage.nextTocUrls, visitedUrls, pendingUrls)
         while (pendingUrls.isNotEmpty() && visitedUrls.size < maxTocPages) {
@@ -31,7 +32,7 @@ class BookTocService(
                 continue
             }
             val nextResponse = httpFetcher.fetch(SharedRequestBuilder.build(nextUrl))
-            val nextPage = parseAndNormalize(source, nextResponse)
+            val nextPage = parseAndNormalize(source, book, nextResponse)
             allChapters.addAll(nextPage.chapters)
             enqueueNextUrls(nextPage.nextTocUrls, visitedUrls, pendingUrls)
         }
@@ -43,12 +44,14 @@ class BookTocService(
         )
     }
 
-    private fun parseAndNormalize(
+    private suspend fun parseAndNormalize(
         source: SharedBookSource,
+        book: SharedBook,
         response: SharedHttpResponse
     ): ChapterListPage {
         return ChapterListPage(
-            chapters = chapterListParser.parse(source, response.body)
+            chapters = (suspendChapterListParser?.parse(source, book, response.body)
+                ?: chapterListParser.parse(source, response.body))
                 .map { chapter ->
                     chapter.copy(
                         url = chapter.url
@@ -59,7 +62,8 @@ class BookTocService(
                 },
             nextTocUrls = SharedUrlResolver.resolveAll(
                 response.finalUrl,
-                chapterListParser.parseNextUrls(source, response.body)
+                suspendChapterListParser?.parseNextUrls(source, book, response.body)
+                    ?: chapterListParser.parseNextUrls(source, response.body)
             )
         )
     }

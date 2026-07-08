@@ -195,6 +195,7 @@ data class SharedSearchBook(
     val wordCount: String? = null,
     val time: Long = 0,
     val variable: String? = null,
+    val variableMap: Map<String, String> = emptyMap(),
     val originOrder: Int = 0,
     val chapterWordCountText: String? = null,
     val chapterWordCount: Int = -1,
@@ -214,7 +215,8 @@ data class SharedSearchBook(
         type = type,
         wordCount = wordCount,
         originOrder = originOrder,
-        variable = variable
+        variable = variable,
+        variableMap = variableMap
     )
 }
 

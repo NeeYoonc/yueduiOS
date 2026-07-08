@@ -10,6 +10,7 @@ import io.legado.shared.platform.HttpFetcher
 import io.legado.shared.platform.ScriptRuntime
 import io.legado.shared.rule.AnalyzeRuleEngine
 import io.legado.shared.rule.RuleWebViewRuntime
+import io.legado.shared.service.RuleEngineChapterListParser
 import io.legado.shared.service.RuleEngineSearchResultParser
 import io.legado.shared.service.ReadingFlowResult
 import io.legado.shared.source.DefaultDataImporter
@@ -28,7 +29,8 @@ open class LegadoRuntime(
     )
     val client: LegadoSharedClient = LegadoSharedClient(
         httpFetcher = httpFetcher,
-        suspendSearchResultParser = RuleEngineSearchResultParser(ruleEngine)
+        suspendSearchResultParser = RuleEngineSearchResultParser(ruleEngine),
+        suspendChapterListParser = RuleEngineChapterListParser(ruleEngine)
     )
     val libraryStore: SharedLibraryStore = SharedLibraryStore(cacheStore)
     val bookshelfService: BookshelfService = BookshelfService(libraryStore)

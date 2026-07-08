@@ -1,6 +1,7 @@
 package io.legado.shared.service
 
 import io.legado.shared.model.SharedBookChapter
+import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.rule.RuleAnalyzer
 import kotlinx.serialization.json.JsonElement
@@ -9,6 +10,12 @@ interface ChapterListParser {
     fun parse(source: SharedBookSource, body: String): List<SharedBookChapter>
 
     fun parseNextUrls(source: SharedBookSource, body: String): List<String> = emptyList()
+}
+
+fun interface SuspendChapterListParser {
+    suspend fun parse(source: SharedBookSource, book: SharedBook, body: String): List<SharedBookChapter>
+
+    suspend fun parseNextUrls(source: SharedBookSource, book: SharedBook, body: String): List<String> = emptyList()
 }
 
 object RegexChapterListParser : ChapterListParser {

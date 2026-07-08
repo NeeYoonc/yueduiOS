@@ -4,6 +4,7 @@ import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedSearchRule
 import io.legado.shared.platform.ScriptRuntime
 import io.legado.shared.rule.AnalyzeRuleEngine
+import io.legado.shared.rule.RuleJavaBridge
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -14,6 +15,7 @@ class RuleEngineSearchResultParserTest {
         val engine = AnalyzeRuleEngine(
             scriptRuntime = object : ScriptRuntime {
                 override suspend fun evaluate(script: String, bindings: Map<String, Any?>): Any? {
+                    (bindings["java"] as RuleJavaBridge).put("bookId", bindings["result"])
                     return "${bindings["result"]}/detail"
                 }
             }
@@ -43,5 +45,7 @@ class RuleEngineSearchResultParserTest {
         assertEquals("Tester", books.single().author)
         assertEquals("book-1/detail", books.single().bookUrl)
         assertEquals("/cover.jpg", books.single().coverUrl)
+        assertEquals("book-1", books.single().variableMap["bookId"])
+        assertEquals("book-1", books.single().toBook().variableMap["bookId"])
     }
 }

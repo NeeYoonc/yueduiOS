@@ -58,8 +58,21 @@ class AnalyzeRuleEngine(
         rule: String?,
         context: RuleEvaluationContext = RuleEvaluationContext()
     ): String? {
+        return evaluateString(
+            content = content,
+            rule = rule,
+            context = context,
+            variables = context.variables.toMutableMap()
+        )
+    }
+
+    suspend fun evaluateString(
+        content: String,
+        rule: String?,
+        context: RuleEvaluationContext = RuleEvaluationContext(),
+        variables: MutableMap<String, String>
+    ): String? {
         val trimmed = rule?.trim()?.takeIf { it.isNotEmpty() } ?: return null
-        val variables = context.variables.toMutableMap()
         val ruleWithoutPut = applyPutRules(content, trimmed, variables)
         val segments = splitExecutableSegments(ruleWithoutPut)
         var result: String? = null
