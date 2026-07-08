@@ -26,6 +26,20 @@ interface RuleWebViewRuntime {
     suspend fun evaluate(request: RuleWebViewRequest): String
 }
 
+class RuleJavaBridge(
+    private val variables: MutableMap<String, String>
+) {
+    fun put(key: String, value: Any?): String {
+        val text = value?.toString().orEmpty()
+        variables[key] = text
+        return text
+    }
+
+    fun get(key: String): String {
+        return variables[key].orEmpty()
+    }
+}
+
 class UnsupportedRuleRuntimeException(message: String) : IllegalStateException(message)
 
 class AnalyzeRuleEngine(
@@ -97,13 +111,14 @@ class AnalyzeRuleEngine(
         content: String,
         script: String,
         context: RuleEvaluationContext,
-        variables: Map<String, String>
+        variables: MutableMap<String, String>
     ): String? {
         val runtime = scriptRuntime
             ?: throw UnsupportedRuleRuntimeException("@js rule requires a platform script runtime")
         return runtime.evaluate(
             script = script,
             bindings = variables + mapOf(
+                "java" to RuleJavaBridge(variables),
                 "result" to content,
                 "baseUrl" to context.baseUrl,
                 "sourceKey" to context.sourceKey,

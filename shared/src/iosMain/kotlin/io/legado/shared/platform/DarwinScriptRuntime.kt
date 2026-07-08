@@ -15,7 +15,7 @@ class DarwinScriptRuntime : ScriptRuntime {
             "var ${key.toSafeIdentifier()} = ${value.toJavaScriptLiteral()};"
         }
         val result = context.evaluateScript(
-            listOf(bootstrap, script)
+            listOf(bootstrap, bridgeBootstrap, script)
                 .filter { it.isNotBlank() }
                 .joinToString(separator = "\n")
         )
@@ -61,5 +61,22 @@ class DarwinScriptRuntime : ScriptRuntime {
             is Iterable<*> -> JsonArray(map { it.toJsonElement() })
             else -> JsonPrimitive(toString())
         }
+    }
+
+    private companion object {
+        val bridgeBootstrap = """
+            if (typeof variables === 'undefined' || variables === null) {
+                var variables = {};
+            }
+            var java = {
+                put: function(key, value) {
+                    variables[String(key)] = value == null ? '' : String(value);
+                    return variables[String(key)];
+                },
+                get: function(key) {
+                    return variables[String(key)] || '';
+                }
+            };
+        """.trimIndent()
     }
 }
