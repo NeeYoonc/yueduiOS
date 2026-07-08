@@ -13,6 +13,7 @@ struct SettingsHomeView: View {
                     LabeledContent("Bookmarks", value: "\(app.bookmarks.count)")
                     LabeledContent("RSS", value: "\(app.rssSources.count)")
                     LabeledContent("Replacements", value: "\(app.replaceRules.count)")
+                    LabeledContent("TXT TOC Rules", value: "\(app.txtTocRules.count)")
                     LabeledContent("Dictionaries", value: "\(app.dictRules.count)")
                     LabeledContent("HTTP TTS", value: "\(app.httpTts.count)")
                     LabeledContent("Search History", value: "\(app.searchKeywords.count)")
@@ -50,6 +51,12 @@ struct SettingsHomeView: View {
                         BookmarkListView()
                     } label: {
                         Label("Bookmarks", systemImage: "bookmark")
+                    }
+
+                    NavigationLink {
+                        TxtTocRuleListView()
+                    } label: {
+                        Label("TXT TOC rules", systemImage: "list.bullet.rectangle")
                     }
                 }
 

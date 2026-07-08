@@ -15,6 +15,7 @@ import io.legado.shared.model.SharedRssArticle
 import io.legado.shared.model.SharedRssSource
 import io.legado.shared.model.SharedSearchBook
 import io.legado.shared.model.SharedSearchKeyword
+import io.legado.shared.model.SharedTxtTocRule
 import io.legado.shared.book.BookDetailCoordinator
 import io.legado.shared.book.BookDetailResult
 import io.legado.shared.book.BookGroupRepository
@@ -29,6 +30,7 @@ import io.legado.shared.bookmark.BookmarkRepository
 import io.legado.shared.config.DictionaryLookupService
 import io.legado.shared.config.DictRuleRepository
 import io.legado.shared.config.HttpTtsRepository
+import io.legado.shared.config.TxtTocRuleRepository
 import io.legado.shared.explore.ExploreService
 import io.legado.shared.local.LocalTextBookService
 import io.legado.shared.local.LocalTextImportResult
@@ -86,6 +88,7 @@ open class LegadoRuntime(
     val dictRuleRepository: DictRuleRepository = DictRuleRepository(libraryStore)
     val dictionaryLookupService: DictionaryLookupService = DictionaryLookupService(httpFetcher, dictRuleRepository, ruleEngine)
     val httpTtsRepository: HttpTtsRepository = HttpTtsRepository(libraryStore)
+    val txtTocRuleRepository: TxtTocRuleRepository = TxtTocRuleRepository(libraryStore)
     val bookmarkRepository: BookmarkRepository = BookmarkRepository(libraryStore)
 
     @Throws(IllegalArgumentException::class)
@@ -125,6 +128,10 @@ open class LegadoRuntime(
 
     fun loadHttpTts(): List<SharedHttpTts> {
         return httpTtsRepository.list()
+    }
+
+    fun loadTxtTocRules(): List<SharedTxtTocRule> {
+        return txtTocRuleRepository.list()
     }
 
     fun loadBookmarks(): List<SharedBookmark> {
@@ -225,6 +232,27 @@ open class LegadoRuntime(
 
     fun exportHttpTtsJson(): String {
         return httpTtsRepository.exportJson()
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun importAndSaveTxtTocRules(json: String, replace: Boolean = false): List<SharedTxtTocRule> {
+        return txtTocRuleRepository.importJson(json, replace)
+    }
+
+    fun upsertTxtTocRule(rule: SharedTxtTocRule): SharedTxtTocRule {
+        return txtTocRuleRepository.upsert(rule)
+    }
+
+    fun setTxtTocRuleEnabled(id: Long, enabled: Boolean): SharedTxtTocRule? {
+        return txtTocRuleRepository.setEnabled(id, enabled)
+    }
+
+    fun deleteTxtTocRule(id: Long): List<SharedTxtTocRule> {
+        return txtTocRuleRepository.delete(id)
+    }
+
+    fun exportTxtTocRulesJson(): String {
+        return txtTocRuleRepository.exportJson()
     }
 
     fun exportBackupJson(nowMillis: Long = 0L): String {

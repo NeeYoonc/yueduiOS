@@ -8,6 +8,7 @@ final class AppState: ObservableObject {
     @Published var backupJson: String = ""
     @Published var dictRuleJson: String = ""
     @Published var httpTtsJson: String = ""
+    @Published var txtTocRuleJson: String = ""
     @Published var keyword: String = ""
     @Published var dictionaryKeyword: String = ""
     @Published var selectedSourceIndex: Int = -1
@@ -24,6 +25,7 @@ final class AppState: ObservableObject {
     @Published private(set) var dictRules: [SharedDictRule] = []
     @Published private(set) var dictionaryLookupResults: [SharedDictionaryLookupResult] = []
     @Published private(set) var httpTts: [SharedHttpTts] = []
+    @Published private(set) var txtTocRules: [SharedTxtTocRule] = []
     @Published private(set) var rssSources: [SharedRssSource] = []
     @Published private(set) var rssArticles: [SharedRssArticle] = []
     @Published private(set) var exploreSources: [SharedBookSource] = []
@@ -68,6 +70,7 @@ final class AppState: ObservableObject {
         replaceRules = runtime.loadReplaceRules() as? [SharedReplaceRule] ?? []
         dictRules = runtime.loadDictRules() as? [SharedDictRule] ?? []
         httpTts = runtime.loadHttpTts() as? [SharedHttpTts] ?? []
+        txtTocRules = runtime.loadTxtTocRules() as? [SharedTxtTocRule] ?? []
         rssSources = runtime.loadRssSources() as? [SharedRssSource] ?? []
         exploreSources = runtime.loadExploreSources() as? [SharedBookSource] ?? []
         searchKeywords = runtime.loadSearchKeywords() as? [SharedSearchKeyword] ?? []
@@ -208,6 +211,36 @@ final class AppState: ObservableObject {
 
     func deleteHttpTts(_ engine: SharedHttpTts) {
         _ = runtime.deleteHttpTts(id: engine.id)
+        refreshLibrary()
+    }
+
+    func importTxtTocRules(replace: Bool = false) {
+        let rawJson = txtTocRuleJson.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "TXT TOC rule JSON is empty"
+            return
+        }
+        do {
+            txtTocRules = try runtime.importAndSaveTxtTocRules(json: rawJson, replace: replace) as? [SharedTxtTocRule] ?? []
+            refreshLibrary()
+            message = txtTocRules.isEmpty ? "No usable TXT TOC rules" : "Imported \(txtTocRules.count) TXT TOC rule(s)"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func exportTxtTocRulesToEditor() {
+        txtTocRuleJson = runtime.exportTxtTocRulesJson()
+        message = "Exported \(txtTocRules.count) TXT TOC rule(s)"
+    }
+
+    func setTxtTocRuleEnabled(_ rule: SharedTxtTocRule, enabled: Bool) {
+        _ = runtime.setTxtTocRuleEnabled(id: rule.id, enabled: enabled)
+        refreshLibrary()
+    }
+
+    func deleteTxtTocRule(_ rule: SharedTxtTocRule) {
+        _ = runtime.deleteTxtTocRule(id: rule.id)
         refreshLibrary()
     }
 
