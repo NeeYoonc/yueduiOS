@@ -48,6 +48,8 @@
 		C10000000000000000000010 /* KeyboardAssistEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000020 /* KeyboardAssistEditorView.swift */; };
 		D10000000000000000000001 /* RuleSubListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000021 /* RuleSubListView.swift */; };
 		D10000000000000000000002 /* RuleSubEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000022 /* RuleSubEditorView.swift */; };
+		D10000000000000000000003 /* RawConfigListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000000000000000000013 /* RawConfigListView.swift */; };
+		D10000000000000000000004 /* RawConfigEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000000000000000000014 /* RawConfigEditorView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -93,6 +95,8 @@
 		C10000000000000000000020 /* KeyboardAssistEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/KeyboardAssistEditorView.swift; sourceTree = "<group>"; };
 		C10000000000000000000021 /* RuleSubListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RuleSubListView.swift; sourceTree = "<group>"; };
 		C10000000000000000000022 /* RuleSubEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RuleSubEditorView.swift; sourceTree = "<group>"; };
+		D10000000000000000000013 /* RawConfigListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RawConfigListView.swift; sourceTree = "<group>"; };
+		D10000000000000000000014 /* RawConfigEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RawConfigEditorView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -153,6 +157,8 @@
 				C10000000000000000000020 /* KeyboardAssistEditorView.swift */,
 				C10000000000000000000021 /* RuleSubListView.swift */,
 				C10000000000000000000022 /* RuleSubEditorView.swift */,
+				D10000000000000000000013 /* RawConfigListView.swift */,
+				D10000000000000000000014 /* RawConfigEditorView.swift */,
 				B1000000000000000000001C /* SourceListView.swift */,
 				B1000000000000000000001D /* SourceEditorView.swift */,
 				B1000000000000000000001E /* SourceDebugView.swift */,
@@ -310,6 +316,8 @@
 				C10000000000000000000010 /* KeyboardAssistEditorView.swift in Sources */,
 				D10000000000000000000001 /* RuleSubListView.swift in Sources */,
 				D10000000000000000000002 /* RuleSubEditorView.swift in Sources */,
+				D10000000000000000000003 /* RawConfigListView.swift in Sources */,
+				D10000000000000000000004 /* RawConfigEditorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

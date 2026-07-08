@@ -34,6 +34,12 @@ data class SharedDataSnapshot(
 )
 
 @Serializable
+data class SharedRawConfigEntry(
+    val key: String = "",
+    val value: String = ""
+)
+
+@Serializable
 data class SharedBookGroup(
     val groupId: Long = 1L,
     val groupName: String = "",

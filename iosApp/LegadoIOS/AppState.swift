@@ -12,6 +12,7 @@ final class AppState: ObservableObject {
     @Published var serverJson: String = ""
     @Published var keyboardAssistJson: String = ""
     @Published var ruleSubJson: String = ""
+    @Published var rawConfigJson: String = ""
     @Published var keyword: String = ""
     @Published var dictionaryKeyword: String = ""
     @Published var selectedSourceIndex: Int = -1
@@ -32,6 +33,7 @@ final class AppState: ObservableObject {
     @Published private(set) var servers: [SharedServer] = []
     @Published private(set) var keyboardAssists: [SharedKeyboardAssist] = []
     @Published private(set) var ruleSubs: [SharedRuleSub] = []
+    @Published private(set) var rawConfigs: [SharedRawConfigEntry] = []
     @Published private(set) var rssSources: [SharedRssSource] = []
     @Published private(set) var rssArticles: [SharedRssArticle] = []
     @Published private(set) var exploreSources: [SharedBookSource] = []
@@ -80,6 +82,7 @@ final class AppState: ObservableObject {
         servers = runtime.loadServers() as? [SharedServer] ?? []
         keyboardAssists = runtime.loadKeyboardAssists() as? [SharedKeyboardAssist] ?? []
         ruleSubs = runtime.loadRuleSubs() as? [SharedRuleSub] ?? []
+        rawConfigs = runtime.loadRawConfigs() as? [SharedRawConfigEntry] ?? []
         rssSources = runtime.loadRssSources() as? [SharedRssSource] ?? []
         exploreSources = runtime.loadExploreSources() as? [SharedBookSource] ?? []
         searchKeywords = runtime.loadSearchKeywords() as? [SharedSearchKeyword] ?? []
@@ -330,6 +333,31 @@ final class AppState: ObservableObject {
 
     func deleteRuleSub(_ ruleSub: SharedRuleSub) {
         ruleSubs = runtime.deleteRuleSub(id: ruleSub.id) as? [SharedRuleSub] ?? []
+        refreshLibrary()
+    }
+
+    func importRawConfigs(replace: Bool = false) {
+        let rawJson = rawConfigJson.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Raw config JSON is empty"
+            return
+        }
+        do {
+            rawConfigs = try runtime.importAndSaveRawConfigs(json: rawJson, replace: replace) as? [SharedRawConfigEntry] ?? []
+            refreshLibrary()
+            message = rawConfigs.isEmpty ? "No usable raw configs" : "Imported \(rawConfigs.count) raw config(s)"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func exportRawConfigsToEditor() {
+        rawConfigJson = runtime.exportRawConfigsJson()
+        message = "Exported \(rawConfigs.count) raw config(s)"
+    }
+
+    func deleteRawConfig(_ entry: SharedRawConfigEntry) {
+        rawConfigs = runtime.deleteRawConfig(key: entry.key) as? [SharedRawConfigEntry] ?? []
         refreshLibrary()
     }
 

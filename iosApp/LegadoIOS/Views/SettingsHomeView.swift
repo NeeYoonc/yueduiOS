@@ -19,6 +19,7 @@ struct SettingsHomeView: View {
                     LabeledContent("Servers", value: "\(app.servers.count)")
                     LabeledContent("Keyboard Assists", value: "\(app.keyboardAssists.count)")
                     LabeledContent("Rule Subscriptions", value: "\(app.ruleSubs.count)")
+                    LabeledContent("Raw Configs", value: "\(app.rawConfigs.count)")
                     LabeledContent("Search History", value: "\(app.searchKeywords.count)")
                     LabeledContent("Results", value: "\(app.searchResults.count)")
                 }
@@ -98,6 +99,12 @@ struct SettingsHomeView: View {
                         RuleSubListView()
                     } label: {
                         Label("Rule subscriptions", systemImage: "arrow.triangle.2.circlepath")
+                    }
+
+                    NavigationLink {
+                        RawConfigListView()
+                    } label: {
+                        Label("Raw configs", systemImage: "slider.horizontal.3")
                     }
                 }
 

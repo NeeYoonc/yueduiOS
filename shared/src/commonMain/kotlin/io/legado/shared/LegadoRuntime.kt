@@ -11,6 +11,7 @@ import io.legado.shared.model.SharedDictionaryLookupResult
 import io.legado.shared.model.SharedExploreKind
 import io.legado.shared.model.SharedHttpTts
 import io.legado.shared.model.SharedKeyboardAssist
+import io.legado.shared.model.SharedRawConfigEntry
 import io.legado.shared.model.SharedReplaceRule
 import io.legado.shared.model.SharedRssArticle
 import io.legado.shared.model.SharedRssSource
@@ -34,6 +35,7 @@ import io.legado.shared.config.DictionaryLookupService
 import io.legado.shared.config.DictRuleRepository
 import io.legado.shared.config.HttpTtsRepository
 import io.legado.shared.config.KeyboardAssistRepository
+import io.legado.shared.config.RawConfigRepository
 import io.legado.shared.config.RuleSubRepository
 import io.legado.shared.config.ServerRepository
 import io.legado.shared.config.TxtTocRuleRepository
@@ -98,6 +100,7 @@ open class LegadoRuntime(
     val serverRepository: ServerRepository = ServerRepository(libraryStore)
     val keyboardAssistRepository: KeyboardAssistRepository = KeyboardAssistRepository(libraryStore)
     val ruleSubRepository: RuleSubRepository = RuleSubRepository(libraryStore)
+    val rawConfigRepository: RawConfigRepository = RawConfigRepository(libraryStore)
     val bookmarkRepository: BookmarkRepository = BookmarkRepository(libraryStore)
 
     @Throws(IllegalArgumentException::class)
@@ -153,6 +156,10 @@ open class LegadoRuntime(
 
     fun loadRuleSubs(): List<SharedRuleSub> {
         return ruleSubRepository.list()
+    }
+
+    fun loadRawConfigs(): List<SharedRawConfigEntry> {
+        return rawConfigRepository.list()
     }
 
     fun loadBookmarks(): List<SharedBookmark> {
@@ -329,6 +336,23 @@ open class LegadoRuntime(
 
     fun exportRuleSubsJson(): String {
         return ruleSubRepository.exportJson()
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun importAndSaveRawConfigs(json: String, replace: Boolean = false): List<SharedRawConfigEntry> {
+        return rawConfigRepository.importJson(json, replace)
+    }
+
+    fun upsertRawConfig(key: String, value: String): SharedRawConfigEntry {
+        return rawConfigRepository.upsert(key, value)
+    }
+
+    fun deleteRawConfig(key: String): List<SharedRawConfigEntry> {
+        return rawConfigRepository.delete(key)
+    }
+
+    fun exportRawConfigsJson(): String {
+        return rawConfigRepository.exportJson()
     }
 
     fun exportBackupJson(nowMillis: Long = 0L): String {
