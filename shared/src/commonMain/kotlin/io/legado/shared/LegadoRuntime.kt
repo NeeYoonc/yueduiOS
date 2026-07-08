@@ -5,6 +5,7 @@ import io.legado.shared.model.SharedBookChapter
 import io.legado.shared.model.SharedBookGroup
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedBookmark
+import io.legado.shared.model.SharedCookie
 import io.legado.shared.model.SharedDataSnapshot
 import io.legado.shared.model.SharedDictRule
 import io.legado.shared.model.SharedDictionaryLookupResult
@@ -36,6 +37,7 @@ import io.legado.shared.book.ReadRecordRepository
 import io.legado.shared.backup.DataBackupService
 import io.legado.shared.backup.WebDavBackupService
 import io.legado.shared.bookmark.BookmarkRepository
+import io.legado.shared.config.CookieRepository
 import io.legado.shared.config.DictionaryLookupService
 import io.legado.shared.config.DictRuleRepository
 import io.legado.shared.config.HttpTtsRepository
@@ -114,6 +116,7 @@ open class LegadoRuntime(
     val ruleSubRepository: RuleSubRepository = RuleSubRepository(libraryStore)
     val rawConfigRepository: RawConfigRepository = RawConfigRepository(libraryStore)
     val bookmarkRepository: BookmarkRepository = BookmarkRepository(libraryStore)
+    val cookieRepository: CookieRepository = CookieRepository(libraryStore)
 
     @Throws(IllegalArgumentException::class)
     fun importAndSaveBookSources(json: String): List<SharedBookSource> {
@@ -229,6 +232,10 @@ open class LegadoRuntime(
         return bookmarkRepository.list()
     }
 
+    fun loadCookies(): List<SharedCookie> {
+        return cookieRepository.list()
+    }
+
     fun loadSearchKeywords(): List<SharedSearchKeyword> {
         return searchCoordinator.listKeywords()
     }
@@ -260,6 +267,27 @@ open class LegadoRuntime(
 
     fun clearSearchKeywords(): List<SharedSearchKeyword> {
         return searchCoordinator.clearKeywords()
+    }
+
+    fun upsertCookie(cookie: SharedCookie): SharedCookie {
+        return cookieRepository.upsert(cookie)
+    }
+
+    fun deleteCookie(url: String): List<SharedCookie> {
+        return cookieRepository.delete(url)
+    }
+
+    fun clearCookies(): List<SharedCookie> {
+        return cookieRepository.clear()
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun importAndSaveCookies(json: String, replace: Boolean = false): List<SharedCookie> {
+        return cookieRepository.importJson(json, replace)
+    }
+
+    fun exportCookiesJson(): String {
+        return cookieRepository.exportJson()
     }
 
     fun recordSearchKeyword(key: String, nowMillis: Long = 0L): List<SharedSearchKeyword> {

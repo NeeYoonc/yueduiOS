@@ -14,6 +14,7 @@ final class AppState: ObservableObject {
     @Published var ruleSubJson: String = ""
     @Published var rawConfigJson: String = ""
     @Published var rssSourceJson: String = ""
+    @Published var cookieJson: String = ""
     @Published var webDavBackupFileName: String = "legado-backup.json"
     @Published var keyword: String = ""
     @Published var dictionaryKeyword: String = ""
@@ -37,6 +38,7 @@ final class AppState: ObservableObject {
     @Published private(set) var keyboardAssists: [SharedKeyboardAssist] = []
     @Published private(set) var ruleSubs: [SharedRuleSub] = []
     @Published private(set) var rawConfigs: [SharedRawConfigEntry] = []
+    @Published private(set) var cookies: [SharedCookie] = []
     @Published private(set) var rssSources: [SharedRssSource] = []
     @Published private(set) var rssArticles: [SharedRssArticle] = []
     @Published private(set) var rssReadRecords: [SharedRssReadRecord] = []
@@ -90,6 +92,7 @@ final class AppState: ObservableObject {
         keyboardAssists = runtime.loadKeyboardAssists() as? [SharedKeyboardAssist] ?? []
         ruleSubs = runtime.loadRuleSubs() as? [SharedRuleSub] ?? []
         rawConfigs = runtime.loadRawConfigs() as? [SharedRawConfigEntry] ?? []
+        cookies = runtime.loadCookies() as? [SharedCookie] ?? []
         rssSources = runtime.loadRssSources() as? [SharedRssSource] ?? []
         rssReadRecords = runtime.loadRssReadRecords() as? [SharedRssReadRecord] ?? []
         rssStars = runtime.loadRssStars() as? [SharedRssStar] ?? []
@@ -368,6 +371,36 @@ final class AppState: ObservableObject {
 
     func deleteRawConfig(_ entry: SharedRawConfigEntry) {
         rawConfigs = runtime.deleteRawConfig(key: entry.key) as? [SharedRawConfigEntry] ?? []
+        refreshLibrary()
+    }
+
+    func importCookies(replace: Bool = false) {
+        let rawJson = cookieJson.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Cookie JSON is empty"
+            return
+        }
+        do {
+            cookies = try runtime.importAndSaveCookies(json: rawJson, replace: replace) as? [SharedCookie] ?? []
+            refreshLibrary()
+            message = cookies.isEmpty ? "No usable cookies" : "Imported \(cookies.count) cookie(s)"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func exportCookiesToEditor() {
+        cookieJson = runtime.exportCookiesJson()
+        message = "Exported \(cookies.count) cookie(s)"
+    }
+
+    func deleteCookie(_ cookie: SharedCookie) {
+        cookies = runtime.deleteCookie(url: cookie.url) as? [SharedCookie] ?? []
+        refreshLibrary()
+    }
+
+    func clearCookies() {
+        cookies = runtime.clearCookies() as? [SharedCookie] ?? []
         refreshLibrary()
     }
 

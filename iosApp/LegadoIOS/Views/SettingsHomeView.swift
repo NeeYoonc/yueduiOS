@@ -22,6 +22,7 @@ struct SettingsHomeView: View {
                     LabeledContent("Keyboard Assists", value: "\(app.keyboardAssists.count)")
                     LabeledContent("Rule Subscriptions", value: "\(app.ruleSubs.count)")
                     LabeledContent("Raw Configs", value: "\(app.rawConfigs.count)")
+                    LabeledContent("Cookies", value: "\(app.cookies.count)")
                     LabeledContent("Search History", value: "\(app.searchKeywords.count)")
                     LabeledContent("Results", value: "\(app.searchResults.count)")
                 }
@@ -125,6 +126,12 @@ struct SettingsHomeView: View {
                         RawConfigListView()
                     } label: {
                         Label("Raw configs", systemImage: "slider.horizontal.3")
+                    }
+
+                    NavigationLink {
+                        CookieListView()
+                    } label: {
+                        Label("Cookies", systemImage: "shippingbox")
                     }
                 }
 
