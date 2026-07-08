@@ -6,7 +6,14 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             List {
-                Section("Source") {
+                Section("Migration Status") {
+                    Text("Full Android parity migration is in progress.")
+                    Text("This screen is a temporary build surface, not the finished reader.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+
+                Section("Manual Source Import") {
                     TextEditor(text: $viewModel.sourceJson)
                         .font(.system(.footnote, design: .monospaced))
                         .frame(minHeight: 120)
@@ -69,7 +76,7 @@ struct ContentView: View {
                     }
                 }
             }
-            .navigationTitle("Legado")
+            .navigationTitle("Legado Migration")
         }
     }
 }

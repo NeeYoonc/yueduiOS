@@ -4,13 +4,13 @@ import LegadoShared
 @MainActor
 final class LegadoViewModel: ObservableObject {
     @Published var sourceJson: String = DefaultSource.json
-    @Published var keyword: String = "metal"
+    @Published var keyword: String = ""
     @Published var selectedSourceIndex: Int = 0
     @Published private(set) var sources: [SharedBookSource] = []
     @Published private(set) var bookTitle: String?
     @Published private(set) var chapterTitle: String?
     @Published private(set) var chapterContent: String = ""
-    @Published private(set) var message: String?
+    @Published private(set) var message: String? = "Full migration in progress. Default Android data import is the next migration phase."
     @Published private(set) var isLoading: Bool = false
 
     private let runtime = DarwinLegadoRuntime()
@@ -20,6 +20,11 @@ final class LegadoViewModel: ObservableObject {
     }
 
     func importSources() {
+        guard !sourceJson.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            message = "Paste Legado source JSON or wait for bundled default data import."
+            return
+        }
+
         do {
             sources = try runtime.importAndSaveBookSources(json: sourceJson) as? [SharedBookSource] ?? []
             selectedSourceIndex = sources.indices.contains(selectedSourceIndex) ? selectedSourceIndex : 0
@@ -30,6 +35,11 @@ final class LegadoViewModel: ObservableObject {
     }
 
     func openFirstResult() async {
+        guard !keyword.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            message = "Enter a search keyword."
+            return
+        }
+
         guard sources.indices.contains(selectedSourceIndex) else {
             message = "No source selected"
             return
