@@ -3,6 +3,7 @@ package io.legado.shared
 import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookChapter
 import io.legado.shared.model.SharedBookSource
+import io.legado.shared.model.SharedReplaceRule
 import io.legado.shared.model.SharedRssArticle
 import io.legado.shared.model.SharedRssSource
 import io.legado.shared.model.SharedSearchBook
@@ -21,6 +22,7 @@ import io.legado.shared.platform.HttpFetcher
 import io.legado.shared.platform.ScriptRuntime
 import io.legado.shared.rule.AnalyzeRuleEngine
 import io.legado.shared.rule.RuleWebViewRuntime
+import io.legado.shared.replacement.ReplacementRepository
 import io.legado.shared.rss.RssArticlePage
 import io.legado.shared.rss.RssService
 import io.legado.shared.service.RuleEngineBookInfoParser
@@ -61,6 +63,7 @@ open class LegadoRuntime(
     val sourceDebugService: SourceDebugService = SourceDebugService(client)
     val rssService: RssService = RssService(httpFetcher, libraryStore)
     val localTextBookService: LocalTextBookService = LocalTextBookService(libraryStore, bookshelfService)
+    val replacementRepository: ReplacementRepository = ReplacementRepository(libraryStore)
 
     @Throws(IllegalArgumentException::class)
     fun importAndSaveBookSources(json: String): List<SharedBookSource> {
@@ -81,6 +84,10 @@ open class LegadoRuntime(
         return rssService.listCachedArticles(source)
     }
 
+    fun loadReplaceRules(): List<SharedReplaceRule> {
+        return replacementRepository.list()
+    }
+
     fun upsertBookSource(source: SharedBookSource): SharedBookSource {
         return sourceRepository.upsert(source)
     }
@@ -95,6 +102,27 @@ open class LegadoRuntime(
 
     fun exportBookSourcesJson(): String {
         return sourceRepository.exportJson()
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun importAndSaveReplaceRules(json: String, replace: Boolean = false): List<SharedReplaceRule> {
+        return replacementRepository.importJson(json, replace)
+    }
+
+    fun upsertReplaceRule(rule: SharedReplaceRule): SharedReplaceRule {
+        return replacementRepository.upsert(rule)
+    }
+
+    fun setReplaceRuleEnabled(id: Long, enabled: Boolean): SharedReplaceRule? {
+        return replacementRepository.setEnabled(id, enabled)
+    }
+
+    fun deleteReplaceRule(id: Long): List<SharedReplaceRule> {
+        return replacementRepository.delete(id)
+    }
+
+    fun exportReplaceRulesJson(): String {
+        return replacementRepository.exportJson()
     }
 
     fun saveBooks(books: List<SharedBook>) {

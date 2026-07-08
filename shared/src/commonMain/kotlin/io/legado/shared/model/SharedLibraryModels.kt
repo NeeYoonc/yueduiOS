@@ -79,7 +79,13 @@ data class SharedReplaceRule(
     val isRegex: Boolean = true,
     val timeoutMillisecond: Long = 3000L,
     val order: Int = Int.MIN_VALUE
-)
+) {
+    val enabled: Boolean
+        get() = isEnabled
+
+    val regex: Boolean
+        get() = isRegex
+}
 
 @Serializable
 data class SharedSearchKeyword(

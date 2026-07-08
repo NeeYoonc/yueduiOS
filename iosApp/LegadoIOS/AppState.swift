@@ -4,11 +4,13 @@ import LegadoShared
 @MainActor
 final class AppState: ObservableObject {
     @Published var sourceJson: String = DefaultSource.json
+    @Published var replaceRuleJson: String = ""
     @Published var keyword: String = ""
     @Published var selectedSourceIndex: Int = -1
 
     @Published private(set) var sources: [SharedBookSource] = []
     @Published private(set) var books: [SharedBook] = []
+    @Published private(set) var replaceRules: [SharedReplaceRule] = []
     @Published private(set) var rssSources: [SharedRssSource] = []
     @Published private(set) var rssArticles: [SharedRssArticle] = []
     @Published private(set) var selectedRssSource: SharedRssSource?
@@ -40,6 +42,7 @@ final class AppState: ObservableObject {
     func refreshLibrary() {
         sources = runtime.loadBookSources() as? [SharedBookSource] ?? []
         books = runtime.loadBooks() as? [SharedBook] ?? []
+        replaceRules = runtime.loadReplaceRules() as? [SharedReplaceRule] ?? []
         rssSources = runtime.loadRssSources() as? [SharedRssSource] ?? []
         if selectedSourceIndex >= sources.count {
             selectedSourceIndex = sources.isEmpty ? -1 : 0
@@ -71,6 +74,36 @@ final class AppState: ObservableObject {
     func exportSourcesToEditor() {
         sourceJson = runtime.exportBookSourcesJson()
         message = "Exported \(sources.count) source(s)"
+    }
+
+    func importReplaceRules(replace: Bool = false) {
+        let rawJson = replaceRuleJson.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Replace rule JSON is empty"
+            return
+        }
+        do {
+            replaceRules = try runtime.importAndSaveReplaceRules(json: rawJson, replace: replace) as? [SharedReplaceRule] ?? []
+            refreshLibrary()
+            message = replaceRules.isEmpty ? "No usable rules" : "Imported \(replaceRules.count) rule(s)"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func exportReplaceRulesToEditor() {
+        replaceRuleJson = runtime.exportReplaceRulesJson()
+        message = "Exported \(replaceRules.count) rule(s)"
+    }
+
+    func setReplaceRuleEnabled(_ rule: SharedReplaceRule, enabled: Bool) {
+        _ = runtime.setReplaceRuleEnabled(id: rule.id, enabled: enabled)
+        refreshLibrary()
+    }
+
+    func deleteReplaceRule(_ rule: SharedReplaceRule) {
+        _ = runtime.deleteReplaceRule(id: rule.id)
+        refreshLibrary()
     }
 
     func setSourceEnabled(_ source: SharedBookSource, enabled: Bool) {

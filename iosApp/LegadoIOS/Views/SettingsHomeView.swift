@@ -10,6 +10,7 @@ struct SettingsHomeView: View {
                     LabeledContent("Sources", value: "\(app.sources.count)")
                     LabeledContent("Books", value: "\(app.books.count)")
                     LabeledContent("RSS", value: "\(app.rssSources.count)")
+                    LabeledContent("Replacements", value: "\(app.replaceRules.count)")
                     LabeledContent("Results", value: "\(app.searchResults.count)")
                 }
 
@@ -24,6 +25,14 @@ struct SettingsHomeView: View {
                         SourceEditorView()
                     } label: {
                         Label("Import and export", systemImage: "doc.text")
+                    }
+                }
+
+                Section("Reading") {
+                    NavigationLink {
+                        ReplaceRuleListView()
+                    } label: {
+                        Label("Replacement rules", systemImage: "wand.and.stars")
                     }
                 }
 

@@ -5,12 +5,14 @@ import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookChapter
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedChapterContent
+import io.legado.shared.replacement.ReplacementService
 import io.legado.shared.storage.SharedLibraryStore
 
 class ChapterRepository(
     private val client: LegadoSharedClient,
     private val libraryStore: SharedLibraryStore,
-    private val bookshelfService: BookshelfService
+    private val bookshelfService: BookshelfService,
+    private val replacementService: ReplacementService = ReplacementService(libraryStore)
 ) {
     suspend fun loadChapter(
         source: SharedBookSource,
@@ -24,7 +26,8 @@ class ChapterRepository(
         val chapter = chapters.getOrNull(chapterIndex)
             ?: throw IllegalArgumentException("Chapter index $chapterIndex is out of range")
         val cached = libraryStore.loadChapterContent(book, chapter)
-        val content = cached ?: fetchAndCache(source, book, chapter)
+        val rawContent = cached ?: fetchAndCache(source, book, chapter)
+        val content = replacementService.applyToChapterContent(book, chapter, rawContent)
         if (preloadAdjacent) {
             listOf(chapterIndex - 1, chapterIndex + 1)
                 .mapNotNull { chapters.getOrNull(it) }
@@ -55,8 +58,9 @@ class ChapterRepository(
         val chapters = libraryStore.loadBookChapters(book)
         val chapter = chapters.getOrNull(chapterIndex)
             ?: throw IllegalArgumentException("Chapter index $chapterIndex is out of range")
-        val content = libraryStore.loadChapterContent(book, chapter)
+        val rawContent = libraryStore.loadChapterContent(book, chapter)
             ?: SharedChapterContent(title = chapter.title)
+        val content = replacementService.applyToChapterContent(book, chapter, rawContent)
         val updatedBook = bookshelfService.updateProgress(book, chapter, position, nowMillis)
         return CachedChapterReadResult(
             book = updatedBook,

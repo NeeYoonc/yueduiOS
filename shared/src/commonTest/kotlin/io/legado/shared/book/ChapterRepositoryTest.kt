@@ -6,6 +6,7 @@ import io.legado.shared.model.SharedBookChapter
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedContentRule
 import io.legado.shared.model.SharedChapterContent
+import io.legado.shared.model.SharedReplaceRule
 import io.legado.shared.platform.CacheStorePort
 import io.legado.shared.platform.HttpFetcher
 import io.legado.shared.platform.SharedHttpRequest
@@ -41,6 +42,30 @@ class ChapterRepositoryTest {
         assertEquals("Two", bookshelf.listBooks().single().durChapterTitle)
         assertEquals(1, bookshelf.listBooks().single().durChapterIndex)
         assertEquals(77L, bookshelf.listBooks().single().durChapterTime)
+    }
+
+    @Test
+    fun appliesReplacementRulesToReturnedCachedContent() {
+        val store = SharedLibraryStore(InMemoryCacheStore())
+        store.saveDataSnapshot(
+            store.loadDataSnapshot().copy(
+                replaceRules = listOf(
+                    SharedReplaceRule(name = "Clean", pattern = "raw", replacement = "clean")
+                )
+            )
+        )
+        val bookshelf = BookshelfService(store)
+        val repository = ChapterRepository(LegadoSharedClient(NoopFetcher), store, bookshelf)
+        val book = SharedBook(name = "Local", bookUrl = "local://book", origin = "loc_book")
+        val chapter = SharedBookChapter(title = "One", url = "local://book#0", index = 0, bookUrl = book.bookUrl)
+        bookshelf.upsertBook(book)
+        store.saveBookChapters(book, listOf(chapter))
+        store.saveChapterContent(book, chapter, SharedChapterContent(content = "raw body"))
+
+        val result = repository.loadCachedChapter(book, chapterIndex = 0)
+
+        assertEquals("clean body", result.content.content)
+        assertEquals("raw body", store.loadChapterContent(book, chapter)?.content)
     }
 
     @Test

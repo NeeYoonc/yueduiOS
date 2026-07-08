@@ -29,6 +29,8 @@
 		B1000000000000000000000E /* SourceDebugView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001E /* SourceDebugView.swift */; };
 		B1000000000000000000000F /* RssArticleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001F /* RssArticleListView.swift */; };
 		B10000000000000000000010 /* RssReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000020 /* RssReaderView.swift */; };
+		C10000000000000000000001 /* ReplaceRuleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000011 /* ReplaceRuleListView.swift */; };
+		C10000000000000000000002 /* ReplaceRuleEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10000000000000000000012 /* ReplaceRuleEditorView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -55,6 +57,8 @@
 		B1000000000000000000001E /* SourceDebugView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SourceDebugView.swift; sourceTree = "<group>"; };
 		B1000000000000000000001F /* RssArticleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RssArticleListView.swift; sourceTree = "<group>"; };
 		B10000000000000000000020 /* RssReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RssReaderView.swift; sourceTree = "<group>"; };
+		C10000000000000000000011 /* ReplaceRuleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ReplaceRuleListView.swift; sourceTree = "<group>"; };
+		C10000000000000000000012 /* ReplaceRuleEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ReplaceRuleEditorView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,6 +100,8 @@
 				B1000000000000000000001F /* RssArticleListView.swift */,
 				B10000000000000000000020 /* RssReaderView.swift */,
 				B1000000000000000000001B /* SettingsHomeView.swift */,
+				C10000000000000000000011 /* ReplaceRuleListView.swift */,
+				C10000000000000000000012 /* ReplaceRuleEditorView.swift */,
 				B1000000000000000000001C /* SourceListView.swift */,
 				B1000000000000000000001D /* SourceEditorView.swift */,
 				B1000000000000000000001E /* SourceDebugView.swift */,
@@ -234,6 +240,8 @@
 				B1000000000000000000000E /* SourceDebugView.swift in Sources */,
 				B1000000000000000000000F /* RssArticleListView.swift in Sources */,
 				B10000000000000000000010 /* RssReaderView.swift in Sources */,
+				C10000000000000000000001 /* ReplaceRuleListView.swift in Sources */,
+				C10000000000000000000002 /* ReplaceRuleEditorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
