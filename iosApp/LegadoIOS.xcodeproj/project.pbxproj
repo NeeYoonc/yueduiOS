@@ -12,6 +12,8 @@
 		A10000000000000000000003 /* LegadoViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* LegadoViewModel.swift */; };
 		A10000000000000000000004 /* DefaultSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000014 /* DefaultSource.swift */; };
 		A10000000000000000000005 /* LegadoShared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A10000000000000000000015 /* LegadoShared.xcframework */; };
+		A10000000000000000000006 /* DefaultDataBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000016 /* DefaultDataBundle.swift */; };
+		A10000000000000000000007 /* DefaultData in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000017 /* DefaultData */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,6 +23,8 @@
 		A10000000000000000000013 /* LegadoViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LegadoViewModel.swift; sourceTree = "<group>"; };
 		A10000000000000000000014 /* DefaultSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultSource.swift; sourceTree = "<group>"; };
 		A10000000000000000000015 /* LegadoShared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = LegadoShared.xcframework; path = ../shared/build/XCFrameworks/debug/LegadoShared.xcframework; sourceTree = SOURCE_ROOT; };
+		A10000000000000000000016 /* DefaultDataBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultDataBundle.swift; sourceTree = "<group>"; };
+		A10000000000000000000017 /* DefaultData */ = {isa = PBXFileReference; lastKnownFileType = folder; path = DefaultData; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +55,8 @@
 				A10000000000000000000012 /* ContentView.swift */,
 				A10000000000000000000013 /* LegadoViewModel.swift */,
 				A10000000000000000000014 /* DefaultSource.swift */,
+				A10000000000000000000016 /* DefaultDataBundle.swift */,
+				A10000000000000000000017 /* DefaultData */,
 			);
 			path = LegadoIOS;
 			sourceTree = "<group>";
@@ -81,6 +87,7 @@
 				A10000000000000000000060 /* Build LegadoShared */,
 				A10000000000000000000050 /* Sources */,
 				A10000000000000000000020 /* Frameworks */,
+				A10000000000000000000021 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -146,6 +153,17 @@
 		};
 /* End PBXShellScriptBuildPhase section */
 
+/* Begin PBXResourcesBuildPhase section */
+		A10000000000000000000021 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000007 /* DefaultData in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		A10000000000000000000050 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -155,6 +173,7 @@
 				A10000000000000000000002 /* ContentView.swift in Sources */,
 				A10000000000000000000003 /* LegadoViewModel.swift in Sources */,
 				A10000000000000000000004 /* DefaultSource.swift in Sources */,
+				A10000000000000000000006 /* DefaultDataBundle.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -5,6 +5,8 @@ import io.legado.shared.model.SharedBookSource
 import io.legado.shared.platform.CacheStorePort
 import io.legado.shared.platform.HttpFetcher
 import io.legado.shared.service.ReadingFlowResult
+import io.legado.shared.source.DefaultDataImporter
+import io.legado.shared.source.DefaultDataPayload
 import io.legado.shared.storage.SharedLibraryStore
 
 open class LegadoRuntime(
@@ -31,6 +33,14 @@ open class LegadoRuntime(
 
     fun loadBooks(): List<SharedBook> {
         return libraryStore.loadBooks()
+    }
+
+    fun importAndSaveDefaultData(payload: DefaultDataPayload) {
+        val snapshot = DefaultDataImporter.importSnapshot(payload)
+        libraryStore.saveDataSnapshot(snapshot)
+        if (snapshot.bookSources.isNotEmpty()) {
+            libraryStore.saveBookSources(snapshot.bookSources)
+        }
     }
 
     suspend fun openFirstSearchResult(

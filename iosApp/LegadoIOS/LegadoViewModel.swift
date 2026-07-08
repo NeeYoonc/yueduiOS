@@ -17,6 +17,17 @@ final class LegadoViewModel: ObservableObject {
 
     init() {
         sources = runtime.loadBookSources() as? [SharedBookSource] ?? []
+        if sources.isEmpty {
+            importBundledDefaultData()
+        }
+    }
+
+    private func importBundledDefaultData() {
+        runtime.importAndSaveDefaultData(payload: DefaultDataBundle.payload())
+        sources = runtime.loadBookSources() as? [SharedBookSource] ?? []
+        message = sources.isEmpty
+            ? "Bundled default data was not found."
+            : "Imported \(sources.count) bundled source(s). Full migration in progress."
     }
 
     func importSources() {

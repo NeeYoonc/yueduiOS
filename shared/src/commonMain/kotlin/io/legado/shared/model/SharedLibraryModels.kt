@@ -29,7 +29,8 @@ data class SharedDataSnapshot(
     val ruleSubs: List<SharedRuleSub> = emptyList(),
     val dictRules: List<SharedDictRule> = emptyList(),
     val keyboardAssists: List<SharedKeyboardAssist> = emptyList(),
-    val servers: List<SharedServer> = emptyList()
+    val servers: List<SharedServer> = emptyList(),
+    val rawConfigs: Map<String, String> = emptyMap()
 )
 
 @Serializable
@@ -273,4 +274,3 @@ data class SharedServer(
     val config: String? = null,
     val sortNumber: Int = 0
 )
-

@@ -94,7 +94,7 @@ Expected: PASS.
 - Modify: `iosApp/LegadoIOS/DefaultSource.swift`
 - Create: `iosApp/LegadoIOS/DefaultDataBundle.swift`
 
-- [ ] **Step 1: Add default data importer**
+- [x] **Step 1: Add default data importer**
 
 Support Android asset JSON shapes from:
 
@@ -111,15 +111,15 @@ app/src/main/assets/defaultData/coverRule.json
 app/src/main/assets/defaultData/directLinkUpload.json
 ```
 
-- [ ] **Step 2: Add fixture tests copied from real asset structures**
+- [x] **Step 2: Add fixture tests copied from real asset structures**
 
 Use small representative JSON fixtures in common tests, not network calls.
 
-- [ ] **Step 3: Wire iOS first launch import**
+- [x] **Step 3: Wire iOS first launch import**
 
 The iOS app should load bundled default data on first launch and then read from shared persistence.
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 Run shared tests and iOS compile tasks:
 
