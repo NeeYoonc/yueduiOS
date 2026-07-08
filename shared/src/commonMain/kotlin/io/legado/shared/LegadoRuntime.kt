@@ -3,6 +3,8 @@ package io.legado.shared
 import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookChapter
 import io.legado.shared.model.SharedBookSource
+import io.legado.shared.model.SharedRssArticle
+import io.legado.shared.model.SharedRssSource
 import io.legado.shared.model.SharedSearchBook
 import io.legado.shared.book.BookDetailCoordinator
 import io.legado.shared.book.BookDetailResult
@@ -16,6 +18,8 @@ import io.legado.shared.platform.HttpFetcher
 import io.legado.shared.platform.ScriptRuntime
 import io.legado.shared.rule.AnalyzeRuleEngine
 import io.legado.shared.rule.RuleWebViewRuntime
+import io.legado.shared.rss.RssArticlePage
+import io.legado.shared.rss.RssService
 import io.legado.shared.service.RuleEngineBookInfoParser
 import io.legado.shared.service.RuleEngineChapterContentParser
 import io.legado.shared.service.RuleEngineChapterListParser
@@ -52,6 +56,7 @@ open class LegadoRuntime(
     val chapterRepository: ChapterRepository = ChapterRepository(client, libraryStore, bookshelfService)
     val sourceRepository: SourceRepository = SourceRepository(libraryStore)
     val sourceDebugService: SourceDebugService = SourceDebugService(client)
+    val rssService: RssService = RssService(httpFetcher, libraryStore)
 
     @Throws(IllegalArgumentException::class)
     fun importAndSaveBookSources(json: String): List<SharedBookSource> {
@@ -60,6 +65,16 @@ open class LegadoRuntime(
 
     fun loadBookSources(): List<SharedBookSource> {
         return sourceRepository.list()
+    }
+
+    fun loadRssSources(): List<SharedRssSource> {
+        return libraryStore.loadDataSnapshot().rssSources.sortedWith(
+            compareBy<SharedRssSource> { it.customOrder }.thenBy { it.sourceName }
+        )
+    }
+
+    fun loadRssArticles(source: SharedRssSource? = null): List<SharedRssArticle> {
+        return rssService.listCachedArticles(source)
     }
 
     fun upsertBookSource(source: SharedBookSource): SharedBookSource {
@@ -112,6 +127,20 @@ open class LegadoRuntime(
         page: Int = 1
     ): SourceDebugResult {
         return sourceDebugService.debugFirstContent(source, key, page)
+    }
+
+    suspend fun refreshRssArticles(
+        source: SharedRssSource,
+        page: Int = 1
+    ): RssArticlePage {
+        return rssService.refreshArticles(source, page)
+    }
+
+    suspend fun loadRssContent(
+        source: SharedRssSource,
+        article: SharedRssArticle
+    ): SharedRssArticle {
+        return rssService.loadContent(source, article)
     }
 
     suspend fun openSearchBook(

@@ -10,6 +10,10 @@ final class AppState: ObservableObject {
     @Published private(set) var sources: [SharedBookSource] = []
     @Published private(set) var books: [SharedBook] = []
     @Published private(set) var rssSources: [SharedRssSource] = []
+    @Published private(set) var rssArticles: [SharedRssArticle] = []
+    @Published private(set) var selectedRssSource: SharedRssSource?
+    @Published private(set) var selectedRssArticle: SharedRssArticle?
+    @Published private(set) var rssContent: String = ""
     @Published private(set) var searchResults: [SharedSearchBook] = []
     @Published private(set) var searchErrors: [SourceSearchError] = []
     @Published private(set) var selectedBook: SharedBook?
@@ -36,8 +40,7 @@ final class AppState: ObservableObject {
     func refreshLibrary() {
         sources = runtime.loadBookSources() as? [SharedBookSource] ?? []
         books = runtime.loadBooks() as? [SharedBook] ?? []
-        let snapshot = runtime.libraryStore.loadDataSnapshot()
-        rssSources = snapshot.rssSources as? [SharedRssSource] ?? []
+        rssSources = runtime.loadRssSources() as? [SharedRssSource] ?? []
         if selectedSourceIndex >= sources.count {
             selectedSourceIndex = sources.isEmpty ? -1 : 0
         }
@@ -101,6 +104,45 @@ final class AppState: ObservableObject {
         } catch {
             debugSteps = []
             debugContent = ""
+            message = error.localizedDescription
+        }
+    }
+
+    func refreshRss(_ source: SharedRssSource) async {
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            let page = try await runtime.refreshRssArticles(source: source, page: 1)
+            selectedRssSource = source
+            rssArticles = page.articles as? [SharedRssArticle] ?? []
+            selectedRssArticle = nil
+            rssContent = ""
+            refreshLibrary()
+            message = rssArticles.isEmpty ? "No RSS articles" : nil
+        } catch {
+            rssArticles = runtime.loadRssArticles(source: source) as? [SharedRssArticle] ?? []
+            selectedRssSource = source
+            message = error.localizedDescription
+        }
+    }
+
+    func openRssArticle(_ article: SharedRssArticle) async {
+        guard let source = selectedRssSource ?? rssSources.first(where: { $0.sourceUrl == article.origin }) else {
+            message = "RSS source not found"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            let parsed = try await runtime.loadRssContent(source: source, article: article)
+            selectedRssArticle = parsed
+            rssContent = parsed.content ?? parsed.description ?? ""
+            refreshLibrary()
+        } catch {
+            selectedRssArticle = article
+            rssContent = article.content ?? article.description ?? ""
             message = error.localizedDescription
         }
     }

@@ -12,15 +12,22 @@ struct RssHomeView: View {
                     } else {
                         ForEach(app.rssSources.indices, id: \.self) { index in
                             let source = app.rssSources[index]
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(source.sourceName.isEmpty ? source.sourceUrl : source.sourceName)
-                                if !source.sourceUrl.isEmpty {
-                                    Text(source.sourceUrl)
-                                        .font(.footnote)
-                                        .foregroundStyle(.secondary)
+                            NavigationLink {
+                                RssArticleListView(source: source)
+                                    .task {
+                                        await app.refreshRss(source)
+                                    }
+                            } label: {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(source.sourceName.isEmpty ? source.sourceUrl : source.sourceName)
+                                    if !source.sourceUrl.isEmpty {
+                                        Text(source.sourceUrl)
+                                            .font(.footnote)
+                                            .foregroundStyle(.secondary)
+                                    }
                                 }
+                                .padding(.vertical, 3)
                             }
-                            .padding(.vertical, 3)
                         }
                     }
                 }
