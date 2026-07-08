@@ -12,6 +12,7 @@ import io.legado.shared.model.SharedExploreKind
 import io.legado.shared.model.SharedHttpTts
 import io.legado.shared.model.SharedKeyboardAssist
 import io.legado.shared.model.SharedRawConfigEntry
+import io.legado.shared.model.SharedReadRecord
 import io.legado.shared.model.SharedReplaceRule
 import io.legado.shared.model.SharedRssArticle
 import io.legado.shared.model.SharedRssReadRecord
@@ -31,6 +32,7 @@ import io.legado.shared.book.ChapterReadResult
 import io.legado.shared.book.ChapterRepository
 import io.legado.shared.book.SearchCoordinator
 import io.legado.shared.book.SearchCoordinatorResult
+import io.legado.shared.book.ReadRecordRepository
 import io.legado.shared.backup.DataBackupService
 import io.legado.shared.bookmark.BookmarkRepository
 import io.legado.shared.config.DictionaryLookupService
@@ -87,6 +89,7 @@ open class LegadoRuntime(
     val libraryStore: SharedLibraryStore = SharedLibraryStore(cacheStore)
     val bookshelfService: BookshelfService = BookshelfService(libraryStore)
     val bookGroupRepository: BookGroupRepository = BookGroupRepository(libraryStore)
+    val readRecordRepository: ReadRecordRepository = ReadRecordRepository(libraryStore)
     val searchCoordinator: SearchCoordinator = SearchCoordinator(client, libraryStore)
     val bookDetailCoordinator: BookDetailCoordinator = BookDetailCoordinator(client, bookshelfService, libraryStore)
     val chapterRepository: ChapterRepository = ChapterRepository(client, libraryStore, bookshelfService)
@@ -221,6 +224,19 @@ open class LegadoRuntime(
 
     fun loadSearchKeywords(): List<SharedSearchKeyword> {
         return searchCoordinator.listKeywords()
+    }
+
+    fun loadReadRecords(): List<SharedReadRecord> {
+        return readRecordRepository.list()
+    }
+
+    fun recordReadTime(
+        book: SharedBook,
+        durationMillis: Long,
+        nowMillis: Long = 0L,
+        deviceId: String = "ios"
+    ): List<SharedReadRecord> {
+        return readRecordRepository.record(book, durationMillis, nowMillis, deviceId)
     }
 
     fun deleteSearchKeyword(word: String): List<SharedSearchKeyword> {

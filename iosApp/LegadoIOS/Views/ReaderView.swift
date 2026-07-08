@@ -4,6 +4,7 @@ struct ReaderView: View {
     @EnvironmentObject private var app: AppState
     let initialChapterIndex: Int
     @State private var hasLoaded = false
+    @State private var readSessionStart: Date?
     @StateObject private var speech = SpeechController()
 
     var body: some View {
@@ -87,9 +88,11 @@ struct ReaderView: View {
                 return
             }
             hasLoaded = true
+            readSessionStart = Date()
             await loadChapter(initialChapterIndex)
         }
         .onDisappear {
+            recordReadSession()
             speech.stop()
         }
     }
@@ -99,6 +102,15 @@ struct ReaderView: View {
             return
         }
         await app.loadChapter(at: index)
+    }
+
+    private func recordReadSession() {
+        guard let start = readSessionStart, !app.currentContent.isEmpty else {
+            return
+        }
+        let duration = Int64(Date().timeIntervalSince(start) * 1000)
+        app.recordCurrentReadingTime(durationMillis: duration)
+        readSessionStart = nil
     }
 }
 

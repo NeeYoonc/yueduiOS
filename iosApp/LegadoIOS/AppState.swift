@@ -24,6 +24,7 @@ final class AppState: ObservableObject {
     @Published private(set) var bookGroups: [SharedBookGroup] = []
     @Published private(set) var visibleBookGroups: [SharedBookGroup] = []
     @Published private(set) var selectableBookGroups: [SharedBookGroup] = []
+    @Published private(set) var readRecords: [SharedReadRecord] = []
     @Published var selectedBookGroupId: Int64 = -1
     @Published private(set) var bookmarks: [SharedBookmark] = []
     @Published private(set) var replaceRules: [SharedReplaceRule] = []
@@ -76,6 +77,7 @@ final class AppState: ObservableObject {
         bookGroups = runtime.loadBookGroups() as? [SharedBookGroup] ?? []
         visibleBookGroups = bookGroups.filter { $0.show }
         selectableBookGroups = runtime.loadSelectableBookGroups() as? [SharedBookGroup] ?? []
+        readRecords = runtime.loadReadRecords() as? [SharedReadRecord] ?? []
         visibleBooks = runtime.loadBooksForGroup(groupId: selectedBookGroupId) as? [SharedBook] ?? books
         bookmarks = runtime.loadBookmarks() as? [SharedBookmark] ?? []
         replaceRules = runtime.loadReplaceRules() as? [SharedReplaceRule] ?? []
@@ -800,6 +802,19 @@ final class AppState: ObservableObject {
         )
         refreshLibrary()
         message = "Bookmark added"
+    }
+
+    func recordCurrentReadingTime(durationMillis: Int64) {
+        guard durationMillis > 0, let book = selectedBook else {
+            return
+        }
+        readRecords = runtime.recordReadTime(
+            book: book,
+            durationMillis: durationMillis,
+            nowMillis: nowMillis(),
+            deviceId: "ios"
+        ) as? [SharedReadRecord] ?? []
+        refreshLibrary()
     }
 
     func deleteBookmark(_ bookmark: SharedBookmark) {
