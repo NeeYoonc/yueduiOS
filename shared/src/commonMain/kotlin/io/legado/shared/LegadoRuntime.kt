@@ -2,6 +2,9 @@ package io.legado.shared
 
 import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookSource
+import io.legado.shared.book.BookshelfService
+import io.legado.shared.book.SearchCoordinator
+import io.legado.shared.book.SearchCoordinatorResult
 import io.legado.shared.platform.CacheStorePort
 import io.legado.shared.platform.HttpFetcher
 import io.legado.shared.platform.ScriptRuntime
@@ -28,6 +31,8 @@ open class LegadoRuntime(
         suspendSearchResultParser = RuleEngineSearchResultParser(ruleEngine)
     )
     val libraryStore: SharedLibraryStore = SharedLibraryStore(cacheStore)
+    val bookshelfService: BookshelfService = BookshelfService(libraryStore)
+    val searchCoordinator: SearchCoordinator = SearchCoordinator(client, libraryStore)
 
     @Throws(IllegalArgumentException::class)
     fun importAndSaveBookSources(json: String): List<SharedBookSource> {
@@ -48,6 +53,14 @@ open class LegadoRuntime(
         return libraryStore.loadBooks()
     }
 
+    suspend fun searchEnabledSources(
+        key: String,
+        page: Int = 1,
+        nowMillis: Long = 0L
+    ): SearchCoordinatorResult {
+        return searchCoordinator.search(loadBookSources(), key, page, nowMillis)
+    }
+
     fun importAndSaveDefaultData(payload: DefaultDataPayload) {
         val snapshot = DefaultDataImporter.importSnapshot(payload)
         libraryStore.saveDataSnapshot(snapshot)
@@ -65,6 +78,12 @@ open class LegadoRuntime(
             val book = result.selectedBook
             val chapter = result.selectedChapter
             val content = result.content?.content
+            if (book != null) {
+                bookshelfService.upsertBook(book)
+            }
+            if (book != null && chapter != null) {
+                bookshelfService.updateProgress(book, chapter, position = 0, nowMillis = 0L)
+            }
             if (book != null && chapter != null && content != null) {
                 libraryStore.saveChapterContent(book, chapter, content)
             }

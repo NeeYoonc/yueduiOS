@@ -1,0 +1,95 @@
+package io.legado.shared.book
+
+import io.legado.shared.LegadoSharedClient
+import io.legado.shared.model.SharedBookSource
+import io.legado.shared.model.SharedSearchRule
+import io.legado.shared.platform.CacheStorePort
+import io.legado.shared.platform.HttpFetcher
+import io.legado.shared.platform.SharedHttpRequest
+import io.legado.shared.platform.SharedHttpResponse
+import io.legado.shared.storage.SharedLibraryStore
+import kotlinx.coroutines.runBlocking
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
+class SearchCoordinatorTest {
+    @Test
+    fun searchesEnabledSourcesAndKeepsPerSourceErrors() = runBlocking {
+        val fetcher = object : HttpFetcher {
+            override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                return when (request.url) {
+                    "https://one.test/search?q=metal&page=1" -> SharedHttpResponse(
+                        finalUrl = request.url,
+                        statusCode = 200,
+                        body = "name=One\nbookUrl=/book/1"
+                    )
+                    "https://bad.test/search?q=metal&page=1" -> error("network down")
+                    else -> error("Unexpected request URL: ${request.url}")
+                }
+            }
+        }
+        val store = SharedLibraryStore(InMemoryCacheStore())
+        val coordinator = SearchCoordinator(LegadoSharedClient(fetcher), store)
+        val sources = listOf(
+            SharedBookSource(
+                bookSourceUrl = "https://one.test",
+                bookSourceName = "One",
+                searchUrl = "https://one.test/search?q={{key}}&page={{page}}"
+            ),
+            SharedBookSource(
+                bookSourceUrl = "https://bad.test",
+                bookSourceName = "Bad",
+                searchUrl = "https://bad.test/search?q={{key}}&page={{page}}"
+            ),
+            SharedBookSource(
+                bookSourceUrl = "https://disabled.test",
+                bookSourceName = "Disabled",
+                enabled = false,
+                searchUrl = "https://disabled.test/search?q={{key}}"
+            )
+        )
+
+        val result = coordinator.search(sources, key = "metal", page = 1, nowMillis = 99L)
+
+        assertEquals(listOf("One"), result.books.map { it.name })
+        assertEquals("https://one.test/book/1", result.books.single().bookUrl)
+        assertEquals(listOf("Bad"), result.errors.map { it.source.bookSourceName })
+        assertEquals("network down", result.errors.single().message)
+        assertEquals("metal", store.loadDataSnapshot().searchKeywords.single().word)
+        assertEquals(1, store.loadDataSnapshot().searchKeywords.single().usage)
+        assertEquals(99L, store.loadDataSnapshot().searchKeywords.single().lastUseTime)
+    }
+
+    @Test
+    fun incrementsExistingSearchKeywordUsage() = runBlocking {
+        val fetcher = object : HttpFetcher {
+            override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                return SharedHttpResponse(finalUrl = request.url, statusCode = 200, body = "")
+            }
+        }
+        val store = SharedLibraryStore(InMemoryCacheStore())
+        val coordinator = SearchCoordinator(LegadoSharedClient(fetcher), store)
+        val source = SharedBookSource(
+            bookSourceUrl = "https://one.test",
+            bookSourceName = "One",
+            searchUrl = "https://one.test/search?q={{key}}"
+        )
+
+        coordinator.search(listOf(source), key = "metal", nowMillis = 1L)
+        coordinator.search(listOf(source), key = "metal", nowMillis = 2L)
+
+        val keyword = store.loadDataSnapshot().searchKeywords.single()
+        assertEquals(2, keyword.usage)
+        assertEquals(2L, keyword.lastUseTime)
+    }
+
+    private class InMemoryCacheStore : CacheStorePort {
+        private val values = mutableMapOf<String, String>()
+
+        override fun getText(key: String): String? = values[key]
+
+        override fun putText(key: String, value: String) {
+            values[key] = value
+        }
+    }
+}

@@ -74,6 +74,8 @@ class LegadoRuntimeTest {
         assertEquals(sources, runtime.loadBookSources())
         assertEquals("Metal Runtime", result.selectedBook?.name)
         assertEquals("Cached line.", result.content?.content?.content)
+        assertEquals("Metal Runtime", runtime.loadBooks().single().name)
+        assertEquals("Chapter 1", runtime.loadBooks().single().durChapterTitle)
         assertEquals(
             result.content?.content,
             runtime.libraryStore.loadChapterContent(
