@@ -15,6 +15,26 @@ class SearchCoordinator(
     private val client: LegadoSharedClient,
     private val libraryStore: SharedLibraryStore
 ) {
+    fun listKeywords(): List<SharedSearchKeyword> {
+        return libraryStore.loadDataSnapshot().searchKeywords.sortedWith(
+            compareByDescending<SharedSearchKeyword> { it.lastUseTime }
+                .thenByDescending { it.usage }
+                .thenBy { it.word }
+        )
+    }
+
+    fun deleteKeyword(word: String): List<SharedSearchKeyword> {
+        val snapshot = libraryStore.loadDataSnapshot()
+        libraryStore.saveDataSnapshot(snapshot.copy(searchKeywords = snapshot.searchKeywords.filterNot { it.word == word }))
+        return listKeywords()
+    }
+
+    fun clearKeywords(): List<SharedSearchKeyword> {
+        val snapshot = libraryStore.loadDataSnapshot()
+        libraryStore.saveDataSnapshot(snapshot.copy(searchKeywords = emptyList()))
+        return emptyList()
+    }
+
     suspend fun search(
         sources: List<SharedBookSource>,
         key: String,
@@ -41,7 +61,7 @@ class SearchCoordinator(
         )
     }
 
-    private fun recordKeyword(key: String, nowMillis: Long) {
+    fun recordKeyword(key: String, nowMillis: Long) {
         if (key.isBlank()) {
             return
         }

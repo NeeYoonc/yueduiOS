@@ -12,6 +12,7 @@ import io.legado.shared.model.SharedReplaceRule
 import io.legado.shared.model.SharedRssArticle
 import io.legado.shared.model.SharedRssSource
 import io.legado.shared.model.SharedSearchBook
+import io.legado.shared.model.SharedSearchKeyword
 import io.legado.shared.book.BookDetailCoordinator
 import io.legado.shared.book.BookDetailResult
 import io.legado.shared.book.BookGroupRepository
@@ -113,6 +114,23 @@ open class LegadoRuntime(
 
     fun loadBookmarks(): List<SharedBookmark> {
         return bookmarkRepository.list()
+    }
+
+    fun loadSearchKeywords(): List<SharedSearchKeyword> {
+        return searchCoordinator.listKeywords()
+    }
+
+    fun deleteSearchKeyword(word: String): List<SharedSearchKeyword> {
+        return searchCoordinator.deleteKeyword(word)
+    }
+
+    fun clearSearchKeywords(): List<SharedSearchKeyword> {
+        return searchCoordinator.clearKeywords()
+    }
+
+    fun recordSearchKeyword(key: String, nowMillis: Long = 0L): List<SharedSearchKeyword> {
+        searchCoordinator.recordKeyword(key, nowMillis)
+        return loadSearchKeywords()
     }
 
     fun loadBookGroups(): List<SharedBookGroup> {

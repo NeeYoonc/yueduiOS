@@ -83,6 +83,53 @@ class SearchCoordinatorTest {
         assertEquals(2L, keyword.lastUseTime)
     }
 
+    @Test
+    fun listsDeletesAndClearsSearchKeywords() = runBlocking {
+        val fetcher = object : HttpFetcher {
+            override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                return SharedHttpResponse(finalUrl = request.url, statusCode = 200, body = "")
+            }
+        }
+        val store = SharedLibraryStore(InMemoryCacheStore())
+        val coordinator = SearchCoordinator(LegadoSharedClient(fetcher), store)
+        val source = SharedBookSource(
+            bookSourceUrl = "https://one.test",
+            bookSourceName = "One",
+            searchUrl = "https://one.test/search?q={{key}}"
+        )
+
+        coordinator.search(listOf(source), key = "old", nowMillis = 1L)
+        coordinator.search(listOf(source), key = "new", nowMillis = 3L)
+        coordinator.search(listOf(source), key = "old", nowMillis = 4L)
+
+        assertEquals(listOf("old", "new"), coordinator.listKeywords().map { it.word })
+        assertEquals(2, coordinator.listKeywords().first().usage)
+
+        coordinator.deleteKeyword("old")
+        assertEquals(listOf("new"), coordinator.listKeywords().map { it.word })
+
+        coordinator.clearKeywords()
+        assertEquals(emptyList(), coordinator.listKeywords())
+    }
+
+    @Test
+    fun recordsKeywordWithoutRunningSearch() {
+        val fetcher = object : HttpFetcher {
+            override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                error("No network expected")
+            }
+        }
+        val store = SharedLibraryStore(InMemoryCacheStore())
+        val coordinator = SearchCoordinator(LegadoSharedClient(fetcher), store)
+
+        coordinator.recordKeyword("manual", nowMillis = 11L)
+
+        val keyword = coordinator.listKeywords().single()
+        assertEquals("manual", keyword.word)
+        assertEquals(1, keyword.usage)
+        assertEquals(11L, keyword.lastUseTime)
+    }
+
     private class InMemoryCacheStore : CacheStorePort {
         private val values = mutableMapOf<String, String>()
 

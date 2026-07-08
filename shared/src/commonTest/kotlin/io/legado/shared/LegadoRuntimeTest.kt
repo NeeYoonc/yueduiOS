@@ -223,6 +223,35 @@ class LegadoRuntimeTest {
         assertEquals(0L, runtime.loadBooks().first { it.name == "A" }.group)
     }
 
+    @Test
+    fun managesSearchKeywordsThroughRuntimeRepository() = runBlocking {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    return SharedHttpResponse(finalUrl = request.url, statusCode = 200, body = "")
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+        runtime.importAndSaveBookSources(
+            """
+            {"bookSourceUrl":"https://one.test","bookSourceName":"One","searchUrl":"https://one.test/search?q={{key}}"}
+            """.trimIndent()
+        )
+
+        runtime.searchEnabledSources("first", nowMillis = 1L)
+        runtime.searchEnabledSources("second", nowMillis = 2L)
+        runtime.recordSearchKeyword("manual", nowMillis = 3L)
+
+        assertEquals(listOf("manual", "second", "first"), runtime.loadSearchKeywords().map { it.word })
+
+        runtime.deleteSearchKeyword("second")
+        assertEquals(listOf("manual", "first"), runtime.loadSearchKeywords().map { it.word })
+
+        runtime.clearSearchKeywords()
+        assertEquals(emptyList(), runtime.loadSearchKeywords())
+    }
+
     private class InMemoryCacheStore : CacheStorePort {
         private val values = mutableMapOf<String, String>()
 

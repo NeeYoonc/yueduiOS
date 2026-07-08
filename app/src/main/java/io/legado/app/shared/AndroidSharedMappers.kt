@@ -5,6 +5,7 @@ import io.legado.app.data.entities.BookChapter
 import io.legado.app.data.entities.BookGroup
 import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.SearchBook
+import io.legado.app.data.entities.SearchKeyword
 import io.legado.app.data.entities.rule.BookInfoRule
 import io.legado.app.data.entities.rule.ContentRule
 import io.legado.app.data.entities.rule.ExploreRule
@@ -20,6 +21,7 @@ import io.legado.shared.model.SharedContentRule
 import io.legado.shared.model.SharedReadConfig
 import io.legado.shared.model.SharedReviewRule
 import io.legado.shared.model.SharedSearchBook
+import io.legado.shared.model.SharedSearchKeyword
 import io.legado.shared.model.SharedSearchRule
 import io.legado.shared.model.SharedTocRule
 
@@ -225,6 +227,12 @@ fun SearchBook.toSharedSearchBook(): SharedSearchBook = SharedSearchBook(
     chapterWordCountText = chapterWordCountText,
     chapterWordCount = chapterWordCount,
     respondTime = respondTime
+)
+
+fun SearchKeyword.toSharedSearchKeyword(): SharedSearchKeyword = SharedSearchKeyword(
+    word = word,
+    usage = usage,
+    lastUseTime = lastUseTime
 )
 
 fun BookChapter.toSharedBookChapter(): SharedBookChapter = SharedBookChapter(

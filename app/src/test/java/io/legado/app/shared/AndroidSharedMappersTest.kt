@@ -5,6 +5,7 @@ import io.legado.app.data.entities.BookChapter
 import io.legado.app.data.entities.BookGroup
 import io.legado.app.data.entities.BookSource
 import io.legado.app.data.entities.SearchBook
+import io.legado.app.data.entities.SearchKeyword
 import io.legado.app.data.entities.rule.BookInfoRule
 import io.legado.app.data.entities.rule.ContentRule
 import io.legado.app.data.entities.rule.ExploreRule
@@ -310,5 +311,16 @@ class AndroidSharedMappersTest {
         assertEquals(false, shared.show)
         assertEquals(2, shared.bookSort)
         assertEquals(true, shared.onlyUpdateRead)
+    }
+
+    @Test
+    fun mapsSearchKeywordToSharedSearchKeyword() {
+        val keyword = SearchKeyword(word = "metal", usage = 7, lastUseTime = 99L)
+
+        val shared = keyword.toSharedSearchKeyword()
+
+        assertEquals("metal", shared.word)
+        assertEquals(7, shared.usage)
+        assertEquals(99L, shared.lastUseTime)
     }
 }

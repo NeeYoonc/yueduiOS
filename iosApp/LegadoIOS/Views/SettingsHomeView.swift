@@ -15,6 +15,7 @@ struct SettingsHomeView: View {
                     LabeledContent("Replacements", value: "\(app.replaceRules.count)")
                     LabeledContent("Dictionaries", value: "\(app.dictRules.count)")
                     LabeledContent("HTTP TTS", value: "\(app.httpTts.count)")
+                    LabeledContent("Search History", value: "\(app.searchKeywords.count)")
                     LabeledContent("Results", value: "\(app.searchResults.count)")
                 }
 

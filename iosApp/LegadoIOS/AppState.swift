@@ -28,6 +28,7 @@ final class AppState: ObservableObject {
     @Published private(set) var selectedRssArticle: SharedRssArticle?
     @Published private(set) var rssContent: String = ""
     @Published private(set) var searchResults: [SharedSearchBook] = []
+    @Published private(set) var searchKeywords: [SharedSearchKeyword] = []
     @Published private(set) var searchErrors: [SourceSearchError] = []
     @Published private(set) var selectedBook: SharedBook?
     @Published private(set) var selectedSearchBook: SharedSearchBook?
@@ -62,6 +63,7 @@ final class AppState: ObservableObject {
         dictRules = runtime.loadDictRules() as? [SharedDictRule] ?? []
         httpTts = runtime.loadHttpTts() as? [SharedHttpTts] ?? []
         rssSources = runtime.loadRssSources() as? [SharedRssSource] ?? []
+        searchKeywords = runtime.loadSearchKeywords() as? [SharedSearchKeyword] ?? []
         if selectedSourceIndex >= sources.count {
             selectedSourceIndex = sources.isEmpty ? -1 : 0
         }
@@ -356,6 +358,7 @@ final class AppState: ObservableObject {
 
         do {
             if sources.indices.contains(selectedSourceIndex) {
+                _ = runtime.recordSearchKeyword(key: text, nowMillis: nowMillis())
                 let result = try await runtime.client.search(
                     source: sources[selectedSourceIndex],
                     key: text,
@@ -372,10 +375,24 @@ final class AppState: ObservableObject {
                 searchResults = result.books as? [SharedSearchBook] ?? []
                 searchErrors = result.errors as? [SourceSearchError] ?? []
             }
+            searchKeywords = runtime.loadSearchKeywords() as? [SharedSearchKeyword] ?? []
             message = searchResults.isEmpty ? "No results" : nil
         } catch {
             message = error.localizedDescription
         }
+    }
+
+    func search(keyword searchKeyword: SharedSearchKeyword) async {
+        keyword = searchKeyword.word
+        await search()
+    }
+
+    func deleteSearchKeyword(_ searchKeyword: SharedSearchKeyword) {
+        searchKeywords = runtime.deleteSearchKeyword(word: searchKeyword.word) as? [SharedSearchKeyword] ?? []
+    }
+
+    func clearSearchKeywords() {
+        searchKeywords = runtime.clearSearchKeywords() as? [SharedSearchKeyword] ?? []
     }
 
     func openSearchResult(_ searchBook: SharedSearchBook) async {

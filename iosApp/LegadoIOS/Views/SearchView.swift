@@ -40,6 +40,44 @@ struct SearchView: View {
                 }
             }
 
+            if !app.searchKeywords.isEmpty {
+                Section("History") {
+                    ForEach(app.searchKeywords.indices, id: \.self) { index in
+                        let item = app.searchKeywords[index]
+                        HStack {
+                            Button {
+                                Task {
+                                    await app.search(keyword: item)
+                                }
+                            } label: {
+                                VStack(alignment: .leading, spacing: 3) {
+                                    Text(item.word)
+                                    Text("\(item.usage) use\(item.usage == 1 ? "" : "s")")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .foregroundStyle(.primary)
+
+                            Spacer()
+
+                            Button(role: .destructive) {
+                                app.deleteSearchKeyword(item)
+                            } label: {
+                                Image(systemName: "trash")
+                            }
+                        }
+                        .buttonStyle(.borderless)
+                    }
+
+                    Button(role: .destructive) {
+                        app.clearSearchKeywords()
+                    } label: {
+                        Label("Clear history", systemImage: "trash")
+                    }
+                }
+            }
+
             if !app.searchResults.isEmpty {
                 Section("Results") {
                     ForEach(app.searchResults.indices, id: \.self) { index in
