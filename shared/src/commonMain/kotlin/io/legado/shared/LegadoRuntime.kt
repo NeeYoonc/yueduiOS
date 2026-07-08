@@ -15,6 +15,7 @@ import io.legado.shared.model.SharedRssArticle
 import io.legado.shared.model.SharedRssSource
 import io.legado.shared.model.SharedSearchBook
 import io.legado.shared.model.SharedSearchKeyword
+import io.legado.shared.model.SharedServer
 import io.legado.shared.model.SharedTxtTocRule
 import io.legado.shared.book.BookDetailCoordinator
 import io.legado.shared.book.BookDetailResult
@@ -30,6 +31,7 @@ import io.legado.shared.bookmark.BookmarkRepository
 import io.legado.shared.config.DictionaryLookupService
 import io.legado.shared.config.DictRuleRepository
 import io.legado.shared.config.HttpTtsRepository
+import io.legado.shared.config.ServerRepository
 import io.legado.shared.config.TxtTocRuleRepository
 import io.legado.shared.explore.ExploreService
 import io.legado.shared.local.LocalTextBookService
@@ -89,6 +91,7 @@ open class LegadoRuntime(
     val dictionaryLookupService: DictionaryLookupService = DictionaryLookupService(httpFetcher, dictRuleRepository, ruleEngine)
     val httpTtsRepository: HttpTtsRepository = HttpTtsRepository(libraryStore)
     val txtTocRuleRepository: TxtTocRuleRepository = TxtTocRuleRepository(libraryStore)
+    val serverRepository: ServerRepository = ServerRepository(libraryStore)
     val bookmarkRepository: BookmarkRepository = BookmarkRepository(libraryStore)
 
     @Throws(IllegalArgumentException::class)
@@ -132,6 +135,10 @@ open class LegadoRuntime(
 
     fun loadTxtTocRules(): List<SharedTxtTocRule> {
         return txtTocRuleRepository.list()
+    }
+
+    fun loadServers(): List<SharedServer> {
+        return serverRepository.list()
     }
 
     fun loadBookmarks(): List<SharedBookmark> {
@@ -253,6 +260,23 @@ open class LegadoRuntime(
 
     fun exportTxtTocRulesJson(): String {
         return txtTocRuleRepository.exportJson()
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun importAndSaveServers(json: String, replace: Boolean = false): List<SharedServer> {
+        return serverRepository.importJson(json, replace)
+    }
+
+    fun upsertServer(server: SharedServer): SharedServer {
+        return serverRepository.upsert(server)
+    }
+
+    fun deleteServer(id: Long): List<SharedServer> {
+        return serverRepository.delete(id)
+    }
+
+    fun exportServersJson(): String {
+        return serverRepository.exportJson()
     }
 
     fun exportBackupJson(nowMillis: Long = 0L): String {

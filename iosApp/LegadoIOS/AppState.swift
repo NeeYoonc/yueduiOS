@@ -9,6 +9,7 @@ final class AppState: ObservableObject {
     @Published var dictRuleJson: String = ""
     @Published var httpTtsJson: String = ""
     @Published var txtTocRuleJson: String = ""
+    @Published var serverJson: String = ""
     @Published var keyword: String = ""
     @Published var dictionaryKeyword: String = ""
     @Published var selectedSourceIndex: Int = -1
@@ -26,6 +27,7 @@ final class AppState: ObservableObject {
     @Published private(set) var dictionaryLookupResults: [SharedDictionaryLookupResult] = []
     @Published private(set) var httpTts: [SharedHttpTts] = []
     @Published private(set) var txtTocRules: [SharedTxtTocRule] = []
+    @Published private(set) var servers: [SharedServer] = []
     @Published private(set) var rssSources: [SharedRssSource] = []
     @Published private(set) var rssArticles: [SharedRssArticle] = []
     @Published private(set) var exploreSources: [SharedBookSource] = []
@@ -71,6 +73,7 @@ final class AppState: ObservableObject {
         dictRules = runtime.loadDictRules() as? [SharedDictRule] ?? []
         httpTts = runtime.loadHttpTts() as? [SharedHttpTts] ?? []
         txtTocRules = runtime.loadTxtTocRules() as? [SharedTxtTocRule] ?? []
+        servers = runtime.loadServers() as? [SharedServer] ?? []
         rssSources = runtime.loadRssSources() as? [SharedRssSource] ?? []
         exploreSources = runtime.loadExploreSources() as? [SharedBookSource] ?? []
         searchKeywords = runtime.loadSearchKeywords() as? [SharedSearchKeyword] ?? []
@@ -241,6 +244,31 @@ final class AppState: ObservableObject {
 
     func deleteTxtTocRule(_ rule: SharedTxtTocRule) {
         _ = runtime.deleteTxtTocRule(id: rule.id)
+        refreshLibrary()
+    }
+
+    func importServers(replace: Bool = false) {
+        let rawJson = serverJson.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Server JSON is empty"
+            return
+        }
+        do {
+            servers = try runtime.importAndSaveServers(json: rawJson, replace: replace) as? [SharedServer] ?? []
+            refreshLibrary()
+            message = servers.isEmpty ? "No usable servers" : "Imported \(servers.count) server(s)"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func exportServersToEditor() {
+        serverJson = runtime.exportServersJson()
+        message = "Exported \(servers.count) server(s)"
+    }
+
+    func deleteServer(_ server: SharedServer) {
+        servers = runtime.deleteServer(id: server.id) as? [SharedServer] ?? []
         refreshLibrary()
     }
 

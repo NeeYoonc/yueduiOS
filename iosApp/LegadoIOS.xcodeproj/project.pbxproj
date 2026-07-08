@@ -42,6 +42,8 @@
 		C1000000000000000000000A /* DictionaryLookupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1000000000000000000001A /* DictionaryLookupView.swift */; };
 		C1000000000000000000000B /* TxtTocRuleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1000000000000000000001B /* TxtTocRuleListView.swift */; };
 		C1000000000000000000000C /* TxtTocRuleEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1000000000000000000001C /* TxtTocRuleEditorView.swift */; };
+		C1000000000000000000000D /* ServerListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1000000000000000000001D /* ServerListView.swift */; };
+		C1000000000000000000000E /* ServerEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1000000000000000000001E /* ServerEditorView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -81,6 +83,8 @@
 		C1000000000000000000001A /* DictionaryLookupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/DictionaryLookupView.swift; sourceTree = "<group>"; };
 		C1000000000000000000001B /* TxtTocRuleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/TxtTocRuleListView.swift; sourceTree = "<group>"; };
 		C1000000000000000000001C /* TxtTocRuleEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/TxtTocRuleEditorView.swift; sourceTree = "<group>"; };
+		C1000000000000000000001D /* ServerListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ServerListView.swift; sourceTree = "<group>"; };
+		C1000000000000000000001E /* ServerEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ServerEditorView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -135,6 +139,8 @@
 				C10000000000000000000019 /* BookGroupListView.swift */,
 				C1000000000000000000001B /* TxtTocRuleListView.swift */,
 				C1000000000000000000001C /* TxtTocRuleEditorView.swift */,
+				C1000000000000000000001D /* ServerListView.swift */,
+				C1000000000000000000001E /* ServerEditorView.swift */,
 				B1000000000000000000001C /* SourceListView.swift */,
 				B1000000000000000000001D /* SourceEditorView.swift */,
 				B1000000000000000000001E /* SourceDebugView.swift */,
@@ -286,6 +292,8 @@
 				C10000000000000000000009 /* BookGroupListView.swift in Sources */,
 				C1000000000000000000000B /* TxtTocRuleListView.swift in Sources */,
 				C1000000000000000000000C /* TxtTocRuleEditorView.swift in Sources */,
+				C1000000000000000000000D /* ServerListView.swift in Sources */,
+				C1000000000000000000000E /* ServerEditorView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
