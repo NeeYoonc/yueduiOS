@@ -25,7 +25,7 @@ struct BackupView: View {
                 }
             }
 
-            Section("WebDAV") {
+            Section {
                 TextField("Backup file name", text: $app.webDavBackupFileName)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
@@ -47,6 +47,8 @@ struct BackupView: View {
                     Label("Download and import from WebDAV", systemImage: "icloud.and.arrow.down")
                 }
                 .disabled(app.servers.filter { $0.type.uppercased() == "WEBDAV" }.isEmpty || app.isLoading)
+            } header: {
+                Text("WebDAV")
             } footer: {
                 Text("Uses the first configured WebDAV server in Remote Servers. The server config JSON should include url, username, and password.")
             }
