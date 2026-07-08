@@ -14,11 +14,12 @@ class ReadingFlowService(
     constructor(
         httpFetcher: HttpFetcher,
         searchResultParser: SearchResultParser = RuleAwareSearchResultParser,
+        suspendSearchResultParser: SuspendSearchResultParser? = null,
         bookInfoParser: BookInfoParser = RegexBookInfoParser,
         chapterListParser: ChapterListParser = RegexChapterListParser,
         chapterContentParser: ChapterContentParser = RegexChapterContentParser
     ) : this(
-        searchService = BookSearchService(httpFetcher, searchResultParser),
+        searchService = BookSearchService(httpFetcher, searchResultParser, suspendSearchResultParser),
         bookInfoService = BookInfoService(httpFetcher, bookInfoParser),
         tocService = BookTocService(httpFetcher, chapterListParser),
         contentService = BookContentService(httpFetcher, chapterContentParser)

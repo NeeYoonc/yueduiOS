@@ -118,6 +118,44 @@ class AndroidSharedBookSearchTest {
         assertEquals(1, result.books.size)
         assertEquals("Regex Road", result.books.single().name)
         assertEquals("Tester", result.books.single().author)
-        assertEquals("/book/1", result.books.single().bookUrl)
+        assertEquals("https://source.test/book/1", result.books.single().bookUrl)
+    }
+
+    @Test
+    fun defaultSearchUsesAndroidScriptRuntimeForJsRules() = runBlocking {
+        val client = OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                val request = chain.request()
+                Response.Builder()
+                    .request(request)
+                    .protocol(Protocol.HTTP_1_1)
+                    .code(200)
+                    .message("OK")
+                    .body(
+                        """
+                        {"content":{"content":[{"id":"book-1","title":"Script Road","author":"Tester"}]}}
+                        """.trimIndent().toResponseBody("application/json".toMediaType())
+                    )
+                    .build()
+            }
+            .build()
+        val search = AndroidSharedBookSearch(AndroidHttpFetcher(client))
+        val source = BookSource(
+            bookSourceUrl = "https://source.test",
+            bookSourceName = "Source",
+            searchUrl = "https://source.test/search?q={{key}}",
+            ruleSearch = SearchRule(
+                bookList = "$.content.content",
+                name = "$.title",
+                author = "$.author",
+                bookUrl = "$.id@js:result + '/detail'"
+            )
+        )
+
+        val result = search.search(source, key = "script")
+
+        assertEquals(1, result.books.size)
+        assertEquals("Script Road", result.books.single().name)
+        assertEquals("https://source.test/book-1/detail", result.books.single().bookUrl)
     }
 }

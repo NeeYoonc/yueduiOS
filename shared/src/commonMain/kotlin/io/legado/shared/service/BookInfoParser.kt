@@ -3,6 +3,7 @@ package io.legado.shared.service
 import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookInfoRule
 import io.legado.shared.model.SharedBookSource
+import io.legado.shared.rule.RuleAnalyzer
 import kotlinx.serialization.json.JsonElement
 
 interface BookInfoParser {
@@ -12,9 +13,6 @@ interface BookInfoParser {
 object RegexBookInfoParser : BookInfoParser {
     override fun parse(source: SharedBookSource, book: SharedBook, body: String): SharedBook {
         val rule = source.ruleBookInfo ?: return book
-        if (rule.hasJsonPathRule()) {
-            return parseJson(rule, book, body)
-        }
         return book.copy(
             name = extractField(body, rule.name) ?: book.name,
             author = extractField(body, rule.author) ?: book.author,
@@ -22,10 +20,12 @@ object RegexBookInfoParser : BookInfoParser {
             latestChapterTitle = extractField(body, rule.lastChapter) ?: book.latestChapterTitle,
             intro = extractField(body, rule.intro) ?: book.intro,
             coverUrl = extractField(body, rule.coverUrl) ?: book.coverUrl,
-            tocUrl = extractField(body, rule.tocUrl) ?: book.tocUrl.ifBlank { book.bookUrl }
+            tocUrl = extractField(body, rule.tocUrl) ?: book.tocUrl.ifBlank { book.bookUrl },
+            wordCount = extractField(body, rule.wordCount) ?: book.wordCount
         )
     }
 
+    @Suppress("unused")
     private fun parseJson(rule: SharedBookInfoRule, book: SharedBook, body: String): SharedBook {
         val root = SimpleJsonPath.parse(body) ?: return book
         return book.copy(
@@ -51,15 +51,9 @@ object RegexBookInfoParser : BookInfoParser {
     }
 
     private fun extractField(body: String, rule: String?): String? {
-        val trimmedRule = rule?.trim()?.takeIf { it.isNotEmpty() } ?: return null
-        val regex = runCatching { Regex(trimmedRule) }.getOrNull() ?: return null
-        val match = regex.find(body) ?: return null
-        val value = if (match.groupValues.size > 1) {
-            match.groupValues[1]
-        } else {
-            match.value
-        }
-        return normalizeField(value).takeIf { it.isNotEmpty() }
+        return RuleAnalyzer.getString(body, rule)
+            ?.let(::normalizeField)
+            ?.takeIf { it.isNotEmpty() }
     }
 
     private fun normalizeField(value: String): String {

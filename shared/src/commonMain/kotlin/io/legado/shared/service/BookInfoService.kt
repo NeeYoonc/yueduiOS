@@ -14,7 +14,7 @@ class BookInfoService(
         source: SharedBookSource,
         book: SharedBook
     ): BookInfoResult {
-        val response = httpFetcher.fetch(SharedHttpRequest(url = book.bookUrl))
+        val response = httpFetcher.fetch(SharedRequestBuilder.build(book.bookUrl))
         val parsedBook = bookInfoParser.parse(source, book, response.body)
         return BookInfoResult(
             source = source,

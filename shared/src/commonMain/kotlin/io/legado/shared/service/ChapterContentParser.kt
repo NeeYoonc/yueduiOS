@@ -5,6 +5,7 @@ import io.legado.shared.model.SharedBookChapter
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedChapterContent
 import io.legado.shared.model.SharedContentRule
+import io.legado.shared.rule.RuleAnalyzer
 
 interface ChapterContentParser {
     fun parse(
@@ -24,9 +25,6 @@ object RegexChapterContentParser : ChapterContentParser {
         body: String
     ): SharedChapterContent {
         val rule = source.ruleContent ?: return SharedChapterContent()
-        if (rule.hasJsonPathRule()) {
-            return parseJson(rule, body)
-        }
         val content = extractSingle(body, rule.content).orEmpty()
         return SharedChapterContent(
             content = applyReplaceRegex(content, rule.replaceRegex),
@@ -53,30 +51,11 @@ object RegexChapterContentParser : ChapterContentParser {
     }
 
     private fun extractSingle(body: String, rule: String?): String? {
-        val trimmedRule = rule?.trim()?.takeIf { it.isNotEmpty() } ?: return null
-        val regex = runCatching { Regex(trimmedRule) }.getOrNull() ?: return null
-        val match = regex.find(body) ?: return null
-        val value = if (match.groupValues.size > 1) {
-            match.groupValues[1].trim()
-        } else {
-            match.value.trim()
-        }
-        return normalizeContent(value)
+        return RuleAnalyzer.getString(body, rule)?.let(::normalizeContent)
     }
 
     private fun extractAll(body: String, rule: String?): List<String> {
-        val trimmedRule = rule?.trim()?.takeIf { it.isNotEmpty() } ?: return emptyList()
-        val regex = runCatching { Regex(trimmedRule) }.getOrNull() ?: return emptyList()
-        return regex.findAll(body)
-            .map { match ->
-                if (match.groupValues.size > 1) {
-                    match.groupValues[1].trim()
-                } else {
-                    match.value.trim()
-                }
-            }
-            .filter { it.isNotEmpty() }
-            .toList()
+        return RuleAnalyzer.getStrings(body, rule)
     }
 
     private fun applyReplaceRegex(content: String, rule: String?): String {

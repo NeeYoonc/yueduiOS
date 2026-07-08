@@ -4,6 +4,7 @@ import io.legado.app.data.entities.Book
 import io.legado.app.data.entities.BookChapter
 import io.legado.app.data.entities.BookSource
 import io.legado.shared.platform.HttpFetcher
+import io.legado.shared.rule.AnalyzeRuleEngine
 import io.legado.shared.service.BookInfoParser
 import io.legado.shared.service.ChapterContentParser
 import io.legado.shared.service.ChapterContentResult
@@ -15,6 +16,7 @@ import io.legado.shared.service.RegexBookInfoParser
 import io.legado.shared.service.RegexChapterContentParser
 import io.legado.shared.service.RegexChapterListParser
 import io.legado.shared.service.RuleAwareSearchResultParser
+import io.legado.shared.service.RuleEngineSearchResultParser
 import io.legado.shared.service.SearchPageResult
 import io.legado.shared.service.SearchResultParser
 
@@ -23,11 +25,23 @@ class AndroidSharedReadingFlow(
     searchResultParser: SearchResultParser = RuleAwareSearchResultParser,
     bookInfoParser: BookInfoParser = RegexBookInfoParser,
     chapterListParser: ChapterListParser = RegexChapterListParser,
-    chapterContentParser: ChapterContentParser = RegexChapterContentParser
+    chapterContentParser: ChapterContentParser = RegexChapterContentParser,
+    useRuleEngine: Boolean = true
 ) {
     private val readingFlowService = ReadingFlowService(
         httpFetcher = httpFetcher,
         searchResultParser = searchResultParser,
+        suspendSearchResultParser = if (useRuleEngine && searchResultParser === RuleAwareSearchResultParser) {
+            RuleEngineSearchResultParser(
+                AnalyzeRuleEngine(
+                    scriptRuntime = AndroidScriptRuntime(),
+                    webViewRuntime = AndroidWebViewRuleRuntime()
+                ),
+                fallbackParser = searchResultParser
+            )
+        } else {
+            null
+        },
         bookInfoParser = bookInfoParser,
         chapterListParser = chapterListParser,
         chapterContentParser = chapterContentParser

@@ -22,16 +22,18 @@ import io.legado.shared.service.RegexChapterListParser
 import io.legado.shared.service.RuleAwareSearchResultParser
 import io.legado.shared.service.SearchPageResult
 import io.legado.shared.service.SearchResultParser
+import io.legado.shared.service.SuspendSearchResultParser
 import io.legado.shared.source.SourceJsonImporter
 
 class LegadoSharedClient(
     httpFetcher: HttpFetcher,
     searchResultParser: SearchResultParser = RuleAwareSearchResultParser,
+    suspendSearchResultParser: SuspendSearchResultParser? = null,
     bookInfoParser: BookInfoParser = RegexBookInfoParser,
     chapterListParser: ChapterListParser = RegexChapterListParser,
     chapterContentParser: ChapterContentParser = RegexChapterContentParser
 ) {
-    private val searchService = BookSearchService(httpFetcher, searchResultParser)
+    private val searchService = BookSearchService(httpFetcher, searchResultParser, suspendSearchResultParser)
     private val bookInfoService = BookInfoService(httpFetcher, bookInfoParser)
     private val tocService = BookTocService(httpFetcher, chapterListParser)
     private val contentService = BookContentService(httpFetcher, chapterContentParser)

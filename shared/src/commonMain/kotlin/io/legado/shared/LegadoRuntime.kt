@@ -4,6 +4,10 @@ import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.platform.CacheStorePort
 import io.legado.shared.platform.HttpFetcher
+import io.legado.shared.platform.ScriptRuntime
+import io.legado.shared.rule.AnalyzeRuleEngine
+import io.legado.shared.rule.RuleWebViewRuntime
+import io.legado.shared.service.RuleEngineSearchResultParser
 import io.legado.shared.service.ReadingFlowResult
 import io.legado.shared.source.DefaultDataImporter
 import io.legado.shared.source.DefaultDataPayload
@@ -11,9 +15,18 @@ import io.legado.shared.storage.SharedLibraryStore
 
 open class LegadoRuntime(
     httpFetcher: HttpFetcher,
-    cacheStore: CacheStorePort
+    cacheStore: CacheStorePort,
+    scriptRuntime: ScriptRuntime? = null,
+    webViewRuntime: RuleWebViewRuntime? = null
 ) {
-    val client: LegadoSharedClient = LegadoSharedClient(httpFetcher)
+    private val ruleEngine = AnalyzeRuleEngine(
+        scriptRuntime = scriptRuntime,
+        webViewRuntime = webViewRuntime
+    )
+    val client: LegadoSharedClient = LegadoSharedClient(
+        httpFetcher = httpFetcher,
+        suspendSearchResultParser = RuleEngineSearchResultParser(ruleEngine)
+    )
     val libraryStore: SharedLibraryStore = SharedLibraryStore(cacheStore)
 
     @Throws(IllegalArgumentException::class)

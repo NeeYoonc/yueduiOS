@@ -22,7 +22,7 @@ class BookContentService(
         val visitedUrls = linkedSetOf<String>()
         val discoveredNextUrls = mutableListOf<String>()
         val pendingUrls = ArrayDeque<String>()
-        val firstResponse = httpFetcher.fetch(SharedHttpRequest(url = requestUrl))
+        val firstResponse = httpFetcher.fetch(SharedRequestBuilder.build(requestUrl))
         visitedUrls.add(requestUrl)
         val firstContent = parseAndNormalize(source, book, chapter, firstResponse)
         val contentParts = mutableListOf<String>()
@@ -40,7 +40,7 @@ class BookContentService(
             if (!visitedUrls.add(nextUrl)) {
                 continue
             }
-            val nextResponse = httpFetcher.fetch(SharedHttpRequest(url = nextUrl))
+            val nextResponse = httpFetcher.fetch(SharedRequestBuilder.build(nextUrl))
             val nextContent = parseAndNormalize(source, book, chapter, nextResponse)
             if (nextContent.content.isNotBlank()) {
                 contentParts.add(nextContent.content)

@@ -20,7 +20,7 @@ class BookTocService(
         val visitedUrls = linkedSetOf<String>()
         val pendingUrls = ArrayDeque<String>()
         val allChapters = mutableListOf<SharedBookChapter>()
-        val firstResponse = httpFetcher.fetch(SharedHttpRequest(url = requestUrl))
+        val firstResponse = httpFetcher.fetch(SharedRequestBuilder.build(requestUrl))
         visitedUrls.add(requestUrl)
         val firstPage = parseAndNormalize(source, firstResponse)
         allChapters.addAll(firstPage.chapters)
@@ -30,7 +30,7 @@ class BookTocService(
             if (!visitedUrls.add(nextUrl)) {
                 continue
             }
-            val nextResponse = httpFetcher.fetch(SharedHttpRequest(url = nextUrl))
+            val nextResponse = httpFetcher.fetch(SharedRequestBuilder.build(nextUrl))
             val nextPage = parseAndNormalize(source, nextResponse)
             allChapters.addAll(nextPage.chapters)
             enqueueNextUrls(nextPage.nextTocUrls, visitedUrls, pendingUrls)

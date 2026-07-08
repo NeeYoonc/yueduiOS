@@ -147,6 +147,8 @@ Expected: PASS.
 - Create: `app/src/main/java/io/legado/app/shared/AndroidScriptRuntime.kt`
 - Create: `app/src/main/java/io/legado/app/shared/AndroidWebViewRuleRuntime.kt`
 
+**Progress note 2026-07-08:** The first shared rule-runtime slice now covers JSON/basic CSS/HTML/regex/XPath-like extraction, rule chains, `||`/`&&`/`%%`, `@put`/`@get`, `@js`/`<js>` sequencing, Android Rhino, Android BackstageWebView, iOS JavaScriptCore, iOS WKWebView, Legado URL options, search-result URL normalization, and an async engine-backed search parser. Remaining parity work in this phase still includes the full JSoup index/filter grammar, deeper XPath parity, richer Java/JS bridge APIs, and engine-backed async parsers for detail/TOC/content.
+
 - [ ] **Step 1: Port rule tokenizer and chaining**
 
 Support Legado rule chains, intermediate result passing, put maps, list/string extraction, and URL normalization.

@@ -3,6 +3,7 @@ package io.legado.shared.service
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedSearchBook
 import io.legado.shared.platform.HttpFetcher
+import io.legado.shared.platform.SharedHttpMethod
 import io.legado.shared.platform.SharedHttpRequest
 import io.legado.shared.platform.SharedHttpResponse
 import kotlinx.coroutines.runBlocking
@@ -101,5 +102,46 @@ class BookSearchServiceTest {
         assertEquals(1, result.books.size)
         assertEquals("Parsed By Injected Parser", result.books.single().name)
         assertEquals("https://parser.test/book/1", result.books.single().bookUrl)
+    }
+
+    @Test
+    fun buildsPostRequestFromLegadoUrlOptions() = runBlocking {
+        val fetcher = object : HttpFetcher {
+            override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                assertEquals("https://api.source.test/book-service/findBookName", request.url)
+                assertEquals(SharedHttpMethod.POST, request.method)
+                assertEquals("ios-test", request.headers["X-Client"])
+                assertEquals("""{"title":"metal max","pageNum":3,"pageSize":100}""", request.body)
+                return SharedHttpResponse(
+                    finalUrl = request.url,
+                    statusCode = 200,
+                    body = """
+                        {"content":{"content":[{"title":"Metal Max","author":"Tester","url":"/book/1"}]}}
+                    """.trimIndent()
+                )
+            }
+        }
+        val source = SharedBookSource(
+            bookSourceUrl = "https://api.source.test",
+            bookSourceName = "API",
+            searchUrl = """
+                https://api.source.test/book-service/findBookName,{
+                  "method":"POST",
+                  "headers":{"X-Client":"ios-test"},
+                  "body":{"title":"searchKey","pageNum":{{searchPage}},"pageSize":100}
+                }
+            """.trimIndent(),
+            ruleSearch = io.legado.shared.model.SharedSearchRule(
+                bookList = "$.content.content",
+                name = "$.title",
+                author = "$.author",
+                bookUrl = "$.url"
+            )
+        )
+
+        val result = BookSearchService(fetcher).search(source, key = "metal max", page = 3)
+
+        assertEquals(1, result.books.size)
+        assertEquals("Metal Max", result.books.single().name)
     }
 }

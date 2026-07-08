@@ -2,6 +2,7 @@ package io.legado.shared.service
 
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedSearchBook
+import io.legado.shared.rule.RuleAnalyzer
 import kotlinx.serialization.json.JsonElement
 
 interface SearchResultParser {
@@ -64,6 +65,23 @@ object RegexSearchResultParser : SearchResultParser {
         if (bookListRule.trim().startsWith("$")) {
             return parseJson(source, body, bookListRule)
         }
+        if (RuleAnalyzer.looksLikeHtmlRule(bookListRule)) {
+            return RuleAnalyzer.selectBlocks(body, bookListRule)
+                .mapNotNull { block ->
+                    val book = SharedSearchBook(
+                        name = RuleAnalyzer.getString(block, rule.name).orEmpty(),
+                        author = RuleAnalyzer.getString(block, rule.author).orEmpty(),
+                        bookUrl = RuleAnalyzer.getString(block, rule.bookUrl).orEmpty(),
+                        origin = source.bookSourceUrl,
+                        kind = RuleAnalyzer.getString(block, rule.kind),
+                        latestChapterTitle = RuleAnalyzer.getString(block, rule.lastChapter),
+                        intro = RuleAnalyzer.getString(block, rule.intro),
+                        coverUrl = RuleAnalyzer.getString(block, rule.coverUrl),
+                        wordCount = RuleAnalyzer.getString(block, rule.wordCount)
+                    )
+                    book.takeIf { it.name.isNotBlank() || it.bookUrl.isNotBlank() }
+                }
+        }
         val bookRegex = runCatching { Regex(bookListRule) }.getOrNull() ?: return emptyList()
         return bookRegex.findAll(body)
             .mapNotNull { match ->
@@ -75,7 +93,8 @@ object RegexSearchResultParser : SearchResultParser {
                     kind = extractField(match, rule.kind),
                     latestChapterTitle = extractField(match, rule.lastChapter),
                     intro = extractField(match, rule.intro),
-                    coverUrl = extractField(match, rule.coverUrl)
+                    coverUrl = extractField(match, rule.coverUrl),
+                    wordCount = extractField(match, rule.wordCount)
                 )
                 book.takeIf { it.name.isNotBlank() || it.bookUrl.isNotBlank() }
             }
@@ -99,7 +118,8 @@ object RegexSearchResultParser : SearchResultParser {
                 kind = extractJsonField(item, rule.kind),
                 latestChapterTitle = extractJsonField(item, rule.lastChapter),
                 intro = extractJsonField(item, rule.intro),
-                coverUrl = extractJsonField(item, rule.coverUrl)
+                coverUrl = extractJsonField(item, rule.coverUrl),
+                wordCount = extractJsonField(item, rule.wordCount)
             )
             book.takeIf { it.name.isNotBlank() || it.bookUrl.isNotBlank() }
         }
@@ -116,13 +136,7 @@ object RegexSearchResultParser : SearchResultParser {
             val groupIndex = groupReference.groupValues[1].toInt()
             return match.groups.getOrNull(groupIndex)?.value?.trim()
         }
-        val fieldRegex = runCatching { Regex(trimmedRule) }.getOrNull() ?: return null
-        val fieldMatch = fieldRegex.find(match.value) ?: return null
-        return if (fieldMatch.groupValues.size > 1) {
-            fieldMatch.groupValues[1].trim()
-        } else {
-            fieldMatch.value.trim()
-        }
+        return RuleAnalyzer.getString(match.value, trimmedRule)
     }
 
     private fun MatchGroupCollection.getOrNull(index: Int): MatchGroup? {

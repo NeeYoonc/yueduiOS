@@ -8,36 +8,45 @@ import io.legado.shared.platform.SharedHttpResponse
 
 class BookSearchService(
     private val httpFetcher: HttpFetcher,
-    private val searchResultParser: SearchResultParser = RuleAwareSearchResultParser
+    private val searchResultParser: SearchResultParser = RuleAwareSearchResultParser,
+    private val suspendSearchResultParser: SuspendSearchResultParser? = null
 ) {
     suspend fun search(source: SharedBookSource, key: String, page: Int = 1): SearchPageResult {
         val template = requireNotNull(source.searchUrl) {
             "Book source ${source.bookSourceName} has no searchUrl"
         }
-        val requestUrl = template
-            .replace("{{key}}", encodeQueryValue(key))
-            .replace("{{page}}", page.toString())
-        val response = httpFetcher.fetch(SharedHttpRequest(url = requestUrl))
+        val request = SharedRequestBuilder.build(
+            template = template,
+            context = SharedRequestBuilder.SharedRequestContext(key = key, page = page)
+        )
+        val response = httpFetcher.fetch(request)
+        val parsedBooks = suspendSearchResultParser?.parse(source, response.body)
+            ?: searchResultParser.parse(source, response.body)
         return SearchPageResult(
             source = source,
             response = response,
-            books = searchResultParser.parse(source, response.body),
+            books = normalizeSearchBookUrls(response.finalUrl, parsedBooks),
             debugBookName = extractDebugValue(response.body, "name")
         )
     }
 
-    private fun encodeQueryValue(value: String): String =
-        value.encodeToByteArray().joinToString("") { byte ->
-            val char = byte.toInt().toChar()
-            when {
-                char in 'a'..'z' -> char.toString()
-                char in 'A'..'Z' -> char.toString()
-                char in '0'..'9' -> char.toString()
-                char == '-' || char == '_' || char == '.' || char == '~' -> char.toString()
-                char == ' ' -> "%20"
-                else -> "%" + byte.toUByte().toString(16).uppercase().padStart(2, '0')
-            }
+    private fun normalizeSearchBookUrls(baseUrl: String, books: List<SharedSearchBook>): List<SharedSearchBook> {
+        return books.map { book ->
+            book.copy(
+                bookUrl = book.bookUrl
+                    .takeIf { it.isNotBlank() }
+                    ?.let { SharedUrlResolver.resolve(baseUrl, it) }
+                    ?: book.bookUrl,
+                coverUrl = book.coverUrl
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let { SharedUrlResolver.resolve(baseUrl, it) },
+                tocUrl = book.tocUrl
+                    .takeIf { it.isNotBlank() }
+                    ?.let { SharedUrlResolver.resolve(baseUrl, it) }
+                    ?: book.tocUrl
+            )
         }
+    }
 
     private fun extractDebugValue(body: String, key: String): String? {
         val prefix = "$key="

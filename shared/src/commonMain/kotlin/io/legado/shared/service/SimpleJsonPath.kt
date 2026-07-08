@@ -9,7 +9,7 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 
-internal object SimpleJsonPath {
+object SimpleJsonPath {
     private val json = Json {
         ignoreUnknownKeys = true
         isLenient = true

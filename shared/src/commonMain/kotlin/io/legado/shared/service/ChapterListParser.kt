@@ -2,6 +2,7 @@ package io.legado.shared.service
 
 import io.legado.shared.model.SharedBookChapter
 import io.legado.shared.model.SharedBookSource
+import io.legado.shared.rule.RuleAnalyzer
 import kotlinx.serialization.json.JsonElement
 
 interface ChapterListParser {
@@ -25,6 +26,26 @@ object RegexChapterListParser : ChapterListParser {
             ?: return emptyList()
         if (chapterListRule.startsWith("$")) {
             return parseJson(source, body, chapterListRule)
+        }
+        if (RuleAnalyzer.looksLikeHtmlRule(chapterListRule)) {
+            return RuleAnalyzer.selectBlocks(body, chapterListRule)
+                .mapNotNull { block ->
+                    val title = RuleAnalyzer.getString(block, rule.chapterName).orEmpty()
+                    if (title.isBlank()) {
+                        null
+                    } else {
+                        SharedBookChapter(
+                            title = title,
+                            url = RuleAnalyzer.getString(block, rule.chapterUrl).orEmpty(),
+                            isVolume = RuleAnalyzer.getString(block, rule.isVolume).toRuleBoolean(),
+                            isVip = RuleAnalyzer.getString(block, rule.isVip).toRuleBoolean(),
+                            isPay = RuleAnalyzer.getString(block, rule.isPay).toRuleBoolean(),
+                            tag = RuleAnalyzer.getString(block, rule.updateTime)
+                        )
+                    }
+                }
+                .mapIndexed { index, chapter -> chapter.copy(index = index) }
+                .toList()
         }
         val chapterRegex = runCatching { Regex(chapterListRule) }.getOrNull() ?: return emptyList()
         return chapterRegex.findAll(body)
@@ -129,5 +150,12 @@ object RegexChapterListParser : ChapterListParser {
         } else {
             null
         }
+    }
+
+    private fun String?.toRuleBoolean(): Boolean {
+        if (isNullOrBlank() || this == "null") {
+            return false
+        }
+        return !falseRegex.matches(trim())
     }
 }
