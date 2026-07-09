@@ -348,6 +348,23 @@ final class AppState: ObservableObject {
         message = "Exported \(httpTts.count) HTTP TTS engine(s)"
     }
 
+    func saveHttpTtsJson(_ json: String) -> Bool {
+        let rawJson = json.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "HTTP TTS JSON is empty"
+            return false
+        }
+        do {
+            _ = try runtime.upsertHttpTtsJson(json: rawJson)
+            refreshLibrary()
+            message = "Saved HTTP TTS engine"
+            return true
+        } catch {
+            message = error.localizedDescription
+            return false
+        }
+    }
+
     func importHttpTtsFromUrl(replace: Bool = false) async {
         let url = httpTtsImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !url.isEmpty else {

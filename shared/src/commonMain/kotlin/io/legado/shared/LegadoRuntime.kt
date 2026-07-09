@@ -528,6 +528,11 @@ open class LegadoRuntime(
         return httpTtsRequestFactory.build(engine, text, speechRate)
     }
 
+    @Throws(IllegalArgumentException::class)
+    fun upsertHttpTtsJson(json: String): SharedHttpTts {
+        return httpTtsRepository.upsertJson(json)
+    }
+
     fun deleteHttpTts(id: Long): List<SharedHttpTts> {
         return httpTtsRepository.delete(id)
     }

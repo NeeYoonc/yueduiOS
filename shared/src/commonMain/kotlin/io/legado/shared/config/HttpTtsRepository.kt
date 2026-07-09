@@ -41,6 +41,12 @@ class HttpTtsRepository(
         return list()
     }
 
+    fun upsertJson(rawJson: String): SharedHttpTts {
+        val imported = decodeEngines(rawJson)
+        require(imported.size == 1) { "HTTP TTS editor JSON must contain exactly one engine" }
+        return upsert(imported.single())
+    }
+
     fun exportJson(): String {
         return json.encodeToString(list())
     }

@@ -14,20 +14,24 @@ struct HttpTtsListView: View {
                 Section {
                     ForEach(app.httpTts.indices, id: \.self) { index in
                         let engine = app.httpTts[index]
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(engine.name)
-                                .font(.headline)
-                            Text(engine.url)
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(2)
-                            if let contentType = engine.contentType, !contentType.isEmpty {
-                                Text(contentType)
-                                    .font(.caption)
+                        NavigationLink {
+                            HttpTtsFormView(engine: engine)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(engine.name)
+                                    .font(.headline)
+                                Text(engine.url)
+                                    .font(.footnote)
                                     .foregroundStyle(.secondary)
+                                    .lineLimit(2)
+                                if let contentType = engine.contentType, !contentType.isEmpty {
+                                    Text(contentType)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
+                            .padding(.vertical, 4)
                         }
-                        .padding(.vertical, 4)
                     }
                     .onDelete { offsets in
                         offsets
@@ -39,10 +43,18 @@ struct HttpTtsListView: View {
         }
         .navigationTitle("HTTP TTS")
         .toolbar {
-            NavigationLink {
-                HttpTtsEditorView()
-            } label: {
-                Image(systemName: "doc.text")
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                NavigationLink {
+                    HttpTtsEditorView()
+                } label: {
+                    Image(systemName: "doc.text")
+                }
+
+                NavigationLink {
+                    HttpTtsFormView()
+                } label: {
+                    Image(systemName: "plus")
+                }
             }
         }
     }

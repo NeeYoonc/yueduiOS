@@ -342,6 +342,49 @@ class LegadoRuntimeTest {
     }
 
     @Test
+    fun upsertsSingleHttpTtsJsonWithoutReplacingOtherEngines() {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    error("No network expected")
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+        runtime.importAndSaveHttpTts(
+            """
+            [
+              {"id":1,"name":"Keep","url":"https://keep.test/tts?text={{speakText}}"},
+              {"id":2,"name":"Old","url":"https://old.test/tts?text={{speakText}}"}
+            ]
+            """.trimIndent()
+        )
+
+        val saved = runtime.upsertHttpTtsJson(
+            """
+            {
+              "id":2,
+              "name":"Edited TTS",
+              "url":"https://tts.test/api?text={{speakText}}&speed={{speakSpeed}}",
+              "contentType":"audio/.*",
+              "concurrentRate":"2",
+              "loginUrl":"https://tts.test/login",
+              "loginUi":"[{\"name\":\"token\"}]",
+              "header":"{\"User-Agent\":\"TTS\"}",
+              "jsLib":"function sign(){}",
+              "enabledCookieJar":true,
+              "loginCheckJs":"result"
+            }
+            """.trimIndent()
+        )
+
+        assertEquals("Edited TTS", saved.name)
+        assertEquals("audio/.*", saved.contentType)
+        assertEquals(listOf("Edited TTS", "Keep"), runtime.loadHttpTts().map { it.name })
+        assertEquals("TTS", runtime.buildHttpTtsAudioRequest(saved, "hello").headers.value("User-Agent"))
+    }
+
+    @Test
     fun importsRssSourcesAndReplaceRulesFromRemoteUrl() = runBlocking {
         val runtime = LegadoRuntime(
             httpFetcher = object : HttpFetcher {
