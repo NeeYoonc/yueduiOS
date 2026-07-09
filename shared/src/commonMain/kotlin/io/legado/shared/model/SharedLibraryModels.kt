@@ -30,6 +30,7 @@ data class SharedDataSnapshot(
     val dictRules: List<SharedDictRule> = emptyList(),
     val keyboardAssists: List<SharedKeyboardAssist> = emptyList(),
     val servers: List<SharedServer> = emptyList(),
+    val readerPreferences: SharedReaderPreferences = SharedReaderPreferences(),
     val rawConfigs: Map<String, String> = emptyMap()
 )
 
@@ -291,6 +292,14 @@ data class SharedReaderSearchResult(
     val startIndex: Int = 0,
     val endIndex: Int = 0,
     val snippet: String = ""
+)
+
+@Serializable
+data class SharedReaderPreferences(
+    val fontSize: Double = 18.0,
+    val lineSpacing: Double = 8.0,
+    val contentPadding: Double = 20.0,
+    val theme: String = "system"
 )
 
 @Serializable

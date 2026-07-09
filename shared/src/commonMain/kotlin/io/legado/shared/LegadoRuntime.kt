@@ -15,6 +15,7 @@ import io.legado.shared.model.SharedHttpTts
 import io.legado.shared.model.SharedKeyboardAssist
 import io.legado.shared.model.SharedRawConfigEntry
 import io.legado.shared.model.SharedReadRecord
+import io.legado.shared.model.SharedReaderPreferences
 import io.legado.shared.model.SharedReaderSearchResult
 import io.legado.shared.model.SharedReplaceRule
 import io.legado.shared.model.SharedRssArticle
@@ -46,6 +47,7 @@ import io.legado.shared.config.DictRuleRepository
 import io.legado.shared.config.HttpTtsRepository
 import io.legado.shared.config.KeyboardAssistRepository
 import io.legado.shared.config.RawConfigRepository
+import io.legado.shared.config.ReaderPreferencesRepository
 import io.legado.shared.config.RuleSubRepository
 import io.legado.shared.config.ServerRepository
 import io.legado.shared.config.TxtTocRuleRepository
@@ -120,6 +122,7 @@ open class LegadoRuntime(
     val keyboardAssistRepository: KeyboardAssistRepository = KeyboardAssistRepository(libraryStore)
     val ruleSubRepository: RuleSubRepository = RuleSubRepository(libraryStore)
     val rawConfigRepository: RawConfigRepository = RawConfigRepository(libraryStore)
+    val readerPreferencesRepository: ReaderPreferencesRepository = ReaderPreferencesRepository(libraryStore)
     val bookmarkRepository: BookmarkRepository = BookmarkRepository(libraryStore)
     val cookieRepository: CookieRepository = CookieRepository(libraryStore)
     val cacheEntryRepository: CacheEntryRepository = CacheEntryRepository(libraryStore)
@@ -244,6 +247,14 @@ open class LegadoRuntime(
 
     fun loadCacheEntries(): List<SharedCacheEntry> {
         return cacheEntryRepository.list()
+    }
+
+    fun loadReaderPreferences(): SharedReaderPreferences {
+        return readerPreferencesRepository.load()
+    }
+
+    fun saveReaderPreferences(preferences: SharedReaderPreferences): SharedReaderPreferences {
+        return readerPreferencesRepository.save(preferences)
     }
 
     fun loadSearchKeywords(): List<SharedSearchKeyword> {

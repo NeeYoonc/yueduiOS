@@ -4,6 +4,7 @@ struct ReaderView: View {
     @EnvironmentObject private var app: AppState
     let initialChapterIndex: Int
     @State private var hasLoaded = false
+    @State private var showReaderSettings = false
     @State private var showSearch = false
     @State private var readerSearchQuery = ""
     @State private var readSessionStart: Date?
@@ -24,9 +25,13 @@ struct ReaderView: View {
                     Text(app.currentChapter?.title ?? app.chapters[safe: initialChapterIndex]?.title ?? "Reader")
                         .font(.title2.weight(.semibold))
                     Text(app.currentContent)
-                        .font(.system(.body, design: .serif))
-                        .lineSpacing(8)
+                        .font(.system(size: CGFloat(app.readerPreferences.fontSize), design: .serif))
+                        .lineSpacing(CGFloat(app.readerPreferences.lineSpacing))
                         .textSelection(.enabled)
+
+                    if showReaderSettings {
+                        readerSettingsPanel
+                    }
 
                     if showSearch {
                         VStack(alignment: .leading, spacing: 10) {
@@ -70,13 +75,21 @@ struct ReaderView: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(20)
+            .padding(CGFloat(app.readerPreferences.contentPadding))
         }
+        .background(readerBackground.ignoresSafeArea())
+        .preferredColorScheme(preferredColorScheme)
         .navigationTitle(app.currentChapter?.title ?? "Reader")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack {
+                    Button {
+                        showReaderSettings.toggle()
+                    } label: {
+                        Image(systemName: "textformat.size")
+                    }
+
                     Button {
                         showSearch.toggle()
                         if showSearch {
@@ -146,6 +159,81 @@ struct ReaderView: View {
         .onDisappear {
             recordReadSession()
             speech.stop()
+        }
+    }
+
+    private var readerSettingsPanel: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Reader Settings")
+                .font(.headline)
+
+            LabeledContent("Font", value: "\(Int(app.readerPreferences.fontSize))")
+            Slider(
+                value: Binding(
+                    get: { app.readerPreferences.fontSize },
+                    set: { app.updateReaderPreferences(fontSize: $0) }
+                ),
+                in: 12...36,
+                step: 1
+            )
+
+            LabeledContent("Line spacing", value: "\(Int(app.readerPreferences.lineSpacing))")
+            Slider(
+                value: Binding(
+                    get: { app.readerPreferences.lineSpacing },
+                    set: { app.updateReaderPreferences(lineSpacing: $0) }
+                ),
+                in: 0...24,
+                step: 1
+            )
+
+            LabeledContent("Padding", value: "\(Int(app.readerPreferences.contentPadding))")
+            Slider(
+                value: Binding(
+                    get: { app.readerPreferences.contentPadding },
+                    set: { app.updateReaderPreferences(contentPadding: $0) }
+                ),
+                in: 0...64,
+                step: 1
+            )
+
+            Picker(
+                "Theme",
+                selection: Binding(
+                    get: { app.readerPreferences.theme },
+                    set: { app.updateReaderPreferences(theme: $0) }
+                )
+            ) {
+                Text("System").tag("system")
+                Text("Light").tag("light")
+                Text("Dark").tag("dark")
+                Text("Sepia").tag("sepia")
+            }
+            .pickerStyle(.segmented)
+        }
+        .padding()
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
+    }
+
+    private var readerBackground: Color {
+        switch app.readerPreferences.theme {
+        case "dark":
+            return .black
+        case "sepia":
+            return Color(red: 0.97, green: 0.93, blue: 0.84)
+        default:
+            return .clear
+        }
+    }
+
+    private var preferredColorScheme: ColorScheme? {
+        switch app.readerPreferences.theme {
+        case "dark":
+            return .dark
+        case "light", "sepia":
+            return .light
+        default:
+            return nil
         }
     }
 

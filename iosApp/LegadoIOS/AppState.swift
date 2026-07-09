@@ -41,6 +41,12 @@ final class AppState: ObservableObject {
     @Published private(set) var rawConfigs: [SharedRawConfigEntry] = []
     @Published private(set) var cookies: [SharedCookie] = []
     @Published private(set) var cacheEntries: [SharedCacheEntry] = []
+    @Published private(set) var readerPreferences = SharedReaderPreferences(
+        fontSize: 18.0,
+        lineSpacing: 8.0,
+        contentPadding: 20.0,
+        theme: "system"
+    )
     @Published private(set) var rssSources: [SharedRssSource] = []
     @Published private(set) var rssArticles: [SharedRssArticle] = []
     @Published private(set) var rssReadRecords: [SharedRssReadRecord] = []
@@ -99,6 +105,7 @@ final class AppState: ObservableObject {
         rawConfigs = runtime.loadRawConfigs() as? [SharedRawConfigEntry] ?? []
         cookies = runtime.loadCookies() as? [SharedCookie] ?? []
         cacheEntries = runtime.loadCacheEntries() as? [SharedCacheEntry] ?? []
+        readerPreferences = runtime.loadReaderPreferences()
         rssSources = runtime.loadRssSources() as? [SharedRssSource] ?? []
         rssReadRecords = runtime.loadRssReadRecords() as? [SharedRssReadRecord] ?? []
         rssStars = runtime.loadRssStars() as? [SharedRssStar] ?? []
@@ -946,6 +953,22 @@ final class AppState: ObservableObject {
     func searchCurrentContent(query: String) {
         readerSearchResults = runtime.searchReaderContent(content: currentContent, query: query, contextChars: Int32(48)) as? [SharedReaderSearchResult] ?? []
         message = query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !readerSearchResults.isEmpty ? nil : "No reader search matches"
+    }
+
+    func updateReaderPreferences(
+        fontSize: Double? = nil,
+        lineSpacing: Double? = nil,
+        contentPadding: Double? = nil,
+        theme: String? = nil
+    ) {
+        readerPreferences = runtime.saveReaderPreferences(
+            preferences: SharedReaderPreferences(
+                fontSize: fontSize ?? readerPreferences.fontSize,
+                lineSpacing: lineSpacing ?? readerPreferences.lineSpacing,
+                contentPadding: contentPadding ?? readerPreferences.contentPadding,
+                theme: theme ?? readerPreferences.theme
+            )
+        )
     }
 
     func addCurrentBookmark() {
