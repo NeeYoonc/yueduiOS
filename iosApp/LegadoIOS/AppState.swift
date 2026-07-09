@@ -15,6 +15,7 @@ final class AppState: ObservableObject {
     @Published var rawConfigJson: String = ""
     @Published var rssSourceJson: String = ""
     @Published var cookieJson: String = ""
+    @Published var cacheJson: String = ""
     @Published var webDavBackupFileName: String = "legado-backup.json"
     @Published var keyword: String = ""
     @Published var dictionaryKeyword: String = ""
@@ -39,6 +40,7 @@ final class AppState: ObservableObject {
     @Published private(set) var ruleSubs: [SharedRuleSub] = []
     @Published private(set) var rawConfigs: [SharedRawConfigEntry] = []
     @Published private(set) var cookies: [SharedCookie] = []
+    @Published private(set) var cacheEntries: [SharedCacheEntry] = []
     @Published private(set) var rssSources: [SharedRssSource] = []
     @Published private(set) var rssArticles: [SharedRssArticle] = []
     @Published private(set) var rssReadRecords: [SharedRssReadRecord] = []
@@ -93,6 +95,7 @@ final class AppState: ObservableObject {
         ruleSubs = runtime.loadRuleSubs() as? [SharedRuleSub] ?? []
         rawConfigs = runtime.loadRawConfigs() as? [SharedRawConfigEntry] ?? []
         cookies = runtime.loadCookies() as? [SharedCookie] ?? []
+        cacheEntries = runtime.loadCacheEntries() as? [SharedCacheEntry] ?? []
         rssSources = runtime.loadRssSources() as? [SharedRssSource] ?? []
         rssReadRecords = runtime.loadRssReadRecords() as? [SharedRssReadRecord] ?? []
         rssStars = runtime.loadRssStars() as? [SharedRssStar] ?? []
@@ -401,6 +404,41 @@ final class AppState: ObservableObject {
 
     func clearCookies() {
         cookies = runtime.clearCookies() as? [SharedCookie] ?? []
+        refreshLibrary()
+    }
+
+    func importCacheEntries(replace: Bool = false) {
+        let rawJson = cacheJson.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Cache JSON is empty"
+            return
+        }
+        do {
+            cacheEntries = try runtime.importAndSaveCacheEntries(json: rawJson, replace: replace) as? [SharedCacheEntry] ?? []
+            refreshLibrary()
+            message = cacheEntries.isEmpty ? "No usable cache entries" : "Imported \(cacheEntries.count) cache entry(s)"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func exportCacheEntriesToEditor() {
+        cacheJson = runtime.exportCacheEntriesJson()
+        message = "Exported \(cacheEntries.count) cache entry(s)"
+    }
+
+    func deleteCacheEntry(_ entry: SharedCacheEntry) {
+        cacheEntries = runtime.deleteCacheEntry(key: entry.key) as? [SharedCacheEntry] ?? []
+        refreshLibrary()
+    }
+
+    func clearExpiredCacheEntries() {
+        cacheEntries = runtime.clearExpiredCacheEntries(nowMillis: nowMillis()) as? [SharedCacheEntry] ?? []
+        refreshLibrary()
+    }
+
+    func clearCacheEntries() {
+        cacheEntries = runtime.clearCacheEntries() as? [SharedCacheEntry] ?? []
         refreshLibrary()
     }
 

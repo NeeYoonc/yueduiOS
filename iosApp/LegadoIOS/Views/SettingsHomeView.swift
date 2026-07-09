@@ -23,6 +23,7 @@ struct SettingsHomeView: View {
                     LabeledContent("Rule Subscriptions", value: "\(app.ruleSubs.count)")
                     LabeledContent("Raw Configs", value: "\(app.rawConfigs.count)")
                     LabeledContent("Cookies", value: "\(app.cookies.count)")
+                    LabeledContent("Cache", value: "\(app.cacheEntries.count)")
                     LabeledContent("Search History", value: "\(app.searchKeywords.count)")
                     LabeledContent("Results", value: "\(app.searchResults.count)")
                 }
@@ -132,6 +133,12 @@ struct SettingsHomeView: View {
                         CookieListView()
                     } label: {
                         Label("Cookies", systemImage: "shippingbox")
+                    }
+
+                    NavigationLink {
+                        CacheEntryListView()
+                    } label: {
+                        Label("Cache", systemImage: "archivebox")
                     }
                 }
 

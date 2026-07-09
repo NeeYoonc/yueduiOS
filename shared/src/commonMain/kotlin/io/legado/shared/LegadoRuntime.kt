@@ -5,6 +5,7 @@ import io.legado.shared.model.SharedBookChapter
 import io.legado.shared.model.SharedBookGroup
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedBookmark
+import io.legado.shared.model.SharedCacheEntry
 import io.legado.shared.model.SharedCookie
 import io.legado.shared.model.SharedDataSnapshot
 import io.legado.shared.model.SharedDictRule
@@ -37,6 +38,7 @@ import io.legado.shared.book.ReadRecordRepository
 import io.legado.shared.backup.DataBackupService
 import io.legado.shared.backup.WebDavBackupService
 import io.legado.shared.bookmark.BookmarkRepository
+import io.legado.shared.config.CacheEntryRepository
 import io.legado.shared.config.CookieRepository
 import io.legado.shared.config.DictionaryLookupService
 import io.legado.shared.config.DictRuleRepository
@@ -117,6 +119,7 @@ open class LegadoRuntime(
     val rawConfigRepository: RawConfigRepository = RawConfigRepository(libraryStore)
     val bookmarkRepository: BookmarkRepository = BookmarkRepository(libraryStore)
     val cookieRepository: CookieRepository = CookieRepository(libraryStore)
+    val cacheEntryRepository: CacheEntryRepository = CacheEntryRepository(libraryStore)
 
     @Throws(IllegalArgumentException::class)
     fun importAndSaveBookSources(json: String): List<SharedBookSource> {
@@ -236,6 +239,10 @@ open class LegadoRuntime(
         return cookieRepository.list()
     }
 
+    fun loadCacheEntries(): List<SharedCacheEntry> {
+        return cacheEntryRepository.list()
+    }
+
     fun loadSearchKeywords(): List<SharedSearchKeyword> {
         return searchCoordinator.listKeywords()
     }
@@ -288,6 +295,31 @@ open class LegadoRuntime(
 
     fun exportCookiesJson(): String {
         return cookieRepository.exportJson()
+    }
+
+    fun upsertCacheEntry(entry: SharedCacheEntry): SharedCacheEntry {
+        return cacheEntryRepository.upsert(entry)
+    }
+
+    fun deleteCacheEntry(key: String): List<SharedCacheEntry> {
+        return cacheEntryRepository.delete(key)
+    }
+
+    fun clearExpiredCacheEntries(nowMillis: Long = 0L): List<SharedCacheEntry> {
+        return cacheEntryRepository.clearExpired(nowMillis)
+    }
+
+    fun clearCacheEntries(): List<SharedCacheEntry> {
+        return cacheEntryRepository.clear()
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun importAndSaveCacheEntries(json: String, replace: Boolean = false): List<SharedCacheEntry> {
+        return cacheEntryRepository.importJson(json, replace)
+    }
+
+    fun exportCacheEntriesJson(): String {
+        return cacheEntryRepository.exportJson()
     }
 
     fun recordSearchKeyword(key: String, nowMillis: Long = 0L): List<SharedSearchKeyword> {
