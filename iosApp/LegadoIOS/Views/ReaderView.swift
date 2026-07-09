@@ -110,6 +110,8 @@ struct ReaderView: View {
                     Button {
                         if speech.isSpeaking {
                             speech.stop()
+                        } else if let request = app.httpTtsAudioRequest(for: app.currentContent) {
+                            speech.speakHttp(request, fallbackText: app.currentContent)
                         } else {
                             speech.speak(app.currentContent)
                         }

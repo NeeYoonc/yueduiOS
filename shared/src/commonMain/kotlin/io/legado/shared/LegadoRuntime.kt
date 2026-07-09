@@ -44,6 +44,7 @@ import io.legado.shared.config.CacheEntryRepository
 import io.legado.shared.config.CookieRepository
 import io.legado.shared.config.DictionaryLookupService
 import io.legado.shared.config.DictRuleRepository
+import io.legado.shared.config.HttpTtsRequestFactory
 import io.legado.shared.config.HttpTtsRepository
 import io.legado.shared.config.KeyboardAssistRepository
 import io.legado.shared.config.RawConfigRepository
@@ -59,6 +60,7 @@ import io.legado.shared.local.LocalTextImportResult
 import io.legado.shared.platform.CacheStorePort
 import io.legado.shared.platform.HttpFetcher
 import io.legado.shared.platform.ScriptRuntime
+import io.legado.shared.platform.SharedHttpRequest
 import io.legado.shared.platform.SharedHttpResponse
 import io.legado.shared.rule.AnalyzeRuleEngine
 import io.legado.shared.rule.RuleWebViewRuntime
@@ -132,6 +134,7 @@ open class LegadoRuntime(
     val dictRuleRepository: DictRuleRepository = DictRuleRepository(libraryStore)
     val dictionaryLookupService: DictionaryLookupService = DictionaryLookupService(httpFetcher, dictRuleRepository, ruleEngine)
     val httpTtsRepository: HttpTtsRepository = HttpTtsRepository(libraryStore)
+    val httpTtsRequestFactory: HttpTtsRequestFactory = HttpTtsRequestFactory(cookieRepository)
     val txtTocRuleRepository: TxtTocRuleRepository = TxtTocRuleRepository(libraryStore)
     val serverRepository: ServerRepository = ServerRepository(libraryStore)
     val keyboardAssistRepository: KeyboardAssistRepository = KeyboardAssistRepository(libraryStore)
@@ -514,6 +517,10 @@ open class LegadoRuntime(
 
     suspend fun importHttpTtsFromUrl(url: String, replace: Boolean = false): List<SharedHttpTts> {
         return httpTtsRepository.importJson(fetchRemoteJson(url, "HTTP TTS URL is empty"), replace)
+    }
+
+    fun buildHttpTtsAudioRequest(engine: SharedHttpTts, text: String, speechRate: Int = 15): SharedHttpRequest {
+        return httpTtsRequestFactory.build(engine, text, speechRate)
     }
 
     fun deleteHttpTts(id: Long): List<SharedHttpTts> {

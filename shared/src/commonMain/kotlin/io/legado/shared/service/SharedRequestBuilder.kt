@@ -48,6 +48,11 @@ object SharedRequestBuilder {
         return value
             .replace("{{key}}", context.encodedKey)
             .replace("{{searchKey}}", context.encodedKey)
+            .replace("{{speakText}}", context.encodedSpeakText)
+            .replace("{{text}}", context.encodedSpeakText)
+            .replace("{{content}}", context.encodedSpeakText)
+            .replace("{{speakSpeed}}", context.speakSpeedText)
+            .replace("{{speed}}", context.speakSpeedText)
             .replace("searchKey", context.encodedKey)
             .replace("{{page}}", context.pageText)
             .replace("{{searchPage}}", context.pageText)
@@ -58,6 +63,11 @@ object SharedRequestBuilder {
         return value
             .replace("{{key}}", context.jsonEscapedKey)
             .replace("{{searchKey}}", context.jsonEscapedKey)
+            .replace("{{speakText}}", context.jsonEscapedSpeakText)
+            .replace("{{text}}", context.jsonEscapedSpeakText)
+            .replace("{{content}}", context.jsonEscapedSpeakText)
+            .replace("{{speakSpeed}}", context.speakSpeedText)
+            .replace("{{speed}}", context.speakSpeedText)
             .replace("searchKey", context.jsonEscapedKey)
             .replace("{{page}}", context.pageText)
             .replace("{{searchPage}}", context.pageText)
@@ -127,10 +137,15 @@ object SharedRequestBuilder {
 
     data class SharedRequestContext(
         val key: String = "",
-        val page: Int = 1
+        val page: Int = 1,
+        val speakText: String? = null,
+        val speakSpeed: Int? = null
     ) {
         val encodedKey: String = encodeQueryValue(key)
         val jsonEscapedKey: String = escapeJsonStringContent(key)
         val pageText: String = page.toString()
+        val encodedSpeakText: String = encodeQueryValue(speakText ?: key)
+        val jsonEscapedSpeakText: String = escapeJsonStringContent(speakText ?: key)
+        val speakSpeedText: String = speakSpeed?.toString().orEmpty()
     }
 }

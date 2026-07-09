@@ -349,6 +349,14 @@ final class AppState: ObservableObject {
         }
     }
 
+    func httpTtsAudioRequest(for text: String) -> SharedHttpRequest? {
+        let content = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !content.isEmpty, let engine = httpTts.first else {
+            return nil
+        }
+        return runtime.buildHttpTtsAudioRequest(engine: engine, text: content, speechRate: Int32(15))
+    }
+
     func deleteHttpTts(_ engine: SharedHttpTts) {
         _ = runtime.deleteHttpTts(id: engine.id)
         refreshLibrary()

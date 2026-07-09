@@ -4,9 +4,11 @@ import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookGroup
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedCookie
+import io.legado.shared.model.SharedHttpTts
 import io.legado.shared.model.SharedRuleSub
 import io.legado.shared.platform.CacheStorePort
 import io.legado.shared.platform.HttpFetcher
+import io.legado.shared.platform.SharedHttpMethod
 import io.legado.shared.platform.SharedHttpRequest
 import io.legado.shared.platform.SharedHttpResponse
 import kotlinx.coroutines.runBlocking
@@ -261,6 +263,38 @@ class LegadoRuntimeTest {
         assertEquals(listOf("Keep", "Edited"), runtime.loadBookSources().map { it.bookSourceName })
         assertEquals("$.data", runtime.loadBookSources().first { it.bookSourceUrl == "https://edit.test" }.ruleSearch?.bookList)
         assertEquals("$.content", runtime.loadBookSources().first { it.bookSourceUrl == "https://edit.test" }.ruleContent?.content)
+    }
+
+    @Test
+    fun buildsHttpTtsAudioRequestWithSpeakTextSpeedHeadersAndCookies() {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    error("No network expected")
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+        runtime.upsertCookie(SharedCookie(url = "httpTts:7", cookie = "sid=tts"))
+        val engine = SharedHttpTts(
+            id = 7,
+            name = "Remote TTS",
+            url = """
+                https://tts.test/say?text={{speakText}}&speed={{speakSpeed}},
+                {"method":"POST","headers":{"Accept":"audio/mpeg"},"body":{"q":"{{speakText}}","speed":"{{speakSpeed}}"}}
+            """.trimIndent(),
+            header = """{"User-Agent":"LegadoTTS"}""",
+            enabledCookieJar = true
+        )
+
+        val request = runtime.buildHttpTtsAudioRequest(engine, "你好 world", speechRate = 17)
+
+        assertEquals(SharedHttpMethod.POST, request.method)
+        assertEquals("https://tts.test/say?text=%E4%BD%A0%E5%A5%BD%20world&speed=17", request.url)
+        assertEquals("audio/mpeg", request.headers.value("Accept"))
+        assertEquals("LegadoTTS", request.headers.value("User-Agent"))
+        assertEquals("sid=tts", request.headers.value("Cookie"))
+        assertEquals("""{"q":"你好 world","speed":"17"}""", request.body)
     }
 
     @Test
