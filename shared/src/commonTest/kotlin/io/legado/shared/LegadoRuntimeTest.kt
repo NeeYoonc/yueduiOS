@@ -501,6 +501,48 @@ class LegadoRuntimeTest {
     }
 
     @Test
+    fun upsertsSingleRssSourceJsonWithoutReplacingOtherSources() {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    error("No network expected")
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+        runtime.importAndSaveRssSources(
+            """
+            [
+              {"sourceUrl":"https://keep.test/rss","sourceName":"Keep RSS","customOrder":1},
+              {"sourceUrl":"https://old.test/rss","sourceName":"Old RSS","ruleArticles":"$.old","customOrder":2}
+            ]
+            """.trimIndent()
+        )
+
+        val saved = runtime.upsertRssSourceJson(
+            """
+            {
+              "sourceUrl":"https://old.test/rss",
+              "sourceName":"Old RSS",
+              "sourceGroup":"News",
+              "ruleArticles":"$.items",
+              "ruleTitle":"$.title",
+              "enableJs":false,
+              "cacheFirst":true,
+              "customOrder":8
+            }
+            """.trimIndent()
+        )
+
+        assertEquals("$.items", saved.ruleArticles)
+        assertEquals("News", saved.sourceGroup)
+        assertEquals(false, saved.enableJs)
+        assertEquals(true, saved.cacheFirst)
+        assertEquals(listOf("Keep RSS", "Old RSS"), runtime.loadRssSources().map { it.sourceName })
+        assertEquals(8, runtime.loadRssSources().first { it.sourceUrl == "https://old.test/rss" }.customOrder)
+    }
+
+    @Test
     fun importsRssSourcesAndReplaceRulesFromRemoteUrl() = runBlocking {
         val runtime = LegadoRuntime(
             httpFetcher = object : HttpFetcher {

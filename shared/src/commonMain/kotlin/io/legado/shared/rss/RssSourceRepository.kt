@@ -55,6 +55,12 @@ class RssSourceRepository(
         return list()
     }
 
+    fun upsertJson(rawJson: String): SharedRssSource {
+        val imported = decodeSources(rawJson)
+        require(imported.size == 1) { "RSS source editor JSON must contain exactly one source" }
+        return upsert(imported.single())
+    }
+
     fun exportJson(): String {
         return json.encodeToString(list())
     }

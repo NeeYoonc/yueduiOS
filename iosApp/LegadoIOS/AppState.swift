@@ -905,6 +905,23 @@ final class AppState: ObservableObject {
         message = "Exported \(rssSources.count) RSS source(s)"
     }
 
+    func saveRssSourceJson(_ json: String) -> Bool {
+        let rawJson = json.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "RSS source JSON is empty"
+            return false
+        }
+        do {
+            _ = try runtime.upsertRssSourceJson(json: rawJson)
+            refreshLibrary()
+            message = "Saved RSS source"
+            return true
+        } catch {
+            message = error.localizedDescription
+            return false
+        }
+    }
+
     func importRssSourcesFromUrl(replace: Bool = false) async {
         let url = rssSourceImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !url.isEmpty else {

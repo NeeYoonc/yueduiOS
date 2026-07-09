@@ -14,14 +14,26 @@ struct RssSourceListView: View {
                 Section {
                     ForEach(app.rssSources.indices, id: \.self) { index in
                         let source = app.rssSources[index]
-                        RssSourceRow(source: source)
-                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                Button(role: .destructive) {
-                                    app.deleteRssSource(source)
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
+                        NavigationLink {
+                            RssSourceFormView(source: source)
+                        } label: {
+                            RssSourceRow(source: source)
+                        }
+                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                            Button {
+                                app.setRssSourceEnabled(source, enabled: !source.enabled)
+                            } label: {
+                                Label(source.enabled ? "Disable" : "Enable", systemImage: source.enabled ? "pause.circle" : "play.circle")
                             }
+                            .tint(source.enabled ? .orange : .green)
+                        }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            Button(role: .destructive) {
+                                app.deleteRssSource(source)
+                            } label: {
+                                Label("Delete", systemImage: "trash")
+                            }
+                        }
                     }
                 } footer: {
                     Text("RSS sources keep Legado's source URL, rule fields, JS flags, grouping, and ordering so imported Android RSS source JSON can be managed on iOS.")
@@ -30,24 +42,30 @@ struct RssSourceListView: View {
         }
         .navigationTitle("RSS Sources")
         .toolbar {
-            NavigationLink {
-                RssSourceEditorView()
-            } label: {
-                Image(systemName: "doc.text")
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                NavigationLink {
+                    RssSourceEditorView()
+                } label: {
+                    Image(systemName: "doc.text")
+                }
+
+                NavigationLink {
+                    RssSourceFormView()
+                } label: {
+                    Image(systemName: "plus")
+                }
             }
         }
     }
 }
 
 private struct RssSourceRow: View {
-    @EnvironmentObject private var app: AppState
     let source: SharedRssSource
 
     var body: some View {
-        Toggle(isOn: Binding(
-            get: { source.enabled },
-            set: { app.setRssSourceEnabled(source, enabled: $0) }
-        )) {
+        HStack(spacing: 12) {
+            Image(systemName: source.enabled ? "checkmark.circle.fill" : "pause.circle")
+                .foregroundStyle(source.enabled ? .green : .secondary)
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
                     Text(source.sourceName.isEmpty ? source.sourceUrl : source.sourceName)
@@ -93,7 +111,7 @@ private struct RssSourceRow: View {
                 .font(.caption.monospacedDigit())
                 .foregroundStyle(.secondary)
             }
-            .padding(.vertical, 4)
         }
+        .padding(.vertical, 4)
     }
 }

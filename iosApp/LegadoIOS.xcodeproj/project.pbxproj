@@ -70,6 +70,7 @@
 		G10000000000000000000009 /* RawConfigFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1000000000000000000000A /* RawConfigFormView.swift */; };
 		G1000000000000000000000B /* CookieFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1000000000000000000000C /* CookieFormView.swift */; };
 		G1000000000000000000000D /* CacheEntryFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1000000000000000000000E /* CacheEntryFormView.swift */; };
+		G1000000000000000000000F /* RssSourceFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G10000000000000000000010 /* RssSourceFormView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -137,6 +138,7 @@
 		G1000000000000000000000A /* RawConfigFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RawConfigFormView.swift; sourceTree = "<group>"; };
 		G1000000000000000000000C /* CookieFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CookieFormView.swift; sourceTree = "<group>"; };
 		G1000000000000000000000E /* CacheEntryFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CacheEntryFormView.swift; sourceTree = "<group>"; };
+		G10000000000000000000010 /* RssSourceFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RssSourceFormView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -180,6 +182,7 @@
 				B1000000000000000000001F /* RssArticleListView.swift */,
 				B10000000000000000000020 /* RssReaderView.swift */,
 				D10000000000000000000015 /* RssSourceListView.swift */,
+				G10000000000000000000010 /* RssSourceFormView.swift */,
 				D10000000000000000000016 /* RssSourceEditorView.swift */,
 				D10000000000000000000018 /* RssStarListView.swift */,
 				B1000000000000000000001B /* SettingsHomeView.swift */,
@@ -361,6 +364,7 @@
 				B1000000000000000000000F /* RssArticleListView.swift in Sources */,
 				B10000000000000000000010 /* RssReaderView.swift in Sources */,
 				D10000000000000000000005 /* RssSourceListView.swift in Sources */,
+				G1000000000000000000000F /* RssSourceFormView.swift in Sources */,
 				D10000000000000000000006 /* RssSourceEditorView.swift in Sources */,
 				D10000000000000000000008 /* RssStarListView.swift in Sources */,
 				C10000000000000000000001 /* ReplaceRuleListView.swift in Sources */,

@@ -220,6 +220,11 @@ open class LegadoRuntime(
         return rssSourceRepository.upsert(source)
     }
 
+    @Throws(IllegalArgumentException::class)
+    fun upsertRssSourceJson(json: String): SharedRssSource {
+        return rssSourceRepository.upsertJson(json)
+    }
+
     fun setRssSourceEnabled(sourceUrl: String, enabled: Boolean): SharedRssSource? {
         return rssSourceRepository.setEnabled(sourceUrl, enabled)
     }
