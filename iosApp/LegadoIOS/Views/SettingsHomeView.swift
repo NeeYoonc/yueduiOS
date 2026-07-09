@@ -157,6 +157,12 @@ struct SettingsHomeView: View {
                     }
 
                     NavigationLink {
+                        QRImportView()
+                    } label: {
+                        Label("QR import", systemImage: "qrcode.viewfinder")
+                    }
+
+                    NavigationLink {
                         BackupView()
                     } label: {
                         Label("Backup and restore", systemImage: "externaldrive")

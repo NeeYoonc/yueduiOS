@@ -75,6 +75,7 @@
 		H10000000000000000000003 /* DocumentPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H10000000000000000000004 /* DocumentPreviewView.swift */; };
 		H10000000000000000000005 /* FileManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H10000000000000000000006 /* FileManagerView.swift */; };
 		H10000000000000000000007 /* MediaPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H10000000000000000000008 /* MediaPlayerView.swift */; };
+		H10000000000000000000009 /* QRImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1000000000000000000000A /* QRImportView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -147,6 +148,7 @@
 		H10000000000000000000004 /* DocumentPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/DocumentPreviewView.swift; sourceTree = "<group>"; };
 		H10000000000000000000006 /* FileManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/FileManagerView.swift; sourceTree = "<group>"; };
 		H10000000000000000000008 /* MediaPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MediaPlayerView.swift; sourceTree = "<group>"; };
+		H1000000000000000000000A /* QRImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/QRImportView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -200,6 +202,7 @@
 				F10000000000000000000004 /* ReplaceRuleFormView.swift */,
 				C10000000000000000000012 /* ReplaceRuleEditorView.swift */,
 				H10000000000000000000002 /* SmartImportView.swift */,
+				H1000000000000000000000A /* QRImportView.swift */,
 				C10000000000000000000013 /* BackupView.swift */,
 				H10000000000000000000006 /* FileManagerView.swift */,
 				C10000000000000000000014 /* DictRuleListView.swift */,
@@ -385,6 +388,7 @@
 				F10000000000000000000003 /* ReplaceRuleFormView.swift in Sources */,
 				C10000000000000000000002 /* ReplaceRuleEditorView.swift in Sources */,
 				H10000000000000000000001 /* SmartImportView.swift in Sources */,
+				H10000000000000000000009 /* QRImportView.swift in Sources */,
 				C10000000000000000000003 /* BackupView.swift in Sources */,
 				H10000000000000000000005 /* FileManagerView.swift in Sources */,
 				C10000000000000000000004 /* DictRuleListView.swift in Sources */,
@@ -436,6 +440,7 @@
 					"$(SRCROOT)/../shared/build/XCFrameworks/debug",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Scan Legado import QR codes";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.legado.ios;
@@ -456,6 +461,7 @@
 					"$(SRCROOT)/../shared/build/XCFrameworks/debug",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Scan Legado import QR codes";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.legado.ios;
