@@ -28,6 +28,16 @@ struct SourceDebugView: View {
                 .disabled(app.isLoading)
             }
 
+            if let loginUrl = source.loginUrl, !loginUrl.isEmpty {
+                Section("Account") {
+                    NavigationLink {
+                        SourceLoginView(source: source)
+                    } label: {
+                        Label("Login / Cookie", systemImage: "key")
+                    }
+                }
+            }
+
             if app.isLoading {
                 Section {
                     HStack {
@@ -66,5 +76,14 @@ struct SourceDebugView: View {
             }
         }
         .navigationTitle("Debug")
+        .toolbar {
+            if let loginUrl = source.loginUrl, !loginUrl.isEmpty {
+                NavigationLink {
+                    SourceLoginView(source: source)
+                } label: {
+                    Image(systemName: "key")
+                }
+            }
+        }
     }
 }

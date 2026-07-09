@@ -4,6 +4,7 @@ import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookChapter
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.platform.HttpFetcher
+import io.legado.shared.platform.CookieStorePort
 import io.legado.shared.service.BookContentService
 import io.legado.shared.service.BookInfoParser
 import io.legado.shared.service.BookInfoResult
@@ -22,6 +23,7 @@ import io.legado.shared.service.RegexChapterListParser
 import io.legado.shared.service.RuleAwareSearchResultParser
 import io.legado.shared.service.SearchPageResult
 import io.legado.shared.service.SearchResultParser
+import io.legado.shared.service.SourceRequestFactory
 import io.legado.shared.service.SuspendBookInfoParser
 import io.legado.shared.service.SuspendChapterContentParser
 import io.legado.shared.service.SuspendChapterListParser
@@ -37,12 +39,24 @@ class LegadoSharedClient(
     chapterListParser: ChapterListParser = RegexChapterListParser,
     suspendChapterListParser: SuspendChapterListParser? = null,
     chapterContentParser: ChapterContentParser = RegexChapterContentParser,
-    suspendChapterContentParser: SuspendChapterContentParser? = null
+    suspendChapterContentParser: SuspendChapterContentParser? = null,
+    cookieStore: CookieStorePort? = null
 ) {
-    private val searchService = BookSearchService(httpFetcher, searchResultParser, suspendSearchResultParser)
-    private val bookInfoService = BookInfoService(httpFetcher, bookInfoParser, suspendBookInfoParser)
-    private val tocService = BookTocService(httpFetcher, chapterListParser, suspendChapterListParser)
-    private val contentService = BookContentService(httpFetcher, chapterContentParser, suspendChapterContentParser)
+    private val requestFactory = SourceRequestFactory(cookieStore)
+    private val searchService = BookSearchService(httpFetcher, searchResultParser, suspendSearchResultParser, requestFactory)
+    private val bookInfoService = BookInfoService(httpFetcher, bookInfoParser, suspendBookInfoParser, requestFactory)
+    private val tocService = BookTocService(
+        httpFetcher = httpFetcher,
+        chapterListParser = chapterListParser,
+        suspendChapterListParser = suspendChapterListParser,
+        requestFactory = requestFactory
+    )
+    private val contentService = BookContentService(
+        httpFetcher = httpFetcher,
+        chapterContentParser = chapterContentParser,
+        suspendChapterContentParser = suspendChapterContentParser,
+        requestFactory = requestFactory
+    )
     private val readingFlowService = ReadingFlowService(
         searchService = searchService,
         bookInfoService = bookInfoService,

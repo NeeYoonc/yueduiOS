@@ -11,7 +11,8 @@ class BookTocService(
     private val httpFetcher: HttpFetcher,
     private val chapterListParser: ChapterListParser = RegexChapterListParser,
     private val suspendChapterListParser: SuspendChapterListParser? = null,
-    private val maxTocPages: Int = 20
+    private val maxTocPages: Int = 20,
+    private val requestFactory: SourceRequestFactory = SourceRequestFactory()
 ) {
     suspend fun getChapterList(
         source: SharedBookSource,
@@ -21,7 +22,8 @@ class BookTocService(
         val visitedUrls = linkedSetOf<String>()
         val pendingUrls = ArrayDeque<String>()
         val allChapters = mutableListOf<SharedBookChapter>()
-        val firstResponse = httpFetcher.fetch(SharedRequestBuilder.build(requestUrl))
+        val firstResponse = httpFetcher.fetch(requestFactory.build(source, requestUrl))
+        requestFactory.storeResponseCookies(source, firstResponse)
         visitedUrls.add(requestUrl)
         val firstPage = parseAndNormalize(source, book, firstResponse)
         allChapters.addAll(firstPage.chapters)
@@ -31,7 +33,8 @@ class BookTocService(
             if (!visitedUrls.add(nextUrl)) {
                 continue
             }
-            val nextResponse = httpFetcher.fetch(SharedRequestBuilder.build(nextUrl))
+            val nextResponse = httpFetcher.fetch(requestFactory.build(source, nextUrl))
+            requestFactory.storeResponseCookies(source, nextResponse)
             val nextPage = parseAndNormalize(source, book, nextResponse)
             allChapters.addAll(nextPage.chapters)
             enqueueNextUrls(nextPage.nextTocUrls, visitedUrls, pendingUrls)

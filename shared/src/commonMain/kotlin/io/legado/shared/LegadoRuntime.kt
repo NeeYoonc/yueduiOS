@@ -76,6 +76,8 @@ import io.legado.shared.source.DefaultDataImporter
 import io.legado.shared.source.DefaultDataPayload
 import io.legado.shared.source.SourceDebugResult
 import io.legado.shared.source.SourceDebugService
+import io.legado.shared.source.SharedSourceLoginRequest
+import io.legado.shared.source.SourceLoginService
 import io.legado.shared.source.SourceRepository
 import io.legado.shared.storage.SharedLibraryStore
 
@@ -89,14 +91,16 @@ open class LegadoRuntime(
         scriptRuntime = scriptRuntime,
         webViewRuntime = webViewRuntime
     )
+    val libraryStore: SharedLibraryStore = SharedLibraryStore(cacheStore)
+    val cookieRepository: CookieRepository = CookieRepository(libraryStore)
     val client: LegadoSharedClient = LegadoSharedClient(
         httpFetcher = httpFetcher,
         suspendSearchResultParser = RuleEngineSearchResultParser(ruleEngine),
         suspendBookInfoParser = RuleEngineBookInfoParser(ruleEngine),
         suspendChapterListParser = RuleEngineChapterListParser(ruleEngine),
-        suspendChapterContentParser = RuleEngineChapterContentParser(ruleEngine)
+        suspendChapterContentParser = RuleEngineChapterContentParser(ruleEngine),
+        cookieStore = cookieRepository
     )
-    val libraryStore: SharedLibraryStore = SharedLibraryStore(cacheStore)
     val bookshelfService: BookshelfService = BookshelfService(libraryStore)
     val bookGroupRepository: BookGroupRepository = BookGroupRepository(libraryStore)
     val readRecordRepository: ReadRecordRepository = ReadRecordRepository(libraryStore)
@@ -104,6 +108,7 @@ open class LegadoRuntime(
     val bookDetailCoordinator: BookDetailCoordinator = BookDetailCoordinator(client, bookshelfService, libraryStore)
     val chapterRepository: ChapterRepository = ChapterRepository(client, libraryStore, bookshelfService)
     val sourceRepository: SourceRepository = SourceRepository(libraryStore)
+    val sourceLoginService: SourceLoginService = SourceLoginService(cookieRepository)
     val sourceDebugService: SourceDebugService = SourceDebugService(client)
     val readerSearchService: ReaderSearchService = ReaderSearchService()
     val exploreService: ExploreService = ExploreService(client, libraryStore)
@@ -124,7 +129,6 @@ open class LegadoRuntime(
     val rawConfigRepository: RawConfigRepository = RawConfigRepository(libraryStore)
     val readerPreferencesRepository: ReaderPreferencesRepository = ReaderPreferencesRepository(libraryStore)
     val bookmarkRepository: BookmarkRepository = BookmarkRepository(libraryStore)
-    val cookieRepository: CookieRepository = CookieRepository(libraryStore)
     val cacheEntryRepository: CacheEntryRepository = CacheEntryRepository(libraryStore)
 
     @Throws(IllegalArgumentException::class)
@@ -387,6 +391,14 @@ open class LegadoRuntime(
 
     fun exportBookSourcesJson(): String {
         return sourceRepository.exportJson()
+    }
+
+    fun buildSourceWebLoginRequest(source: SharedBookSource): SharedSourceLoginRequest? {
+        return sourceLoginService.buildWebLoginRequest(source)
+    }
+
+    fun saveSourceWebLoginCookie(source: SharedBookSource, cookie: String): SharedCookie {
+        return cookieRepository.upsert(SharedCookie(url = source.bookSourceUrl, cookie = cookie))
     }
 
     @Throws(IllegalArgumentException::class)

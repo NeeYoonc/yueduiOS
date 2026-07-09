@@ -20,12 +20,23 @@ class ReadingFlowService(
         chapterListParser: ChapterListParser = RegexChapterListParser,
         suspendChapterListParser: SuspendChapterListParser? = null,
         chapterContentParser: ChapterContentParser = RegexChapterContentParser,
-        suspendChapterContentParser: SuspendChapterContentParser? = null
+        suspendChapterContentParser: SuspendChapterContentParser? = null,
+        requestFactory: SourceRequestFactory = SourceRequestFactory()
     ) : this(
-        searchService = BookSearchService(httpFetcher, searchResultParser, suspendSearchResultParser),
-        bookInfoService = BookInfoService(httpFetcher, bookInfoParser, suspendBookInfoParser),
-        tocService = BookTocService(httpFetcher, chapterListParser, suspendChapterListParser),
-        contentService = BookContentService(httpFetcher, chapterContentParser, suspendChapterContentParser)
+        searchService = BookSearchService(httpFetcher, searchResultParser, suspendSearchResultParser, requestFactory),
+        bookInfoService = BookInfoService(httpFetcher, bookInfoParser, suspendBookInfoParser, requestFactory),
+        tocService = BookTocService(
+            httpFetcher = httpFetcher,
+            chapterListParser = chapterListParser,
+            suspendChapterListParser = suspendChapterListParser,
+            requestFactory = requestFactory
+        ),
+        contentService = BookContentService(
+            httpFetcher = httpFetcher,
+            chapterContentParser = chapterContentParser,
+            suspendChapterContentParser = suspendChapterContentParser,
+            requestFactory = requestFactory
+        )
     )
 
     suspend fun search(

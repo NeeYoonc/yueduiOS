@@ -9,17 +9,20 @@ import io.legado.shared.platform.SharedHttpResponse
 class BookSearchService(
     private val httpFetcher: HttpFetcher,
     private val searchResultParser: SearchResultParser = RuleAwareSearchResultParser,
-    private val suspendSearchResultParser: SuspendSearchResultParser? = null
+    private val suspendSearchResultParser: SuspendSearchResultParser? = null,
+    private val requestFactory: SourceRequestFactory = SourceRequestFactory()
 ) {
     suspend fun search(source: SharedBookSource, key: String, page: Int = 1): SearchPageResult {
         val template = requireNotNull(source.searchUrl) {
             "Book source ${source.bookSourceName} has no searchUrl"
         }
-        val request = SharedRequestBuilder.build(
+        val request = requestFactory.build(
+            source = source,
             template = template,
             context = SharedRequestBuilder.SharedRequestContext(key = key, page = page)
         )
         val response = httpFetcher.fetch(request)
+        requestFactory.storeResponseCookies(source, response)
         val parsedBooks = suspendSearchResultParser?.parse(source, response.body)
             ?: searchResultParser.parse(source, response.body)
         return SearchPageResult(

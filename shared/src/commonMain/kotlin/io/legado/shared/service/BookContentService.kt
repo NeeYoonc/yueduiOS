@@ -12,7 +12,8 @@ class BookContentService(
     private val httpFetcher: HttpFetcher,
     private val chapterContentParser: ChapterContentParser = RegexChapterContentParser,
     private val suspendChapterContentParser: SuspendChapterContentParser? = null,
-    private val maxContentPages: Int = 20
+    private val maxContentPages: Int = 20,
+    private val requestFactory: SourceRequestFactory = SourceRequestFactory()
 ) {
     suspend fun getContent(
         source: SharedBookSource,
@@ -23,7 +24,8 @@ class BookContentService(
         val visitedUrls = linkedSetOf<String>()
         val discoveredNextUrls = mutableListOf<String>()
         val pendingUrls = ArrayDeque<String>()
-        val firstResponse = httpFetcher.fetch(SharedRequestBuilder.build(requestUrl))
+        val firstResponse = httpFetcher.fetch(requestFactory.build(source, requestUrl))
+        requestFactory.storeResponseCookies(source, firstResponse)
         visitedUrls.add(requestUrl)
         val firstContent = parseAndNormalize(source, book, chapter, firstResponse)
         val contentParts = mutableListOf<String>()
@@ -41,7 +43,8 @@ class BookContentService(
             if (!visitedUrls.add(nextUrl)) {
                 continue
             }
-            val nextResponse = httpFetcher.fetch(SharedRequestBuilder.build(nextUrl))
+            val nextResponse = httpFetcher.fetch(requestFactory.build(source, nextUrl))
+            requestFactory.storeResponseCookies(source, nextResponse)
             val nextContent = parseAndNormalize(source, book, chapter, nextResponse)
             if (nextContent.content.isNotBlank()) {
                 contentParts.add(nextContent.content)

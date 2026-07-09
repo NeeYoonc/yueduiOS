@@ -604,6 +604,21 @@ final class AppState: ObservableObject {
         refreshLibrary()
     }
 
+    func sourceWebLoginRequest(_ source: SharedBookSource) -> SharedSourceLoginRequest? {
+        runtime.buildSourceWebLoginRequest(source: source)
+    }
+
+    func saveSourceWebLoginCookie(_ source: SharedBookSource, cookie: String) {
+        let cleanCookie = cookie.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !cleanCookie.isEmpty else {
+            message = "Cookie is empty"
+            return
+        }
+        _ = runtime.saveSourceWebLoginCookie(source: source, cookie: cleanCookie)
+        refreshLibrary()
+        message = "Saved login cookie for \(source.bookSourceName.isEmpty ? source.bookSourceUrl : source.bookSourceName)"
+    }
+
     func deleteBook(_ book: SharedBook) {
         books = runtime.removeBook(book: book) as? [SharedBook] ?? []
         if selectedBook?.bookUrl == book.bookUrl {

@@ -2,6 +2,8 @@ package io.legado.shared
 
 import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookGroup
+import io.legado.shared.model.SharedBookSource
+import io.legado.shared.model.SharedCookie
 import io.legado.shared.platform.CacheStorePort
 import io.legado.shared.platform.HttpFetcher
 import io.legado.shared.platform.SharedHttpRequest
@@ -197,6 +199,34 @@ class LegadoRuntimeTest {
     }
 
     @Test
+    fun exposesSourceWebLoginRequestAndStoresSourceCookie() {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    error("No network expected")
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+        val source = SharedBookSource(
+            bookSourceUrl = "https://runtime-login.test",
+            bookSourceName = "Runtime Login",
+            header = """{"User-Agent":"RuntimeUA"}""",
+            loginUrl = "/login",
+            enabledCookieJar = true
+        )
+        runtime.upsertCookie(SharedCookie(url = source.bookSourceUrl, cookie = "sid=stored"))
+
+        val request = runtime.buildSourceWebLoginRequest(source)
+        runtime.saveSourceWebLoginCookie(source, "token=web")
+
+        assertEquals("https://runtime-login.test/login", request?.url)
+        assertEquals("RuntimeUA", request?.headers?.value("User-Agent"))
+        assertEquals("sid=stored", request?.headers?.value("Cookie"))
+        assertEquals("token=web", runtime.loadCookies().single { it.url == source.bookSourceUrl }.cookie)
+    }
+
+    @Test
     fun managesBookGroupsThroughRuntimeRepository() {
         val runtime = LegadoRuntime(
             httpFetcher = object : HttpFetcher {
@@ -298,5 +328,9 @@ class LegadoRuntimeTest {
         override fun putText(key: String, value: String) {
             values[key] = value
         }
+    }
+
+    private fun Map<String, String>.value(name: String): String? {
+        return entries.firstOrNull { it.key.equals(name, ignoreCase = true) }?.value
     }
 }
