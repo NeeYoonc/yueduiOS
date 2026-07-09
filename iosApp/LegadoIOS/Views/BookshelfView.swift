@@ -4,7 +4,7 @@ import UniformTypeIdentifiers
 
 struct BookshelfView: View {
     @EnvironmentObject private var app: AppState
-    @State private var isImportingText = false
+    @State private var isImportingLocalBook = false
 
     var body: some View {
         NavigationStack {
@@ -59,7 +59,7 @@ struct BookshelfView: View {
             .toolbar {
                 ToolbarItemGroup(placement: .topBarTrailing) {
                     Button {
-                        isImportingText = true
+                        isImportingLocalBook = true
                     } label: {
                         Image(systemName: "doc.badge.plus")
                     }
@@ -72,8 +72,8 @@ struct BookshelfView: View {
                 }
             }
             .fileImporter(
-                isPresented: $isImportingText,
-                allowedContentTypes: [.plainText, .text]
+                isPresented: $isImportingLocalBook,
+                allowedContentTypes: [.data, .plainText, .text]
             ) { result in
                 handleImport(result)
             }
@@ -101,9 +101,14 @@ struct BookshelfView: View {
             Task {
                 do {
                     let payload = try await Task.detached {
-                        try LocalTextFilePayload.load(from: url)
+                        try LocalBookFilePayload.load(from: url)
                     }.value
-                    await app.importLocalTextFile(fileName: payload.fileName, text: payload.text)
+                    switch payload {
+                    case .text(let fileName, let text):
+                        await app.importLocalTextFile(fileName: fileName, text: text)
+                    case .document(let fileName, let filePath, let mimeType):
+                        await app.importLocalDocumentFile(fileName: fileName, filePath: filePath, mimeType: mimeType)
+                    }
                 } catch {
                     await app.showMessage(error.localizedDescription)
                 }
@@ -116,20 +121,76 @@ struct BookshelfView: View {
     }
 }
 
-private struct LocalTextFilePayload {
-    let fileName: String
-    let text: String
+private enum LocalBookFilePayload {
+    case text(fileName: String, text: String)
+    case document(fileName: String, filePath: String, mimeType: String?)
 
-    static func load(from url: URL) throws -> LocalTextFilePayload {
+    static func load(from url: URL) throws -> LocalBookFilePayload {
         let accessed = url.startAccessingSecurityScopedResource()
         defer {
             if accessed {
                 url.stopAccessingSecurityScopedResource()
             }
         }
-        var encoding = String.Encoding.utf8
-        let text = try String(contentsOf: url, usedEncoding: &encoding)
-        return LocalTextFilePayload(fileName: url.lastPathComponent, text: text)
+        let fileName = url.lastPathComponent
+        let type = UTType(filenameExtension: url.pathExtension)
+        if shouldImportAsText(url: url, type: type) {
+            var encoding = String.Encoding.utf8
+            let text = try String(contentsOf: url, usedEncoding: &encoding)
+            return .text(fileName: fileName, text: text)
+        }
+
+        let copiedUrl = try copyIntoDocuments(url: url)
+        return .document(
+            fileName: fileName,
+            filePath: copiedUrl.path,
+            mimeType: type?.preferredMIMEType
+        )
+    }
+
+    private static func shouldImportAsText(url: URL, type: UTType?) -> Bool {
+        if type?.conforms(to: .text) == true {
+            return true
+        }
+        return ["txt", "md", "json", "html", "htm", "xml"].contains(url.pathExtension.lowercased())
+    }
+
+    private static func copyIntoDocuments(url: URL) throws -> URL {
+        let fileManager = FileManager.default
+        let documents = try fileManager.url(
+            for: .documentDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        let directory = documents.appendingPathComponent("ImportedBooks", isDirectory: true)
+        try fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+
+        let destination = uniqueDestination(
+            directory: directory,
+            fileName: url.lastPathComponent,
+            fileManager: fileManager
+        )
+        try fileManager.copyItem(at: url, to: destination)
+        return destination
+    }
+
+    private static func uniqueDestination(directory: URL, fileName: String, fileManager: FileManager) -> URL {
+        let baseName = fileName.isEmpty ? "ImportedBook" : fileName
+        var candidate = directory.appendingPathComponent(baseName)
+        guard fileManager.fileExists(atPath: candidate.path) else {
+            return candidate
+        }
+
+        let name = (baseName as NSString).deletingPathExtension
+        let ext = (baseName as NSString).pathExtension
+        var index = 1
+        repeat {
+            let nextName = ext.isEmpty ? "\(name)-\(index)" : "\(name)-\(index).\(ext)"
+            candidate = directory.appendingPathComponent(nextName)
+            index += 1
+        } while fileManager.fileExists(atPath: candidate.path)
+        return candidate
     }
 }
 

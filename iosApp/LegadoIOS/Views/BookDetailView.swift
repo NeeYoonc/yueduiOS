@@ -37,6 +37,16 @@ struct BookDetailView: View {
                     } label: {
                         Label("Edit metadata", systemImage: "pencil")
                     }
+
+                    if let documentUrl = firstDocumentURL {
+                        NavigationLink {
+                            DocumentPreviewView(url: documentUrl)
+                                .navigationTitle(book.name)
+                                .navigationBarTitleDisplayMode(.inline)
+                        } label: {
+                            Label("Open local document", systemImage: "doc.viewfinder")
+                        }
+                    }
                 }
 
                 Section("Groups") {
@@ -111,6 +121,13 @@ struct BookDetailView: View {
         }
         .navigationTitle(app.selectedBook?.name ?? "Detail")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var firstDocumentURL: URL? {
+        guard let resource = app.chapters.first?.resourceUrl else {
+            return nil
+        }
+        return LocalDocumentURL.make(resource)
     }
 }
 

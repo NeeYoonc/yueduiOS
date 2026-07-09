@@ -55,6 +55,8 @@ import io.legado.shared.config.RuleSubUpdateService
 import io.legado.shared.config.ServerRepository
 import io.legado.shared.config.TxtTocRuleRepository
 import io.legado.shared.explore.ExploreService
+import io.legado.shared.local.LocalDocumentBookService
+import io.legado.shared.local.LocalDocumentImportResult
 import io.legado.shared.local.LocalTextBookService
 import io.legado.shared.local.LocalTextImportResult
 import io.legado.shared.platform.CacheStorePort
@@ -152,6 +154,7 @@ open class LegadoRuntime(
         requestFactory = SourceRequestFactory(cookieRepository)
     )
     val rssSourceRepository: RssSourceRepository = RssSourceRepository(libraryStore)
+    val localDocumentBookService: LocalDocumentBookService = LocalDocumentBookService(libraryStore, bookshelfService)
     val localTextBookService: LocalTextBookService = LocalTextBookService(libraryStore, bookshelfService)
     val replacementRepository: ReplacementRepository = ReplacementRepository(libraryStore)
     val dataBackupService: DataBackupService = DataBackupService(libraryStore)
@@ -927,6 +930,16 @@ open class LegadoRuntime(
         nowMillis: Long = 0L
     ): LocalTextImportResult {
         return localTextBookService.importTextFile(fileName, text, nowMillis)
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun importLocalDocumentBook(
+        fileName: String,
+        fileUrl: String,
+        mimeType: String? = null,
+        nowMillis: Long = 0L
+    ): LocalDocumentImportResult {
+        return localDocumentBookService.importDocument(fileName, fileUrl, mimeType, nowMillis)
     }
 
     suspend fun searchEnabledSources(

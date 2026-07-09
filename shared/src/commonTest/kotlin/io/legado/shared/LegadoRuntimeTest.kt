@@ -14,6 +14,7 @@ import io.legado.shared.platform.SharedHttpResponse
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class LegadoRuntimeTest {
     @Test
@@ -620,6 +621,32 @@ class LegadoRuntimeTest {
 
         assertEquals(1, summary.bookSources)
         assertEquals(listOf("Remote Source"), runtime.loadBookSources().map { it.bookSourceName })
+    }
+
+    @Test
+    fun importsLocalDocumentBookWithResourceUrl() {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    error("No network expected")
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+
+        val result = runtime.importLocalDocumentBook(
+            fileName = "Manual.pdf",
+            fileUrl = "file:///Documents/Manual.pdf",
+            mimeType = "application/pdf",
+            nowMillis = 1234L
+        )
+
+        assertEquals("Manual", result.book.name)
+        assertTrue((result.book.type and 0b100000000) > 0, "local bit should be set")
+        assertTrue((result.book.type and 0b10000000) > 0, "web/file bit should be set")
+        assertEquals("file:///Documents/Manual.pdf", result.chapters.single().resourceUrl)
+        assertEquals(result.book, runtime.loadBooks().single())
+        assertEquals(result.chapters.single(), runtime.loadBookChapters(result.book).single())
     }
 
     @Test

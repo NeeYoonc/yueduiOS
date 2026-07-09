@@ -72,6 +72,7 @@
 		G1000000000000000000000D /* CacheEntryFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1000000000000000000000E /* CacheEntryFormView.swift */; };
 		G1000000000000000000000F /* RssSourceFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G10000000000000000000010 /* RssSourceFormView.swift */; };
 		H10000000000000000000001 /* SmartImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H10000000000000000000002 /* SmartImportView.swift */; };
+		H10000000000000000000003 /* DocumentPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H10000000000000000000004 /* DocumentPreviewView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -141,6 +142,7 @@
 		G1000000000000000000000E /* CacheEntryFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CacheEntryFormView.swift; sourceTree = "<group>"; };
 		G10000000000000000000010 /* RssSourceFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RssSourceFormView.swift; sourceTree = "<group>"; };
 		H10000000000000000000002 /* SmartImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SmartImportView.swift; sourceTree = "<group>"; };
+		H10000000000000000000004 /* DocumentPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/DocumentPreviewView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -178,6 +180,7 @@
 				B10000000000000000000016 /* SearchView.swift */,
 				B10000000000000000000017 /* BookDetailView.swift */,
 				D1000000000000000000001B /* BookEditView.swift */,
+				H10000000000000000000004 /* DocumentPreviewView.swift */,
 				B10000000000000000000018 /* ChapterListView.swift */,
 				B10000000000000000000019 /* ReaderView.swift */,
 				B1000000000000000000001A /* RssHomeView.swift */,
@@ -357,6 +360,7 @@
 				B10000000000000000000007 /* BookDetailView.swift in Sources */,
 				B10000000000000000000008 /* ChapterListView.swift in Sources */,
 				B10000000000000000000009 /* ReaderView.swift in Sources */,
+				H10000000000000000000003 /* DocumentPreviewView.swift in Sources */,
 				B1000000000000000000000A /* RssHomeView.swift in Sources */,
 				B1000000000000000000000B /* SettingsHomeView.swift in Sources */,
 				B1000000000000000000000C /* SourceListView.swift in Sources */,

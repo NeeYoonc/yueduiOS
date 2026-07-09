@@ -1644,6 +1644,26 @@ final class AppState: ObservableObject {
         }
     }
 
+    func importLocalDocumentFile(fileName: String, filePath: String, mimeType: String?) {
+        do {
+            let result = try runtime.importLocalDocumentBook(
+                fileName: fileName,
+                fileUrl: filePath,
+                mimeType: mimeType,
+                nowMillis: nowMillis()
+            )
+            selectedBook = result.book
+            chapters = result.chapters as? [SharedBookChapter] ?? []
+            activeSource = nil
+            currentChapter = nil
+            currentContent = ""
+            refreshLibrary()
+            message = "Imported \(result.book.name)"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
     func showMessage(_ text: String) {
         message = text
     }
