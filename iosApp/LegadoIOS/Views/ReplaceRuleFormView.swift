@@ -60,7 +60,7 @@ struct ReplaceRuleFormView: View {
                     .keyboardType(.numberPad)
             }
 
-            Section("Rule") {
+            Section {
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Pattern")
                         .font(.caption)
@@ -82,6 +82,8 @@ struct ReplaceRuleFormView: View {
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                 }
+            } header: {
+                Text("Rule")
             } footer: {
                 Text("Fields map to Android Legado replacement rule JSON, including title/content scope, regex mode, timeout, and custom ordering.")
             }
