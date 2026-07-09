@@ -147,6 +147,12 @@ struct SettingsHomeView: View {
                     } label: {
                         Label("Search books", systemImage: "books.vertical")
                     }
+
+                    NavigationLink {
+                        LogView()
+                    } label: {
+                        Label("Logs", systemImage: "doc.text.magnifyingglass")
+                    }
                 }
 
                 Section("Data") {
@@ -172,6 +178,14 @@ struct SettingsHomeView: View {
                         FileManagerView()
                     } label: {
                         Label("File manager", systemImage: "folder")
+                    }
+                }
+
+                Section("About") {
+                    NavigationLink {
+                        AboutView()
+                    } label: {
+                        Label("About and privacy", systemImage: "info.circle")
                     }
                 }
 

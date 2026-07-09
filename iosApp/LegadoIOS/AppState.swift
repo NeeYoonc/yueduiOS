@@ -88,7 +88,18 @@ final class AppState: ObservableObject {
     @Published private(set) var readerSearchResults: [SharedReaderSearchResult] = []
     @Published private(set) var debugSteps: [SourceDebugStep] = []
     @Published private(set) var debugContent: String = ""
-    @Published private(set) var message: String?
+    @Published private(set) var message: String? = nil {
+        didSet {
+            guard let message, !message.isEmpty, message != oldValue else {
+                return
+            }
+            messageLog.insert("\(Date().formatted(date: .abbreviated, time: .standard))  \(message)", at: 0)
+            if messageLog.count > 200 {
+                messageLog.removeLast(messageLog.count - 200)
+            }
+        }
+    }
+    @Published private(set) var messageLog: [String] = []
     @Published private(set) var isLoading: Bool = false
 
     private let runtime = DarwinLegadoRuntime()
@@ -1707,6 +1718,10 @@ final class AppState: ObservableObject {
 
     func clearMessage() {
         message = nil
+    }
+
+    func clearMessageLog() {
+        messageLog = []
     }
 
     private func source(for searchBook: SharedSearchBook) -> SharedBookSource? {

@@ -76,6 +76,8 @@
 		H10000000000000000000005 /* FileManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H10000000000000000000006 /* FileManagerView.swift */; };
 		H10000000000000000000007 /* MediaPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H10000000000000000000008 /* MediaPlayerView.swift */; };
 		H10000000000000000000009 /* QRImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1000000000000000000000A /* QRImportView.swift */; };
+		H1000000000000000000000B /* LogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1000000000000000000000C /* LogView.swift */; };
+		H1000000000000000000000D /* AboutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1000000000000000000000E /* AboutView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -149,6 +151,8 @@
 		H10000000000000000000006 /* FileManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/FileManagerView.swift; sourceTree = "<group>"; };
 		H10000000000000000000008 /* MediaPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/MediaPlayerView.swift; sourceTree = "<group>"; };
 		H1000000000000000000000A /* QRImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/QRImportView.swift; sourceTree = "<group>"; };
+		H1000000000000000000000C /* LogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/LogView.swift; sourceTree = "<group>"; };
+		H1000000000000000000000E /* AboutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/AboutView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -205,6 +209,8 @@
 				H1000000000000000000000A /* QRImportView.swift */,
 				C10000000000000000000013 /* BackupView.swift */,
 				H10000000000000000000006 /* FileManagerView.swift */,
+				H1000000000000000000000C /* LogView.swift */,
+				H1000000000000000000000E /* AboutView.swift */,
 				C10000000000000000000014 /* DictRuleListView.swift */,
 				F10000000000000000000008 /* DictRuleFormView.swift */,
 				C10000000000000000000015 /* DictRuleEditorView.swift */,
@@ -391,6 +397,8 @@
 				H10000000000000000000009 /* QRImportView.swift in Sources */,
 				C10000000000000000000003 /* BackupView.swift in Sources */,
 				H10000000000000000000005 /* FileManagerView.swift in Sources */,
+				H1000000000000000000000B /* LogView.swift in Sources */,
+				H1000000000000000000000D /* AboutView.swift in Sources */,
 				C10000000000000000000004 /* DictRuleListView.swift in Sources */,
 				F10000000000000000000007 /* DictRuleFormView.swift in Sources */,
 				C10000000000000000000005 /* DictRuleEditorView.swift in Sources */,
