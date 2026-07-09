@@ -16,6 +16,10 @@ struct RssReaderView: View {
         return article.readableContent
     }
 
+    private var mediaURL: URL? {
+        LegadoMediaURL.make(from: displayedArticle.link)
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -49,6 +53,14 @@ struct RssReaderView: View {
         .navigationTitle(article.title.isEmpty ? "RSS" : article.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            if let mediaURL {
+                NavigationLink {
+                    MediaPlayerView(url: mediaURL, title: displayedArticle.title)
+                } label: {
+                    Image(systemName: "play.circle")
+                }
+            }
+
             Button {
                 app.setRssArticleStarred(displayedArticle, starred: !app.isRssArticleStarred(displayedArticle))
             } label: {
