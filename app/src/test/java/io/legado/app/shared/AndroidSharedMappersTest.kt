@@ -218,6 +218,7 @@ class AndroidSharedMappersTest {
             author = "Author",
             bookUrl = "https://source.test/book/2",
             origin = "https://source.test",
+            originName = "Source",
             kind = "Fantasy",
             latestChapterTitle = "Latest",
             intro = "Intro",
@@ -235,6 +236,7 @@ class AndroidSharedMappersTest {
         val sharedSearchBook = searchBook.toSharedSearchBook()
 
         assertEquals("Result", sharedSearchBook.name)
+        assertEquals("Source", sharedSearchBook.originName)
         assertEquals("Fantasy", sharedSearchBook.kind)
         assertEquals("Latest", sharedSearchBook.latestChapterTitle)
         assertEquals("https://source.test/result.jpg", sharedSearchBook.coverUrl)

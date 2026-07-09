@@ -214,6 +214,7 @@ fun SearchBook.toSharedSearchBook(): SharedSearchBook = SharedSearchBook(
     author = author,
     bookUrl = bookUrl,
     origin = origin,
+    originName = originName,
     kind = kind,
     latestChapterTitle = latestChapterTitle,
     intro = intro,

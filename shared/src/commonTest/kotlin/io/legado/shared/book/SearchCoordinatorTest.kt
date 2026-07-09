@@ -1,7 +1,10 @@
 package io.legado.shared.book
 
 import io.legado.shared.LegadoSharedClient
+import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookSource
+import io.legado.shared.model.SharedDataSnapshot
+import io.legado.shared.model.SharedSearchBook
 import io.legado.shared.model.SharedSearchRule
 import io.legado.shared.platform.CacheStorePort
 import io.legado.shared.platform.HttpFetcher
@@ -128,6 +131,59 @@ class SearchCoordinatorTest {
         assertEquals("manual", keyword.word)
         assertEquals(1, keyword.usage)
         assertEquals(11L, keyword.lastUseTime)
+    }
+
+    @Test
+    fun storesSearchBooksAndListsChangeSourceCandidates() = runBlocking {
+        val fetcher = object : HttpFetcher {
+            override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                return when (request.url) {
+                    "https://one.test/search?q=metal&page=1" -> SharedHttpResponse(
+                        finalUrl = request.url,
+                        statusCode = 200,
+                        body = "name=Metal Story\nauthor=Author\nbookUrl=/book/1"
+                    )
+                    "https://two.test/search?q=metal&page=1" -> SharedHttpResponse(
+                        finalUrl = request.url,
+                        statusCode = 200,
+                        body = "name=Metal Story\nauthor=Author\nbookUrl=/book/2"
+                    )
+                    else -> error("Unexpected request URL: ${request.url}")
+                }
+            }
+        }
+        val store = SharedLibraryStore(InMemoryCacheStore())
+        val coordinator = SearchCoordinator(LegadoSharedClient(fetcher), store)
+        val sources = listOf(
+            SharedBookSource(
+                bookSourceUrl = "https://one.test",
+                bookSourceName = "One",
+                customOrder = 2,
+                searchUrl = "https://one.test/search?q={{key}}&page={{page}}"
+            ),
+            SharedBookSource(
+                bookSourceUrl = "https://two.test",
+                bookSourceName = "Two",
+                customOrder = 1,
+                searchUrl = "https://two.test/search?q={{key}}&page={{page}}"
+            )
+        )
+
+        coordinator.search(sources, key = "metal", page = 1, nowMillis = 88L)
+
+        assertEquals(
+            listOf("https://two.test/book/2", "https://one.test/book/1"),
+            coordinator.listSearchBooks().map { it.bookUrl }
+        )
+        assertEquals(listOf("Two", "One"), coordinator.listSearchBooks().map { it.originName })
+        assertEquals(listOf(88L, 88L), coordinator.listSearchBooks().map { it.time })
+
+        val candidates = coordinator.listChangeSourceCandidates(
+            book = SharedBook(name = "Metal Story", author = "Author", bookUrl = "https://one.test/book/1"),
+            sources = sources
+        )
+
+        assertEquals(listOf("Two"), candidates.map { it.originName })
     }
 
     private class InMemoryCacheStore : CacheStorePort {

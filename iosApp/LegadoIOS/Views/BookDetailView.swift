@@ -49,6 +49,35 @@ struct BookDetailView: View {
                     }
                 }
 
+                Section("Change Source") {
+                    Button {
+                        app.loadChangeSourceCandidates()
+                    } label: {
+                        Label("Load candidates", systemImage: "arrow.triangle.2.circlepath")
+                    }
+
+                    if app.changeSourceCandidates.isEmpty {
+                        EmptyStateView(title: "No candidates", systemImage: "arrow.left.arrow.right")
+                    } else {
+                        ForEach(app.changeSourceCandidates.indices, id: \.self) { index in
+                            let candidate = app.changeSourceCandidates[index]
+                            Button {
+                                Task {
+                                    await app.changeSource(to: candidate)
+                                }
+                            } label: {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(candidate.originName.isEmpty ? candidate.origin : candidate.originName)
+                                    Text(candidate.latestChapterTitle ?? candidate.bookUrl)
+                                        .font(.footnote)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(2)
+                                }
+                            }
+                        }
+                    }
+                }
+
                 Section("Catalog") {
                     if app.chapters.isEmpty {
                         EmptyStateView(title: "No chapters", systemImage: "list.bullet")

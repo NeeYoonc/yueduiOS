@@ -247,6 +247,14 @@ open class LegadoRuntime(
         return searchCoordinator.listKeywords()
     }
 
+    fun loadSearchBooks(): List<SharedSearchBook> {
+        return searchCoordinator.listSearchBooks()
+    }
+
+    fun loadChangeSourceCandidates(book: SharedBook, key: String = ""): List<SharedSearchBook> {
+        return searchCoordinator.listChangeSourceCandidates(book, sourceRepository.list(), key)
+    }
+
     fun loadReadRecords(): List<SharedReadRecord> {
         return readRecordRepository.list()
     }
@@ -274,6 +282,18 @@ open class LegadoRuntime(
 
     fun clearSearchKeywords(): List<SharedSearchKeyword> {
         return searchCoordinator.clearKeywords()
+    }
+
+    fun deleteSearchBook(bookUrl: String): List<SharedSearchBook> {
+        return searchCoordinator.deleteSearchBook(bookUrl)
+    }
+
+    fun clearSearchBooks(): List<SharedSearchBook> {
+        return searchCoordinator.clearSearchBooks()
+    }
+
+    fun clearExpiredSearchBooks(beforeMillis: Long): List<SharedSearchBook> {
+        return searchCoordinator.clearExpiredSearchBooks(beforeMillis)
     }
 
     fun upsertCookie(cookie: SharedCookie): SharedCookie {

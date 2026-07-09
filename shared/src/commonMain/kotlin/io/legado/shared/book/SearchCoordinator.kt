@@ -1,8 +1,8 @@
 package io.legado.shared.book
 
 import io.legado.shared.LegadoSharedClient
+import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookSource
-import io.legado.shared.model.SharedDataSnapshot
 import io.legado.shared.model.SharedSearchBook
 import io.legado.shared.model.SharedSearchKeyword
 import io.legado.shared.service.SearchPageResult
@@ -35,6 +35,54 @@ class SearchCoordinator(
         return emptyList()
     }
 
+    fun listSearchBooks(): List<SharedSearchBook> {
+        return libraryStore.loadDataSnapshot().searchBooks.sortedForUse()
+    }
+
+    fun deleteSearchBook(bookUrl: String): List<SharedSearchBook> {
+        val snapshot = libraryStore.loadDataSnapshot()
+        libraryStore.saveDataSnapshot(snapshot.copy(searchBooks = snapshot.searchBooks.filterNot { it.bookUrl == bookUrl }))
+        return listSearchBooks()
+    }
+
+    fun clearSearchBooks(): List<SharedSearchBook> {
+        val snapshot = libraryStore.loadDataSnapshot()
+        libraryStore.saveDataSnapshot(snapshot.copy(searchBooks = emptyList()))
+        return emptyList()
+    }
+
+    fun clearExpiredSearchBooks(beforeMillis: Long): List<SharedSearchBook> {
+        val snapshot = libraryStore.loadDataSnapshot()
+        libraryStore.saveDataSnapshot(snapshot.copy(searchBooks = snapshot.searchBooks.filterNot { it.time < beforeMillis }))
+        return listSearchBooks()
+    }
+
+    fun listChangeSourceCandidates(
+        book: SharedBook,
+        sources: List<SharedBookSource>,
+        key: String = ""
+    ): List<SharedSearchBook> {
+        val enabledSourceByUrl = sources
+            .filter { it.enabled }
+            .associateBy { it.bookSourceUrl }
+        return listSearchBooks()
+            .asSequence()
+            .filter { it.bookUrl != book.bookUrl }
+            .filter { it.name == book.name }
+            .filter { book.author.isBlank() || it.author.contains(book.author, ignoreCase = true) }
+            .filter { key.isBlank() || it.originName.contains(key, ignoreCase = true) || (it.latestChapterTitle?.contains(key, ignoreCase = true) == true) }
+            .filter { enabledSourceByUrl.containsKey(it.origin) }
+            .map { searchBook ->
+                val source = enabledSourceByUrl.getValue(searchBook.origin)
+                searchBook.copy(
+                    originName = searchBook.originName.ifBlank { source.bookSourceName },
+                    originOrder = source.customOrder.takeUnless { it == 0 } ?: searchBook.originOrder
+                )
+            }
+            .toList()
+            .sortedForUse()
+    }
+
     suspend fun search(
         sources: List<SharedBookSource>,
         key: String,
@@ -58,7 +106,13 @@ class SearchCoordinator(
                     )
                 }
             }
-        )
+        ).also { result ->
+            saveSearchBooks(result.pages.flatMap { pageResult ->
+                pageResult.books.map { searchBook ->
+                    searchBook.normalizedForStorage(pageResult.source, nowMillis)
+                }
+            })
+        }
     }
 
     fun recordKeyword(key: String, nowMillis: Long) {
@@ -74,6 +128,47 @@ class SearchCoordinator(
         }
         val keywords = listOf(updatedKeyword) + snapshot.searchKeywords.filterNot { it.word == key }
         libraryStore.saveDataSnapshot(snapshot.copy(searchKeywords = keywords))
+    }
+
+    private fun saveSearchBooks(books: List<SharedSearchBook>) {
+        if (books.isEmpty()) {
+            return
+        }
+        val snapshot = libraryStore.loadDataSnapshot()
+        val byUrl = linkedMapOf<String, SharedSearchBook>()
+        snapshot.searchBooks.forEach { existing ->
+            if (existing.bookUrl.isNotBlank()) {
+                byUrl[existing.bookUrl] = existing
+            }
+        }
+        books.forEach { book ->
+            if (book.bookUrl.isNotBlank()) {
+                byUrl[book.bookUrl] = book
+            }
+        }
+        libraryStore.saveDataSnapshot(snapshot.copy(searchBooks = byUrl.values.toList().sortedForUse()))
+    }
+
+    private fun SharedSearchBook.normalizedForStorage(
+        source: SharedBookSource,
+        nowMillis: Long
+    ): SharedSearchBook {
+        return copy(
+            origin = origin.ifBlank { source.bookSourceUrl },
+            originName = originName.ifBlank { source.bookSourceName },
+            originOrder = originOrder.takeUnless { it == 0 } ?: source.customOrder,
+            time = time.takeUnless { it == 0L } ?: nowMillis
+        )
+    }
+
+    private fun List<SharedSearchBook>.sortedForUse(): List<SharedSearchBook> {
+        return sortedWith(
+            compareBy<SharedSearchBook> { it.originOrder }
+                .thenBy { it.originName }
+                .thenBy { it.name }
+                .thenBy { it.author }
+                .thenBy { it.bookUrl }
+        )
     }
 }
 

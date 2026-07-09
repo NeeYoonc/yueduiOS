@@ -54,6 +54,8 @@ final class AppState: ObservableObject {
     @Published private(set) var selectedRssArticle: SharedRssArticle?
     @Published private(set) var rssContent: String = ""
     @Published private(set) var searchResults: [SharedSearchBook] = []
+    @Published private(set) var searchBooks: [SharedSearchBook] = []
+    @Published private(set) var changeSourceCandidates: [SharedSearchBook] = []
     @Published private(set) var searchKeywords: [SharedSearchKeyword] = []
     @Published private(set) var searchErrors: [SourceSearchError] = []
     @Published private(set) var selectedBook: SharedBook?
@@ -101,6 +103,7 @@ final class AppState: ObservableObject {
         rssStars = runtime.loadRssStars() as? [SharedRssStar] ?? []
         rssStarredArticles = runtime.loadRssStarredArticles() as? [SharedRssArticle] ?? []
         exploreSources = runtime.loadExploreSources() as? [SharedBookSource] ?? []
+        searchBooks = runtime.loadSearchBooks() as? [SharedSearchBook] ?? []
         searchKeywords = runtime.loadSearchKeywords() as? [SharedSearchKeyword] ?? []
         if selectedSourceIndex >= sources.count {
             selectedSourceIndex = sources.isEmpty ? -1 : 0
@@ -782,6 +785,7 @@ final class AppState: ObservableObject {
                 searchErrors = result.errors as? [SourceSearchError] ?? []
             }
             searchKeywords = runtime.loadSearchKeywords() as? [SharedSearchKeyword] ?? []
+            searchBooks = runtime.loadSearchBooks() as? [SharedSearchBook] ?? []
             message = searchResults.isEmpty ? "No results" : nil
         } catch {
             message = error.localizedDescription
@@ -821,6 +825,7 @@ final class AppState: ObservableObject {
             chapters = detail.chapters as? [SharedBookChapter] ?? []
             currentChapter = nil
             currentContent = ""
+            changeSourceCandidates = runtime.loadChangeSourceCandidates(book: detail.book) as? [SharedSearchBook] ?? []
             refreshLibrary()
             message = chapters.isEmpty ? "No chapters" : nil
         } catch {
@@ -835,6 +840,7 @@ final class AppState: ObservableObject {
             activeSource = nil
             currentChapter = nil
             currentContent = ""
+            changeSourceCandidates = runtime.loadChangeSourceCandidates(book: book) as? [SharedSearchBook] ?? []
             message = chapters.isEmpty ? "Source not found" : nil
             return
         }
@@ -858,6 +864,9 @@ final class AppState: ObservableObject {
             activeSource = source
             currentChapter = nil
             currentContent = ""
+            if let selected = selectedBook {
+                changeSourceCandidates = runtime.loadChangeSourceCandidates(book: selected) as? [SharedSearchBook] ?? []
+            }
             refreshLibrary()
             message = chapters.isEmpty ? "No chapters" : nil
         } catch {
@@ -913,6 +922,19 @@ final class AppState: ObservableObject {
         } catch {
             message = error.localizedDescription
         }
+    }
+
+    func loadChangeSourceCandidates() {
+        guard let book = selectedBook else {
+            message = "No book selected"
+            return
+        }
+        changeSourceCandidates = runtime.loadChangeSourceCandidates(book: book) as? [SharedSearchBook] ?? []
+        message = changeSourceCandidates.isEmpty ? "No change source candidates" : nil
+    }
+
+    func changeSource(to searchBook: SharedSearchBook) async {
+        await openSearchResult(searchBook)
     }
 
     func addCurrentBookmark() {

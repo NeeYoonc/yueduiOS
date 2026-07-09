@@ -25,6 +25,7 @@ struct SettingsHomeView: View {
                     LabeledContent("Cookies", value: "\(app.cookies.count)")
                     LabeledContent("Cache", value: "\(app.cacheEntries.count)")
                     LabeledContent("Search History", value: "\(app.searchKeywords.count)")
+                    LabeledContent("Search Books", value: "\(app.searchBooks.count)")
                     LabeledContent("Results", value: "\(app.searchResults.count)")
                 }
 
