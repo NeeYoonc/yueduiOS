@@ -15,6 +15,7 @@ import io.legado.shared.model.SharedHttpTts
 import io.legado.shared.model.SharedKeyboardAssist
 import io.legado.shared.model.SharedRawConfigEntry
 import io.legado.shared.model.SharedReadRecord
+import io.legado.shared.model.SharedReaderSearchResult
 import io.legado.shared.model.SharedReplaceRule
 import io.legado.shared.model.SharedRssArticle
 import io.legado.shared.model.SharedRssReadRecord
@@ -66,6 +67,7 @@ import io.legado.shared.service.RuleEngineBookInfoParser
 import io.legado.shared.service.RuleEngineChapterContentParser
 import io.legado.shared.service.RuleEngineChapterListParser
 import io.legado.shared.service.RuleEngineSearchResultParser
+import io.legado.shared.service.ReaderSearchService
 import io.legado.shared.service.ReadingFlowResult
 import io.legado.shared.service.SearchPageResult
 import io.legado.shared.source.DefaultDataImporter
@@ -101,6 +103,7 @@ open class LegadoRuntime(
     val chapterRepository: ChapterRepository = ChapterRepository(client, libraryStore, bookshelfService)
     val sourceRepository: SourceRepository = SourceRepository(libraryStore)
     val sourceDebugService: SourceDebugService = SourceDebugService(client)
+    val readerSearchService: ReaderSearchService = ReaderSearchService()
     val exploreService: ExploreService = ExploreService(client, libraryStore)
     val rssArticleStateRepository: RssArticleStateRepository = RssArticleStateRepository(libraryStore)
     val rssService: RssService = RssService(httpFetcher, libraryStore, stateRepository = rssArticleStateRepository)
@@ -253,6 +256,10 @@ open class LegadoRuntime(
 
     fun loadChangeSourceCandidates(book: SharedBook, key: String = ""): List<SharedSearchBook> {
         return searchCoordinator.listChangeSourceCandidates(book, sourceRepository.list(), key)
+    }
+
+    fun searchReaderContent(content: String, query: String, contextChars: Int = 40): List<SharedReaderSearchResult> {
+        return readerSearchService.search(content, query, contextChars)
     }
 
     fun loadReadRecords(): List<SharedReadRecord> {

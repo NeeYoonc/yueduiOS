@@ -4,6 +4,8 @@ struct ReaderView: View {
     @EnvironmentObject private var app: AppState
     let initialChapterIndex: Int
     @State private var hasLoaded = false
+    @State private var showSearch = false
+    @State private var readerSearchQuery = ""
     @State private var readSessionStart: Date?
     @StateObject private var speech = SpeechController()
 
@@ -25,6 +27,46 @@ struct ReaderView: View {
                         .font(.system(.body, design: .serif))
                         .lineSpacing(8)
                         .textSelection(.enabled)
+
+                    if showSearch {
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack {
+                                TextField("Search in chapter", text: $readerSearchQuery)
+                                    .textInputAutocapitalization(.never)
+                                    .autocorrectionDisabled()
+                                    .textFieldStyle(.roundedBorder)
+                                    .onSubmit {
+                                        app.searchCurrentContent(query: readerSearchQuery)
+                                    }
+
+                                Button("Search") {
+                                    app.searchCurrentContent(query: readerSearchQuery)
+                                }
+                                .disabled(app.currentContent.isEmpty)
+                            }
+
+                            if app.readerSearchResults.isEmpty {
+                                Text("No matches")
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                ForEach(app.readerSearchResults.indices, id: \.self) { index in
+                                    let result = app.readerSearchResults[index]
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("#\(index + 1) \(result.startIndex)-\(result.endIndex)")
+                                            .font(.caption.monospacedDigit())
+                                            .foregroundStyle(.secondary)
+                                        Text(result.snippet)
+                                            .font(.callout)
+                                            .textSelection(.enabled)
+                                    }
+                                    .padding(.vertical, 4)
+                                }
+                            }
+                        }
+                        .padding()
+                        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 12))
+                    }
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -35,6 +77,16 @@ struct ReaderView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack {
+                    Button {
+                        showSearch.toggle()
+                        if showSearch {
+                            app.searchCurrentContent(query: readerSearchQuery)
+                        }
+                    } label: {
+                        Image(systemName: "magnifyingglass")
+                    }
+                    .disabled(app.currentContent.isEmpty)
+
                     Button {
                         app.addCurrentBookmark()
                     } label: {

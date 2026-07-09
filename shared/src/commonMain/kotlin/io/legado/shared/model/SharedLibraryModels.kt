@@ -287,6 +287,13 @@ data class SharedDictionaryLookupResult(
 )
 
 @Serializable
+data class SharedReaderSearchResult(
+    val startIndex: Int = 0,
+    val endIndex: Int = 0,
+    val snippet: String = ""
+)
+
+@Serializable
 data class SharedKeyboardAssist(
     val type: Int = 0,
     val key: String = "",

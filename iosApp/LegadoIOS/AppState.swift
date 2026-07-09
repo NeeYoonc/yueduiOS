@@ -64,6 +64,7 @@ final class AppState: ObservableObject {
     @Published private(set) var currentChapter: SharedBookChapter?
     @Published private(set) var currentChapterIndex: Int = 0
     @Published private(set) var currentContent: String = ""
+    @Published private(set) var readerSearchResults: [SharedReaderSearchResult] = []
     @Published private(set) var debugSteps: [SourceDebugStep] = []
     @Published private(set) var debugContent: String = ""
     @Published private(set) var message: String?
@@ -825,6 +826,7 @@ final class AppState: ObservableObject {
             chapters = detail.chapters as? [SharedBookChapter] ?? []
             currentChapter = nil
             currentContent = ""
+            readerSearchResults = []
             changeSourceCandidates = runtime.loadChangeSourceCandidates(book: detail.book, key: "") as? [SharedSearchBook] ?? []
             refreshLibrary()
             message = chapters.isEmpty ? "No chapters" : nil
@@ -840,6 +842,7 @@ final class AppState: ObservableObject {
             activeSource = nil
             currentChapter = nil
             currentContent = ""
+            readerSearchResults = []
             changeSourceCandidates = runtime.loadChangeSourceCandidates(book: book, key: "") as? [SharedSearchBook] ?? []
             message = chapters.isEmpty ? "Source not found" : nil
             return
@@ -864,6 +867,7 @@ final class AppState: ObservableObject {
             activeSource = source
             currentChapter = nil
             currentContent = ""
+            readerSearchResults = []
             if let selected = selectedBook {
                 changeSourceCandidates = runtime.loadChangeSourceCandidates(book: selected, key: "") as? [SharedSearchBook] ?? []
             }
@@ -899,6 +903,7 @@ final class AppState: ObservableObject {
                 currentChapter = result.chapter
                 currentChapterIndex = Int(result.chapterIndex)
                 currentContent = result.content.content
+                readerSearchResults = []
                 refreshLibrary()
                 message = currentContent.isEmpty ? "No content" : nil
                 return
@@ -917,6 +922,7 @@ final class AppState: ObservableObject {
             currentChapter = result.chapter
             currentChapterIndex = Int(result.chapterIndex)
             currentContent = result.content.content
+            readerSearchResults = []
             refreshLibrary()
             message = currentContent.isEmpty ? "No content" : nil
         } catch {
@@ -935,6 +941,11 @@ final class AppState: ObservableObject {
 
     func changeSource(to searchBook: SharedSearchBook) async {
         await openSearchResult(searchBook)
+    }
+
+    func searchCurrentContent(query: String) {
+        readerSearchResults = runtime.searchReaderContent(content: currentContent, query: query, contextChars: Int32(48)) as? [SharedReaderSearchResult] ?? []
+        message = query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !readerSearchResults.isEmpty ? nil : "No reader search matches"
     }
 
     func addCurrentBookmark() {
