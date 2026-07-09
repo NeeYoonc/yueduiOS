@@ -4,6 +4,7 @@ import LegadoShared
 @MainActor
 final class AppState: ObservableObject {
     @Published var sourceJson: String = DefaultSource.json
+    @Published var sourceImportUrl: String = ""
     @Published var replaceRuleJson: String = ""
     @Published var backupJson: String = ""
     @Published var dictRuleJson: String = ""
@@ -143,6 +144,24 @@ final class AppState: ObservableObject {
     func exportSourcesToEditor() {
         sourceJson = runtime.exportBookSourcesJson()
         message = "Exported \(sources.count) source(s)"
+    }
+
+    func importSourcesFromUrl(replace: Bool = false) async {
+        let url = sourceImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !url.isEmpty else {
+            message = "Source URL is empty"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            sources = try await runtime.importBookSourcesFromUrl(url: url, replace: replace) as? [SharedBookSource] ?? []
+            refreshLibrary()
+            message = sources.isEmpty ? "No usable sources" : "Imported \(sources.count) source(s) from URL"
+        } catch {
+            message = error.localizedDescription
+        }
     }
 
     func importReplaceRules(replace: Bool = false) {

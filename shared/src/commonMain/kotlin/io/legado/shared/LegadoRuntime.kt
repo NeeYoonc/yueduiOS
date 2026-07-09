@@ -74,6 +74,7 @@ import io.legado.shared.service.RuleEngineSearchResultParser
 import io.legado.shared.service.ReaderSearchService
 import io.legado.shared.service.ReadingFlowResult
 import io.legado.shared.service.SearchPageResult
+import io.legado.shared.service.SharedRequestBuilder
 import io.legado.shared.service.SourceRequestFactory
 import io.legado.shared.source.DefaultDataImporter
 import io.legado.shared.source.DefaultDataPayload
@@ -150,6 +151,13 @@ open class LegadoRuntime(
     @Throws(IllegalArgumentException::class)
     fun importAndSaveBookSources(json: String): List<SharedBookSource> {
         return sourceRepository.importJson(json, replace = true)
+    }
+
+    suspend fun importBookSourcesFromUrl(url: String, replace: Boolean = false): List<SharedBookSource> {
+        val requestUrl = url.trim()
+        require(requestUrl.isNotEmpty()) { "Book source URL is empty" }
+        val response = httpFetcher.fetch(SharedRequestBuilder.build(requestUrl))
+        return sourceRepository.importJson(response.body, replace)
     }
 
     fun loadBookSources(): List<SharedBookSource> {

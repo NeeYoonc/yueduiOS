@@ -200,6 +200,28 @@ class LegadoRuntimeTest {
     }
 
     @Test
+    fun importsBookSourcesFromRemoteUrl() = runBlocking {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    assertEquals("https://remote-source.test/bookSources.json", request.url)
+                    return SharedHttpResponse(
+                        finalUrl = request.url,
+                        statusCode = 200,
+                        body = """[{"bookSourceUrl":"https://remote-source.test","bookSourceName":"Remote Source"}]"""
+                    )
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+
+        val imported = runtime.importBookSourcesFromUrl("https://remote-source.test/bookSources.json")
+
+        assertEquals(listOf("Remote Source"), imported.map { it.bookSourceName })
+        assertEquals(imported, runtime.loadBookSources())
+    }
+
+    @Test
     fun exposesSourceWebLoginRequestAndStoresSourceCookie() {
         val runtime = LegadoRuntime(
             httpFetcher = object : HttpFetcher {
