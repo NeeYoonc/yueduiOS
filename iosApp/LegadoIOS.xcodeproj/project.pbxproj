@@ -62,6 +62,7 @@
 		F10000000000000000000001 /* BookSourceFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000002 /* BookSourceFormView.swift */; };
 		F10000000000000000000003 /* ReplaceRuleFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000004 /* ReplaceRuleFormView.swift */; };
 		F10000000000000000000005 /* HttpTtsFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000006 /* HttpTtsFormView.swift */; };
+		F10000000000000000000007 /* DictRuleFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000008 /* DictRuleFormView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -121,6 +122,7 @@
 		F10000000000000000000002 /* BookSourceFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/BookSourceFormView.swift; sourceTree = "<group>"; };
 		F10000000000000000000004 /* ReplaceRuleFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ReplaceRuleFormView.swift; sourceTree = "<group>"; };
 		F10000000000000000000006 /* HttpTtsFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/HttpTtsFormView.swift; sourceTree = "<group>"; };
+		F10000000000000000000008 /* DictRuleFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/DictRuleFormView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,6 +174,7 @@
 				C10000000000000000000012 /* ReplaceRuleEditorView.swift */,
 				C10000000000000000000013 /* BackupView.swift */,
 				C10000000000000000000014 /* DictRuleListView.swift */,
+				F10000000000000000000008 /* DictRuleFormView.swift */,
 				C10000000000000000000015 /* DictRuleEditorView.swift */,
 				C1000000000000000000001A /* DictionaryLookupView.swift */,
 				C10000000000000000000016 /* HttpTtsListView.swift */,
@@ -344,6 +347,7 @@
 				C10000000000000000000002 /* ReplaceRuleEditorView.swift in Sources */,
 				C10000000000000000000003 /* BackupView.swift in Sources */,
 				C10000000000000000000004 /* DictRuleListView.swift in Sources */,
+				F10000000000000000000007 /* DictRuleFormView.swift in Sources */,
 				C10000000000000000000005 /* DictRuleEditorView.swift in Sources */,
 				C1000000000000000000000A /* DictionaryLookupView.swift in Sources */,
 				C10000000000000000000006 /* HttpTtsListView.swift in Sources */,

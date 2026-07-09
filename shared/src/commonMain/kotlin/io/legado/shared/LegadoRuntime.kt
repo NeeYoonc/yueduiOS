@@ -495,6 +495,11 @@ open class LegadoRuntime(
         return dictRuleRepository.importJson(json, replace)
     }
 
+    @Throws(IllegalArgumentException::class)
+    fun upsertDictRuleJson(json: String): SharedDictRule {
+        return dictRuleRepository.upsertJson(json)
+    }
+
     suspend fun importDictRulesFromUrl(url: String, replace: Boolean = false): List<SharedDictRule> {
         return dictRuleRepository.importJson(fetchRemoteJson(url, "Dictionary rule URL is empty"), replace)
     }

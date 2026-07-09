@@ -272,6 +272,23 @@ final class AppState: ObservableObject {
         message = "Exported \(dictRules.count) dictionary rule(s)"
     }
 
+    func saveDictRuleJson(_ json: String) -> Bool {
+        let rawJson = json.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Dictionary rule JSON is empty"
+            return false
+        }
+        do {
+            _ = try runtime.upsertDictRuleJson(json: rawJson)
+            refreshLibrary()
+            message = "Saved dictionary rule"
+            return true
+        } catch {
+            message = error.localizedDescription
+            return false
+        }
+    }
+
     func importDictRulesFromUrl(replace: Bool = false) async {
         let url = dictRuleImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !url.isEmpty else {

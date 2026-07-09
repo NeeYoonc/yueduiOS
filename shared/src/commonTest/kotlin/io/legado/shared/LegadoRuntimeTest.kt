@@ -385,6 +385,43 @@ class LegadoRuntimeTest {
     }
 
     @Test
+    fun upsertsSingleDictRuleJsonWithoutReplacingOtherRules() {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    error("No network expected")
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+        runtime.importAndSaveDictRules(
+            """
+            [
+              {"name":"Keep","urlRule":"https://keep.test/{{word}}","showRule":"text"},
+              {"name":"Old","urlRule":"https://old.test/{{word}}","showRule":"old"}
+            ]
+            """.trimIndent()
+        )
+
+        val saved = runtime.upsertDictRuleJson(
+            """
+            {
+              "name":"Old",
+              "urlRule":"https://dict.test/{{word}}",
+              "showRule":"$.content",
+              "enabled":false,
+              "sortNumber":8
+            }
+            """.trimIndent()
+        )
+
+        assertEquals("$.content", saved.showRule)
+        assertEquals(false, saved.enabled)
+        assertEquals(listOf("Keep", "Old"), runtime.loadDictRules().map { it.name })
+        assertEquals(8, runtime.loadDictRules().first { it.name == "Old" }.sortNumber)
+    }
+
+    @Test
     fun importsRssSourcesAndReplaceRulesFromRemoteUrl() = runBlocking {
         val runtime = LegadoRuntime(
             httpFetcher = object : HttpFetcher {

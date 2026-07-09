@@ -14,7 +14,19 @@ struct DictRuleListView: View {
                 Section {
                     ForEach(app.dictRules.indices, id: \.self) { index in
                         let rule = app.dictRules[index]
-                        DictRuleRow(rule: rule)
+                        NavigationLink {
+                            DictRuleFormView(rule: rule)
+                        } label: {
+                            DictRuleRow(rule: rule)
+                        }
+                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                            Button {
+                                app.setDictRuleEnabled(rule, enabled: !rule.enabled)
+                            } label: {
+                                Label(rule.enabled ? "Disable" : "Enable", systemImage: rule.enabled ? "pause.circle" : "play.circle")
+                            }
+                            .tint(rule.enabled ? .orange : .green)
+                        }
                     }
                     .onDelete { offsets in
                         offsets
@@ -26,30 +38,36 @@ struct DictRuleListView: View {
         }
         .navigationTitle("Dictionaries")
         .toolbar {
-            NavigationLink {
-                DictionaryLookupView()
-            } label: {
-                Image(systemName: "magnifyingglass")
-            }
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                NavigationLink {
+                    DictionaryLookupView()
+                } label: {
+                    Image(systemName: "magnifyingglass")
+                }
 
-            NavigationLink {
-                DictRuleEditorView()
-            } label: {
-                Image(systemName: "doc.text")
+                NavigationLink {
+                    DictRuleEditorView()
+                } label: {
+                    Image(systemName: "doc.text")
+                }
+
+                NavigationLink {
+                    DictRuleFormView()
+                } label: {
+                    Image(systemName: "plus")
+                }
             }
         }
     }
 }
 
 private struct DictRuleRow: View {
-    @EnvironmentObject private var app: AppState
     let rule: SharedDictRule
 
     var body: some View {
-        Toggle(isOn: Binding(
-            get: { rule.enabled },
-            set: { app.setDictRuleEnabled(rule, enabled: $0) }
-        )) {
+        HStack(spacing: 12) {
+            Image(systemName: rule.enabled ? "checkmark.circle.fill" : "pause.circle")
+                .foregroundStyle(rule.enabled ? .green : .secondary)
             VStack(alignment: .leading, spacing: 5) {
                 Text(rule.name)
                     .font(.headline)
@@ -57,8 +75,12 @@ private struct DictRuleRow: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
+                Text(rule.showRule.isEmpty ? "No show rule" : rule.showRule)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
             }
-            .padding(.vertical, 4)
         }
+        .padding(.vertical, 4)
     }
 }
