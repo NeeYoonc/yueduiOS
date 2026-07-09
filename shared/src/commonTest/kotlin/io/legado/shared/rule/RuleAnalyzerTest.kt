@@ -36,6 +36,18 @@ class RuleAnalyzerTest {
     }
 
     @Test
+    fun extractsLegacyIndexedJsoupSelectors() {
+        val html = """
+            <section class="book"><a href="/one"><span id="first-title">One</span></a></section>
+            <section class="book"><a href="/two"><span id="second-title">Two</span></a></section>
+        """.trimIndent()
+
+        assertEquals("Two", RuleAnalyzer.getString(html, "class.book.1@text"))
+        assertEquals("/two", RuleAnalyzer.getString(html, "tag.a.1@href"))
+        assertEquals("One", RuleAnalyzer.getString(html, "id.first-title@text"))
+    }
+
+    @Test
     fun evaluatesChainedHtmlRules() {
         val html = """
             <section class="book"><div class="meta"><a href="/one"><span class="name">One</span></a></div></section>

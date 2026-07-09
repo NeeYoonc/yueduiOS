@@ -39,7 +39,7 @@ object RuleAnalyzer {
 
     fun looksLikeHtmlRule(rule: String?): Boolean {
         val trimmed = rule?.trim()?.removeModePrefix("@css:") ?: return false
-        val selector = normalizeLegacySelector(trimmed.substringBefore("@").trim())
+        val selector = parseHtmlSelector(trimmed.substringBefore("@").trim()).selector
         return selector.startsWith(".") ||
             selector.startsWith("#") ||
             htmlTagRegex.matches(selector) ||
@@ -120,18 +120,20 @@ object RuleAnalyzer {
     }
 
     private fun htmlElements(content: String, rule: String): List<String> {
-        val selector = HtmlRule.parse(rule).selector
+        val htmlRule = HtmlRule.parse(rule)
+        val selector = htmlRule.selector
             .split(Regex("""\s+"""))
             .last()
             .trim()
         if (selector.isEmpty()) {
             return emptyList()
         }
-        return when {
+        val elements = when {
             selector.startsWith(".") -> elementsByClass(content, selector.removePrefix("."))
             selector.startsWith("#") -> elementsByAttribute(content, "id", selector.removePrefix("#"))
             else -> elementsByTag(content, selector)
         }
+        return htmlRule.index?.let { index -> elements.getOrNull(index)?.let { listOf(it) } ?: emptyList() } ?: elements
     }
 
     private fun htmlChainElements(content: String, rule: String): List<String> {
@@ -396,7 +398,7 @@ object RuleAnalyzer {
     }
 
     private fun isHtmlSelector(rule: String): Boolean {
-        val selector = normalizeLegacySelector(rule.trim().substringBefore("@").trim())
+        val selector = parseHtmlSelector(rule.trim().substringBefore("@").trim()).selector
         return selector.startsWith(".") ||
             selector.startsWith("#") ||
             htmlTagRegex.matches(selector) ||
@@ -410,27 +412,55 @@ object RuleAnalyzer {
 
     private data class HtmlRule(
         val selector: String,
-        val attr: String
+        val attr: String,
+        val index: Int? = null
     ) {
         companion object {
             fun parse(rule: String): HtmlRule {
                 val normalized = rule.trim().removePrefix("@css:")
-                val selector = normalizeLegacySelector(normalized.substringBefore("@").trim())
+                val parsedSelector = parseHtmlSelector(normalized.substringBefore("@").trim())
                 val attr = normalized.substringAfter("@", "text").trim().ifEmpty { "text" }
-                return HtmlRule(selector, attr)
+                return HtmlRule(parsedSelector.selector, attr, parsedSelector.index)
             }
         }
     }
 
-    private fun normalizeLegacySelector(selector: String): String {
+    private fun parseHtmlSelector(selector: String): HtmlSelector {
         val trimmed = selector.trim()
-        return when {
-            trimmed.startsWith("tag.", ignoreCase = true) -> trimmed.substringAfter(".").trim()
-            trimmed.startsWith("class.", ignoreCase = true) -> "." + trimmed.substringAfter(".").trim()
-            trimmed.startsWith("id.", ignoreCase = true) -> "#" + trimmed.substringAfter(".").trim()
-            else -> trimmed
+        val legacy = legacySelectorRegex.matchEntire(trimmed)
+        if (legacy != null) {
+            val kind = legacy.groupValues[1].lowercase()
+            val (name, index) = splitSelectorIndex(legacy.groupValues[2])
+            val normalized = when (kind) {
+                "tag" -> name
+                "class" -> ".$name"
+                "id" -> "#$name"
+                else -> name
+            }
+            return HtmlSelector(normalized.trim(), index)
         }
+
+        val (name, index) = splitSelectorIndex(trimmed)
+        return HtmlSelector(name.trim(), index)
     }
+
+    private fun splitSelectorIndex(value: String): Pair<String, Int?> {
+        val lastDot = value.lastIndexOf('.')
+        if (lastDot > 0 && lastDot < value.lastIndex) {
+            val index = value.substring(lastDot + 1).toIntOrNull()
+            if (index != null) {
+                return value.substring(0, lastDot) to index
+            }
+        }
+        return value to null
+    }
+
+    private val legacySelectorRegex = Regex("""^(tag|class|id)\.(.+)$""", RegexOption.IGNORE_CASE)
+
+    private data class HtmlSelector(
+        val selector: String,
+        val index: Int? = null
+    )
 
     private data class CompositeRule(
         val operator: String,
