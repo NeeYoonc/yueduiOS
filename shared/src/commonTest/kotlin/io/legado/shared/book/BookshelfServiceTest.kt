@@ -58,6 +58,40 @@ class BookshelfServiceTest {
     }
 
     @Test
+    fun updatesBookMetadataWithoutLosingProgressOrOrder() {
+        val store = SharedLibraryStore(InMemoryCacheStore())
+        val service = BookshelfService(store)
+        val book = SharedBook(
+            name = "Old",
+            author = "Author",
+            bookUrl = "https://source.test/book/meta",
+            origin = "https://source.test",
+            order = 7,
+            durChapterIndex = 3,
+            durChapterPos = 99
+        )
+
+        service.upsertBook(book)
+        val updated = service.updateMetadata(
+            book = book,
+            name = "New",
+            author = "New Author",
+            customIntro = "Custom intro",
+            customCoverUrl = "https://img.test/cover.jpg",
+            customTag = "favorite"
+        )
+
+        assertEquals("New", updated.name)
+        assertEquals("New Author", updated.author)
+        assertEquals("Custom intro", updated.customIntro)
+        assertEquals("https://img.test/cover.jpg", updated.customCoverUrl)
+        assertEquals("favorite", updated.customTag)
+        assertEquals(0, updated.order)
+        assertEquals(3, updated.durChapterIndex)
+        assertEquals(99, updated.durChapterPos)
+    }
+
+    @Test
     fun removesBookByOriginAndUrl() {
         val store = SharedLibraryStore(InMemoryCacheStore())
         val service = BookshelfService(store)

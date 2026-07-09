@@ -576,6 +576,17 @@ open class LegadoRuntime(
         return loadBooks()
     }
 
+    fun updateBookMetadata(
+        book: SharedBook,
+        name: String,
+        author: String,
+        customIntro: String?,
+        customCoverUrl: String?,
+        customTag: String?
+    ): SharedBook {
+        return bookshelfService.updateMetadata(book, name, author, customIntro, customCoverUrl, customTag)
+    }
+
     fun loadBooksForGroup(groupId: Long): List<SharedBook> {
         return bookGroupRepository.booksForGroup(groupId)
     }

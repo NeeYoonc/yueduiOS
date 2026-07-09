@@ -56,6 +56,7 @@
 		D10000000000000000000008 /* RssStarListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000000000000000000018 /* RssStarListView.swift */; };
 		D10000000000000000000009 /* CookieListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10000000000000000000019 /* CookieListView.swift */; };
 		D1000000000000000000000A /* CacheEntryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1000000000000000000001A /* CacheEntryListView.swift */; };
+		D1000000000000000000000B /* BookEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1000000000000000000001B /* BookEditView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -109,6 +110,7 @@
 		D10000000000000000000018 /* RssStarListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RssStarListView.swift; sourceTree = "<group>"; };
 		D10000000000000000000019 /* CookieListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CookieListView.swift; sourceTree = "<group>"; };
 		D1000000000000000000001A /* CacheEntryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CacheEntryListView.swift; sourceTree = "<group>"; };
+		D1000000000000000000001B /* BookEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/BookEditView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,6 +147,7 @@
 				B10000000000000000000015 /* ExploreView.swift */,
 				B10000000000000000000016 /* SearchView.swift */,
 				B10000000000000000000017 /* BookDetailView.swift */,
+				D1000000000000000000001B /* BookEditView.swift */,
 				B10000000000000000000018 /* ChapterListView.swift */,
 				B10000000000000000000019 /* ReaderView.swift */,
 				B1000000000000000000001A /* RssHomeView.swift */,
@@ -342,6 +345,7 @@
 				D10000000000000000000004 /* RawConfigEditorView.swift in Sources */,
 				D10000000000000000000009 /* CookieListView.swift in Sources */,
 				D1000000000000000000000A /* CacheEntryListView.swift in Sources */,
+				D1000000000000000000000B /* BookEditView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

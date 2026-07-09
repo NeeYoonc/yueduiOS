@@ -31,6 +31,12 @@ struct BookDetailView: View {
                         }
                     }
                     .padding(.vertical, 4)
+
+                    NavigationLink {
+                        BookEditView(book: book)
+                    } label: {
+                        Label("Edit metadata", systemImage: "pencil")
+                    }
                 }
 
                 Section("Groups") {

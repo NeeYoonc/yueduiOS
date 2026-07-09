@@ -51,6 +51,25 @@ class BookshelfService(
         return upsertBook(updated)
     }
 
+    fun updateMetadata(
+        book: SharedBook,
+        name: String,
+        author: String,
+        customIntro: String?,
+        customCoverUrl: String?,
+        customTag: String?
+    ): SharedBook {
+        val current = listBooks().firstOrNull { it.sameBookAs(book) } ?: book
+        val updated = current.copy(
+            name = name.trim().ifEmpty { current.name },
+            author = author.trim(),
+            customIntro = customIntro?.trim()?.takeIf { it.isNotEmpty() },
+            customCoverUrl = customCoverUrl?.trim()?.takeIf { it.isNotEmpty() },
+            customTag = customTag?.trim()?.takeIf { it.isNotEmpty() }
+        )
+        return upsertBook(updated)
+    }
+
     private fun List<SharedBook>.nextOrder(): Int {
         return maxOfOrNull { it.order }?.plus(1) ?: 0
     }

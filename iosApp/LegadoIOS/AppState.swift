@@ -615,6 +615,29 @@ final class AppState: ObservableObject {
         refreshLibrary()
     }
 
+    func updateSelectedBookMetadata(
+        name: String,
+        author: String,
+        customIntro: String,
+        customCoverUrl: String,
+        customTag: String
+    ) {
+        guard let book = selectedBook else {
+            message = "No book selected"
+            return
+        }
+        selectedBook = runtime.updateBookMetadata(
+            book: book,
+            name: name,
+            author: author,
+            customIntro: customIntro,
+            customCoverUrl: customCoverUrl,
+            customTag: customTag
+        )
+        refreshLibrary()
+        message = "Book metadata saved"
+    }
+
     func selectBookGroup(_ group: SharedBookGroup) {
         selectedBookGroupId = group.groupId
         visibleBooks = runtime.loadBooksForGroup(groupId: group.groupId) as? [SharedBook] ?? books
