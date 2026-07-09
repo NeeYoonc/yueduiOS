@@ -67,6 +67,12 @@ class SourceRepository(
         return list()
     }
 
+    fun upsertJson(rawJson: String): SharedBookSource {
+        val imported = SourceJsonImporter.importBookSources(rawJson)
+        require(imported.size == 1) { "Book source editor JSON must contain exactly one source" }
+        return upsert(imported.single())
+    }
+
     fun exportJson(): String {
         return json.encodeToString(list())
     }

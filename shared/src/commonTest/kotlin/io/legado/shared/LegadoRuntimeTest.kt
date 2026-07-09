@@ -222,6 +222,48 @@ class LegadoRuntimeTest {
     }
 
     @Test
+    fun upsertsSingleBookSourceJsonWithoutReplacingOtherSources() {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    error("No network expected")
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+        runtime.importAndSaveBookSources(
+            """
+            [
+              {"bookSourceUrl":"https://keep.test","bookSourceName":"Keep"},
+              {"bookSourceUrl":"https://edit.test","bookSourceName":"Old"}
+            ]
+            """.trimIndent()
+        )
+
+        val saved = runtime.upsertBookSourceJson(
+            """
+            {
+              "bookSourceUrl":"https://edit.test",
+              "bookSourceName":"Edited",
+              "bookSourceGroup":"Group A",
+              "enabled":false,
+              "enabledExplore":false,
+              "searchUrl":"https://edit.test/search?q={{key}}",
+              "ruleSearch":{"bookList":"$.data","name":"$.title"},
+              "ruleToc":{"chapterList":"$.chapters","chapterName":"$.name"},
+              "ruleContent":{"content":"$.content","nextContentUrl":"$.next"}
+            }
+            """.trimIndent()
+        )
+
+        assertEquals("Edited", saved.bookSourceName)
+        assertEquals(false, saved.enabled)
+        assertEquals(listOf("Keep", "Edited"), runtime.loadBookSources().map { it.bookSourceName })
+        assertEquals("$.data", runtime.loadBookSources().first { it.bookSourceUrl == "https://edit.test" }.ruleSearch?.bookList)
+        assertEquals("$.content", runtime.loadBookSources().first { it.bookSourceUrl == "https://edit.test" }.ruleContent?.content)
+    }
+
+    @Test
     fun importsRssSourcesAndReplaceRulesFromRemoteUrl() = runBlocking {
         val runtime = LegadoRuntime(
             httpFetcher = object : HttpFetcher {

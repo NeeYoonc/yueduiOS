@@ -414,6 +414,11 @@ open class LegadoRuntime(
         return sourceRepository.upsert(source)
     }
 
+    @Throws(IllegalArgumentException::class)
+    fun upsertBookSourceJson(json: String): SharedBookSource {
+        return sourceRepository.upsertJson(json)
+    }
+
     fun setBookSourceEnabled(bookSourceUrl: String, enabled: Boolean): SharedBookSource? {
         return sourceRepository.setEnabled(bookSourceUrl, enabled)
     }

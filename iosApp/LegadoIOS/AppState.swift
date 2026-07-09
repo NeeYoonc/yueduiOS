@@ -157,6 +157,23 @@ final class AppState: ObservableObject {
         message = "Exported \(sources.count) source(s)"
     }
 
+    func saveBookSourceJson(_ json: String) -> Bool {
+        let rawJson = json.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Book source JSON is empty"
+            return false
+        }
+        do {
+            _ = try runtime.upsertBookSourceJson(json: rawJson)
+            refreshLibrary()
+            message = "Saved book source"
+            return true
+        } catch {
+            message = error.localizedDescription
+            return false
+        }
+    }
+
     func importSourcesFromUrl(replace: Bool = false) async {
         let url = sourceImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !url.isEmpty else {

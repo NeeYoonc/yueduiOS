@@ -15,7 +15,7 @@ struct SourceListView: View {
                     ForEach(app.sources.indices, id: \.self) { index in
                         let source = app.sources[index]
                         NavigationLink {
-                            SourceDebugView(source: source)
+                            BookSourceFormView(source: source)
                         } label: {
                             SourceRow(source: source)
                         }
@@ -40,10 +40,24 @@ struct SourceListView: View {
         }
         .navigationTitle("Sources")
         .toolbar {
-            Button {
-                app.refreshLibrary()
-            } label: {
-                Image(systemName: "arrow.clockwise")
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                NavigationLink {
+                    SourceEditorView()
+                } label: {
+                    Image(systemName: "doc.text")
+                }
+
+                NavigationLink {
+                    BookSourceFormView()
+                } label: {
+                    Image(systemName: "plus")
+                }
+
+                Button {
+                    app.refreshLibrary()
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                }
             }
         }
     }
