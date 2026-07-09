@@ -36,6 +36,41 @@ class SourceLoginServiceTest {
         assertNull(service.buildWebLoginRequest(SharedBookSource(loginUrl = "https://source.test/login", loginUi = "[]")))
     }
 
+    @Test
+    fun parsesStructuredLoginUiAndBuildsDefaultLoginInfoJson() {
+        val service = SourceLoginService(InMemoryCookieStore())
+        val source = SharedBookSource(
+            bookSourceUrl = "https://login-form.test",
+            bookSourceName = "Login Form",
+            loginUrl = "function login() {}",
+            loginUi = """
+            [
+              {"name":"telephone","type":"text"},
+              {"name":"password","type":"password","default":"123456"},
+              {"name":"endpoint","type":"select","chars":["A","B"],"default":"B"},
+              {"name":"remember","type":"toggle","chars":["yes","no"]},
+              {"name":"register","type":"button","action":"https://login-form.test/register"}
+            ]
+            """.trimIndent()
+        )
+
+        val fields = service.loadLoginUiFields(source)
+        val defaults = service.defaultLoginInfoJson(source)
+
+        assertEquals(listOf("telephone", "password", "endpoint", "remember", "register"), fields.map { it.name })
+        assertEquals(listOf("text", "password", "select", "toggle", "button"), fields.map { it.type })
+        assertEquals(listOf("A", "B"), fields[2].chars)
+        assertEquals(
+            mapOf(
+                "telephone" to "",
+                "password" to "123456",
+                "endpoint" to "B",
+                "remember" to "yes"
+            ),
+            service.decodeLoginInfoJson(defaults)
+        )
+    }
+
     private fun Map<String, String>.value(name: String): String? {
         return entries.firstOrNull { it.key.equals(name, ignoreCase = true) }?.value
     }

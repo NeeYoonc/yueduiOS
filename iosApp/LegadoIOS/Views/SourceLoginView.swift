@@ -43,6 +43,8 @@ struct SourceLoginView: View {
                     }
                     .disabled(cookieString.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
+            } else if !app.sourceLoginFields(source).isEmpty {
+                StructuredSourceLoginForm(source: source)
             } else {
                 List {
                     Section {
@@ -68,6 +70,124 @@ struct SourceLoginView: View {
         }
         .navigationTitle(source.bookSourceName.isEmpty ? "Source Login" : source.bookSourceName)
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct StructuredSourceLoginForm: View {
+    @EnvironmentObject private var app: AppState
+    let source: SharedBookSource
+    @State private var values: [String: String] = [:]
+
+    private var fields: [SharedLoginUiField] {
+        app.sourceLoginFields(source)
+    }
+
+    var body: some View {
+        Form {
+            Section {
+                ForEach(Array(fields.enumerated()), id: \.offset) { _, field in
+                    fieldView(field)
+                }
+            } header: {
+                Text("Login fields")
+            } footer: {
+                Text("These values match Legado source loginUi fields and are stored under this source. JavaScript login execution will reuse them when the remaining JS login runtime is migrated.")
+            }
+
+            Section {
+                Button {
+                    app.saveSourceLoginInfo(source, values: values)
+                } label: {
+                    Label("Save login info", systemImage: "square.and.arrow.down")
+                }
+
+                Button(role: .destructive) {
+                    values = app.sourceLoginInfo(source)
+                    app.clearSourceLoginInfo(source)
+                } label: {
+                    Label("Reset to defaults", systemImage: "arrow.counterclockwise")
+                }
+            }
+        }
+        .onAppear {
+            values = app.sourceLoginInfo(source)
+        }
+    }
+
+    @ViewBuilder
+    private func fieldView(_ field: SharedLoginUiField) -> some View {
+        let title = fieldTitle(field)
+        switch field.type {
+        case "password":
+            SecureField(title, text: binding(for: field.name))
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+        case "select":
+            Picker(title, selection: binding(for: field.name)) {
+                ForEach(fieldChars(field), id: \.self) { value in
+                    Text(value).tag(value)
+                }
+            }
+        case "toggle":
+            Button {
+                cycle(field)
+            } label: {
+                HStack {
+                    Text(title)
+                    Spacer()
+                    Text(values[field.name] ?? fieldChars(field).first ?? "")
+                        .foregroundStyle(.secondary)
+                }
+            }
+        case "button":
+            if let action = field.action, let url = URL(string: action), !action.isEmpty {
+                Link(destination: url) {
+                    Label(title, systemImage: "link")
+                }
+            } else {
+                Text(title)
+                    .foregroundStyle(.secondary)
+            }
+        default:
+            TextField(title, text: binding(for: field.name), axis: .vertical)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+        }
+    }
+
+    private func binding(for name: String) -> Binding<String> {
+        Binding(
+            get: { values[name] ?? "" },
+            set: { values[name] = $0 }
+        )
+    }
+
+    private func cycle(_ field: SharedLoginUiField) {
+        let chars = fieldChars(field)
+        guard !chars.isEmpty else {
+            return
+        }
+        let current = values[field.name] ?? chars.first ?? ""
+        let currentIndex = chars.firstIndex(of: current) ?? -1
+        let nextIndex = (currentIndex + 1) % chars.count
+        values[field.name] = chars[nextIndex]
+    }
+
+    private func fieldTitle(_ field: SharedLoginUiField) -> String {
+        if let viewName = field.viewName, !viewName.isEmpty {
+            return viewName.trimmingCharacters(in: CharacterSet(charactersIn: "'"))
+        }
+        return field.name
+    }
+
+    private func fieldChars(_ field: SharedLoginUiField) -> [String] {
+        if let chars = field.chars as? [String] {
+            return chars
+        }
+        if let chars = field.chars as? NSArray {
+            return chars.map { "\($0)" }
+        }
+        return []
     }
 }
 

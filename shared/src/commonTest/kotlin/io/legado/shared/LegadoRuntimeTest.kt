@@ -227,6 +227,44 @@ class LegadoRuntimeTest {
     }
 
     @Test
+    fun exposesStructuredSourceLoginFieldsAndPersistsLoginInfo() {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    error("No network expected")
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+        val source = SharedBookSource(
+            bookSourceUrl = "https://runtime-login-form.test",
+            bookSourceName = "Runtime Login Form",
+            loginUrl = "function login() {}",
+            loginUi = """
+            [
+              {"name":"telephone","type":"text"},
+              {"name":"password","type":"password","default":"123456"}
+            ]
+            """.trimIndent()
+        )
+
+        val fields = runtime.loadSourceLoginFields(source)
+        val defaultInfo = runtime.loadSourceLoginInfoJson(source)
+        val saved = runtime.saveSourceLoginInfoJson(
+            source,
+            """{"telephone":"13800000000","password":"pw"}"""
+        )
+
+        assertEquals(listOf("telephone", "password"), fields.map { it.name })
+        assertEquals("""{"telephone":"","password":"123456"}""", defaultInfo.replace(Regex("\\s"), ""))
+        assertEquals("userInfo_${source.bookSourceUrl}", saved.key)
+        assertEquals("""{"telephone":"13800000000","password":"pw"}""", runtime.loadSourceLoginInfoJson(source).replace(Regex("\\s"), ""))
+
+        runtime.clearSourceLoginInfo(source)
+        assertEquals(defaultInfo.replace(Regex("\\s"), ""), runtime.loadSourceLoginInfoJson(source).replace(Regex("\\s"), ""))
+    }
+
+    @Test
     fun managesBookGroupsThroughRuntimeRepository() {
         val runtime = LegadoRuntime(
             httpFetcher = object : HttpFetcher {

@@ -77,6 +77,7 @@ import io.legado.shared.source.DefaultDataImporter
 import io.legado.shared.source.DefaultDataPayload
 import io.legado.shared.source.SourceDebugResult
 import io.legado.shared.source.SourceDebugService
+import io.legado.shared.source.SharedLoginUiField
 import io.legado.shared.source.SharedSourceLoginRequest
 import io.legado.shared.source.SourceLoginService
 import io.legado.shared.source.SourceRepository
@@ -405,6 +406,24 @@ open class LegadoRuntime(
 
     fun saveSourceWebLoginCookie(source: SharedBookSource, cookie: String): SharedCookie {
         return cookieRepository.upsert(SharedCookie(url = source.bookSourceUrl, cookie = cookie))
+    }
+
+    fun loadSourceLoginFields(source: SharedBookSource): List<SharedLoginUiField> {
+        return sourceLoginService.loadLoginUiFields(source)
+    }
+
+    fun loadSourceLoginInfoJson(source: SharedBookSource): String {
+        return cacheEntryRepository.getValue(source.loginInfoKey())
+            ?: sourceLoginService.defaultLoginInfoJson(source)
+    }
+
+    fun saveSourceLoginInfoJson(source: SharedBookSource, json: String): SharedCacheEntry {
+        val normalized = sourceLoginService.encodeLoginInfoJson(sourceLoginService.decodeLoginInfoJson(json))
+        return cacheEntryRepository.putValue(source.loginInfoKey(), normalized)
+    }
+
+    fun clearSourceLoginInfo(source: SharedBookSource): List<SharedCacheEntry> {
+        return cacheEntryRepository.delete(source.loginInfoKey())
     }
 
     @Throws(IllegalArgumentException::class)
@@ -785,3 +804,5 @@ open class LegadoRuntime(
         }
     }
 }
+
+private fun SharedBookSource.loginInfoKey(): String = "userInfo_$bookSourceUrl"

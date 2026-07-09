@@ -608,6 +608,38 @@ final class AppState: ObservableObject {
         runtime.buildSourceWebLoginRequest(source: source)
     }
 
+    func sourceLoginFields(_ source: SharedBookSource) -> [SharedLoginUiField] {
+        runtime.loadSourceLoginFields(source: source) as? [SharedLoginUiField] ?? []
+    }
+
+    func sourceLoginInfo(_ source: SharedBookSource) -> [String: String] {
+        let json = runtime.loadSourceLoginInfoJson(source: source)
+        guard let data = json.data(using: .utf8),
+              let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return [:]
+        }
+        return object.reduce(into: [String: String]()) { result, item in
+            result[item.key] = "\(item.value)"
+        }
+    }
+
+    func saveSourceLoginInfo(_ source: SharedBookSource, values: [String: String]) {
+        guard let data = try? JSONSerialization.data(withJSONObject: values, options: [.sortedKeys]),
+              let json = String(data: data, encoding: .utf8) else {
+            message = "Login info JSON encode failed"
+            return
+        }
+        _ = runtime.saveSourceLoginInfoJson(source: source, json: json)
+        refreshLibrary()
+        message = "Saved login info for \(source.bookSourceName.isEmpty ? source.bookSourceUrl : source.bookSourceName)"
+    }
+
+    func clearSourceLoginInfo(_ source: SharedBookSource) {
+        _ = runtime.clearSourceLoginInfo(source: source)
+        refreshLibrary()
+        message = "Cleared login info"
+    }
+
     func saveSourceWebLoginCookie(_ source: SharedBookSource, cookie: String) {
         let cleanCookie = cookie.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !cleanCookie.isEmpty else {
