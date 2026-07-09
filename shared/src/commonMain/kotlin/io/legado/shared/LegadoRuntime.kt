@@ -72,6 +72,7 @@ import io.legado.shared.service.RuleEngineSearchResultParser
 import io.legado.shared.service.ReaderSearchService
 import io.legado.shared.service.ReadingFlowResult
 import io.legado.shared.service.SearchPageResult
+import io.legado.shared.service.SourceRequestFactory
 import io.legado.shared.source.DefaultDataImporter
 import io.legado.shared.source.DefaultDataPayload
 import io.legado.shared.source.SourceDebugResult
@@ -113,7 +114,12 @@ open class LegadoRuntime(
     val readerSearchService: ReaderSearchService = ReaderSearchService()
     val exploreService: ExploreService = ExploreService(client, libraryStore)
     val rssArticleStateRepository: RssArticleStateRepository = RssArticleStateRepository(libraryStore)
-    val rssService: RssService = RssService(httpFetcher, libraryStore, stateRepository = rssArticleStateRepository)
+    val rssService: RssService = RssService(
+        httpFetcher = httpFetcher,
+        libraryStore = libraryStore,
+        stateRepository = rssArticleStateRepository,
+        requestFactory = SourceRequestFactory(cookieRepository)
+    )
     val rssSourceRepository: RssSourceRepository = RssSourceRepository(libraryStore)
     val localTextBookService: LocalTextBookService = LocalTextBookService(libraryStore, bookshelfService)
     val replacementRepository: ReplacementRepository = ReplacementRepository(libraryStore)

@@ -1,6 +1,7 @@
 package io.legado.shared.service
 
 import io.legado.shared.model.SharedBookSource
+import io.legado.shared.model.SharedRssSource
 import io.legado.shared.platform.CookieStorePort
 import io.legado.shared.platform.SharedHttpRequest
 import io.legado.shared.platform.SharedHttpResponse
@@ -19,15 +20,51 @@ class SourceRequestFactory(
         context: SharedRequestBuilder.SharedRequestContext = SharedRequestBuilder.SharedRequestContext()
     ): SharedHttpRequest {
         val request = SharedRequestBuilder.build(template, context)
+        return decorateRequest(
+            request = request,
+            sourceKey = source.bookSourceUrl,
+            header = source.header,
+            enabledCookieJar = source.enabledCookieJar
+        )
+    }
+
+    fun build(
+        source: SharedRssSource,
+        template: String,
+        context: SharedRequestBuilder.SharedRequestContext = SharedRequestBuilder.SharedRequestContext()
+    ): SharedHttpRequest {
+        val request = SharedRequestBuilder.build(template, context)
+        return decorateRequest(
+            request = request,
+            sourceKey = source.sourceUrl,
+            header = source.header,
+            enabledCookieJar = source.enabledCookieJar
+        )
+    }
+
+    fun storeResponseCookies(source: SharedBookSource, response: SharedHttpResponse) {
+        storeResponseCookies(source.bookSourceUrl, source.enabledCookieJar, response)
+    }
+
+    fun storeResponseCookies(source: SharedRssSource, response: SharedHttpResponse) {
+        storeResponseCookies(source.sourceUrl, source.enabledCookieJar, response)
+    }
+
+    private fun decorateRequest(
+        request: SharedHttpRequest,
+        sourceKey: String,
+        header: String?,
+        enabledCookieJar: Boolean?
+    ): SharedHttpRequest {
         val headers = linkedMapOf<String, String>()
-        source.headersFromRule().forEach { (name, value) ->
+        header.headersFromRule().forEach { (name, value) ->
             headers.putCaseInsensitive(name, value)
         }
         request.headers.forEach { (name, value) ->
             headers.putCaseInsensitive(name, value)
         }
-        val storedCookie = cookieStore.takeUnless { source.enabledCookieJar == false }
-            ?.getCookie(source.bookSourceUrl)
+        val storedCookie = cookieStore.takeUnless { enabledCookieJar == false }
+            ?.getCookie(sourceKey)
             ?.takeIf { it.isNotBlank() }
         if (storedCookie != null && !headers.containsKeyIgnoreCase("Cookie")) {
             headers["Cookie"] = storedCookie
@@ -35,8 +72,12 @@ class SourceRequestFactory(
         return request.copy(headers = headers)
     }
 
-    fun storeResponseCookies(source: SharedBookSource, response: SharedHttpResponse) {
-        if (source.enabledCookieJar == false) {
+    private fun storeResponseCookies(
+        sourceKey: String,
+        enabledCookieJar: Boolean?,
+        response: SharedHttpResponse
+    ) {
+        if (enabledCookieJar == false) {
             return
         }
         val setCookie = response.headers.valueIgnoreCase("Set-Cookie") ?: return
@@ -46,12 +87,12 @@ class SourceRequestFactory(
             ?.trim()
             ?.takeIf { it.contains('=') }
             ?: return
-        val merged = mergeCookie(cookieStore?.getCookie(source.bookSourceUrl), cookiePair)
-        cookieStore?.putCookie(source.bookSourceUrl, merged)
+        val merged = mergeCookie(cookieStore?.getCookie(sourceKey), cookiePair)
+        cookieStore?.putCookie(sourceKey, merged)
     }
 
-    private fun SharedBookSource.headersFromRule(): Map<String, String> {
-        val rawHeader = header?.trim()?.takeIf { it.isNotBlank() } ?: return emptyMap()
+    private fun String?.headersFromRule(): Map<String, String> {
+        val rawHeader = this?.trim()?.takeIf { it.isNotBlank() } ?: return emptyMap()
         if (rawHeader.startsWith("@js:", ignoreCase = true) || rawHeader.startsWith("<js>", ignoreCase = true)) {
             return emptyMap()
         }

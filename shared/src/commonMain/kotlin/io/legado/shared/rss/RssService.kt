@@ -5,13 +5,15 @@ import io.legado.shared.model.SharedRssSource
 import io.legado.shared.platform.HttpFetcher
 import io.legado.shared.platform.SharedHttpResponse
 import io.legado.shared.service.SharedRequestBuilder
+import io.legado.shared.service.SourceRequestFactory
 import io.legado.shared.storage.SharedLibraryStore
 
 class RssService(
     private val httpFetcher: HttpFetcher,
     private val libraryStore: SharedLibraryStore? = null,
     private val parser: RssRuleParser = RssRuleParser(),
-    private val stateRepository: RssArticleStateRepository? = libraryStore?.let { RssArticleStateRepository(it) }
+    private val stateRepository: RssArticleStateRepository? = libraryStore?.let { RssArticleStateRepository(it) },
+    private val requestFactory: SourceRequestFactory = SourceRequestFactory()
 ) {
     suspend fun refreshArticles(
         source: SharedRssSource,
@@ -21,7 +23,8 @@ class RssService(
         key: String? = null
     ): RssArticlePage {
         val response = httpFetcher.fetch(
-            SharedRequestBuilder.build(
+            requestFactory.build(
+                source = source,
                 template = requestTemplate(source, sortUrl, key),
                 context = SharedRequestBuilder.SharedRequestContext(
                     key = key.orEmpty(),
@@ -29,6 +32,7 @@ class RssService(
                 )
             )
         )
+        requestFactory.storeResponseCookies(source, response)
         val articles = parser.parseArticles(
             source = source,
             body = response.body,
@@ -50,7 +54,8 @@ class RssService(
         if (source.ruleContent.isNullOrBlank() || article.link.isBlank()) {
             return article
         }
-        val response = httpFetcher.fetch(SharedRequestBuilder.build(article.link))
+        val response = httpFetcher.fetch(requestFactory.build(source, article.link))
+        requestFactory.storeResponseCookies(source, response)
         val parsed = parser.parseContent(source, article, response.body).withState()
         saveArticles(listOf(parsed))
         return parsed

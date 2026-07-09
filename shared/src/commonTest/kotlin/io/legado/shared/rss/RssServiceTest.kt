@@ -3,9 +3,11 @@ package io.legado.shared.rss
 import io.legado.shared.model.SharedRssSource
 import io.legado.shared.model.SharedRssArticle
 import io.legado.shared.platform.CacheStorePort
+import io.legado.shared.platform.CookieStorePort
 import io.legado.shared.platform.HttpFetcher
 import io.legado.shared.platform.SharedHttpRequest
 import io.legado.shared.platform.SharedHttpResponse
+import io.legado.shared.service.SourceRequestFactory
 import io.legado.shared.storage.SharedLibraryStore
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
@@ -103,6 +105,61 @@ class RssServiceTest {
         assertEquals(true, service.listCachedArticles(source).single().read)
     }
 
+    @Test
+    fun appliesRssSourceHeadersAndCookieJarAcrossFeedAndContentRequests() = runBlocking {
+        val requestedHeaders = linkedMapOf<String, Map<String, String>>()
+        val cookies = InMemoryCookieStore().apply {
+            putCookie("https://rss-auth.test/feed?page={{page}}", "sid=before")
+        }
+        val fetcher = object : HttpFetcher {
+            override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                requestedHeaders[request.url] = request.headers
+                return when (request.url) {
+                    "https://rss-auth.test/feed?page=1" -> SharedHttpResponse(
+                        finalUrl = request.url,
+                        statusCode = 200,
+                        headers = mapOf("Set-Cookie" to "rssToken=after; Path=/; HttpOnly"),
+                        body = """{"items":[{"title":"Article","link":"/article","desc":"Intro"}]}"""
+                    )
+
+                    "https://rss-auth.test/article" -> SharedHttpResponse(
+                        finalUrl = request.url,
+                        statusCode = 200,
+                        body = """{"content":{"text":"Authed content."}}"""
+                    )
+
+                    else -> error("Unexpected ${request.url}")
+                }
+            }
+        }
+        val store = SharedLibraryStore(InMemoryCacheStore())
+        val source = SharedRssSource(
+            sourceUrl = "https://rss-auth.test/feed?page={{page}}",
+            sourceName = "RSS Auth",
+            header = """{"User-Agent":"RssUA","X-Rss":"yes"}""",
+            enabledCookieJar = true,
+            ruleArticles = "$.items",
+            ruleTitle = "$.title",
+            ruleLink = "$.link",
+            ruleDescription = "$.desc",
+            ruleContent = "$.content.text"
+        )
+        val service = RssService(
+            httpFetcher = fetcher,
+            libraryStore = store,
+            requestFactory = SourceRequestFactory(cookies)
+        )
+
+        val page = service.refreshArticles(source, page = 1)
+        val article = service.loadContent(source, page.articles.single())
+
+        assertEquals("Authed content.", article.content)
+        assertEquals("RssUA", requestedHeaders.getValue("https://rss-auth.test/feed?page=1").value("User-Agent"))
+        assertEquals("yes", requestedHeaders.getValue("https://rss-auth.test/feed?page=1").value("X-Rss"))
+        assertEquals("sid=before", requestedHeaders.getValue("https://rss-auth.test/feed?page=1").value("Cookie"))
+        assertEquals("sid=before; rssToken=after", requestedHeaders.getValue("https://rss-auth.test/article").value("Cookie"))
+    }
+
     private class InMemoryCacheStore : CacheStorePort {
         private val values = mutableMapOf<String, String>()
 
@@ -111,5 +168,19 @@ class RssServiceTest {
         override fun putText(key: String, value: String) {
             values[key] = value
         }
+    }
+
+    private class InMemoryCookieStore : CookieStorePort {
+        private val values = mutableMapOf<String, String>()
+
+        override fun getCookie(url: String): String? = values[url]
+
+        override fun putCookie(url: String, cookie: String) {
+            values[url] = cookie
+        }
+    }
+
+    private fun Map<String, String>.value(name: String): String? {
+        return entries.firstOrNull { it.key.equals(name, ignoreCase = true) }?.value
     }
 }
