@@ -161,6 +161,12 @@ struct SettingsHomeView: View {
                     } label: {
                         Label("Backup and restore", systemImage: "externaldrive")
                     }
+
+                    NavigationLink {
+                        FileManagerView()
+                    } label: {
+                        Label("File manager", systemImage: "folder")
+                    }
                 }
 
                 Section("Active Sources") {
