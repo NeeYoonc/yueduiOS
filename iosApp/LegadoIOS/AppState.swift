@@ -363,6 +363,33 @@ final class AppState: ObservableObject {
         refreshLibrary()
     }
 
+    func updateRuleSub(_ ruleSub: SharedRuleSub) async {
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            let result = try await runtime.updateRuleSub(ruleSub: ruleSub, nowMillis: nowMillis())
+            refreshLibrary()
+            message = "Updated \(ruleSub.name): imported \(result.importedCount) item(s)"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func updateAutoRuleSubs() async {
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            let results = try await runtime.updateAutoRuleSubs(nowMillis: nowMillis()) as? [RuleSubUpdateResult] ?? []
+            refreshLibrary()
+            let total = results.reduce(0) { $0 + Int($1.importedCount) }
+            message = results.isEmpty ? "No due rule subscriptions" : "Updated \(results.count) subscription(s), imported \(total) item(s)"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
     func importRawConfigs(replace: Bool = false) {
         let rawJson = rawConfigJson.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !rawJson.isEmpty else {

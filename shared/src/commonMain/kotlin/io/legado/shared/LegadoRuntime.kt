@@ -49,6 +49,8 @@ import io.legado.shared.config.KeyboardAssistRepository
 import io.legado.shared.config.RawConfigRepository
 import io.legado.shared.config.ReaderPreferencesRepository
 import io.legado.shared.config.RuleSubRepository
+import io.legado.shared.config.RuleSubUpdateResult
+import io.legado.shared.config.RuleSubUpdateService
 import io.legado.shared.config.ServerRepository
 import io.legado.shared.config.TxtTocRuleRepository
 import io.legado.shared.explore.ExploreService
@@ -133,6 +135,13 @@ open class LegadoRuntime(
     val serverRepository: ServerRepository = ServerRepository(libraryStore)
     val keyboardAssistRepository: KeyboardAssistRepository = KeyboardAssistRepository(libraryStore)
     val ruleSubRepository: RuleSubRepository = RuleSubRepository(libraryStore)
+    val ruleSubUpdateService: RuleSubUpdateService = RuleSubUpdateService(
+        httpFetcher = httpFetcher,
+        ruleSubRepository = ruleSubRepository,
+        sourceRepository = sourceRepository,
+        rssSourceRepository = rssSourceRepository,
+        replacementRepository = replacementRepository
+    )
     val rawConfigRepository: RawConfigRepository = RawConfigRepository(libraryStore)
     val readerPreferencesRepository: ReaderPreferencesRepository = ReaderPreferencesRepository(libraryStore)
     val bookmarkRepository: BookmarkRepository = BookmarkRepository(libraryStore)
@@ -551,6 +560,14 @@ open class LegadoRuntime(
 
     fun deleteRuleSub(id: Long): List<SharedRuleSub> {
         return ruleSubRepository.delete(id)
+    }
+
+    suspend fun updateRuleSub(ruleSub: SharedRuleSub, nowMillis: Long = 0L): RuleSubUpdateResult {
+        return ruleSubUpdateService.update(ruleSub, nowMillis)
+    }
+
+    suspend fun updateAutoRuleSubs(nowMillis: Long): List<RuleSubUpdateResult> {
+        return ruleSubUpdateService.updateAuto(nowMillis)
     }
 
     fun exportRuleSubsJson(): String {

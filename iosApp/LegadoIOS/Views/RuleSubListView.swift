@@ -15,6 +15,16 @@ struct RuleSubListView: View {
                     ForEach(app.ruleSubs.indices, id: \.self) { index in
                         let ruleSub = app.ruleSubs[index]
                         RuleSubRow(ruleSub: ruleSub)
+                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                                Button {
+                                    Task {
+                                        await app.updateRuleSub(ruleSub)
+                                    }
+                                } label: {
+                                    Label("Update", systemImage: "arrow.triangle.2.circlepath")
+                                }
+                                .tint(.blue)
+                            }
                     }
                     .onDelete { offsets in
                         offsets
@@ -28,6 +38,15 @@ struct RuleSubListView: View {
         }
         .navigationTitle("Rule Subscriptions")
         .toolbar {
+            Button {
+                Task {
+                    await app.updateAutoRuleSubs()
+                }
+            } label: {
+                Image(systemName: "arrow.triangle.2.circlepath")
+            }
+            .disabled(app.isLoading)
+
             NavigationLink {
                 RuleSubEditorView()
             } label: {

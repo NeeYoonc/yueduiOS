@@ -4,6 +4,7 @@ import io.legado.shared.model.SharedBook
 import io.legado.shared.model.SharedBookGroup
 import io.legado.shared.model.SharedBookSource
 import io.legado.shared.model.SharedCookie
+import io.legado.shared.model.SharedRuleSub
 import io.legado.shared.platform.CacheStorePort
 import io.legado.shared.platform.HttpFetcher
 import io.legado.shared.platform.SharedHttpRequest
@@ -318,6 +319,39 @@ class LegadoRuntimeTest {
 
         runtime.clearSearchKeywords()
         assertEquals(emptyList(), runtime.loadSearchKeywords())
+    }
+
+    @Test
+    fun updatesRuleSubscriptionsThroughRuntime() = runBlocking {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    assertEquals("https://runtime-sub.test/books.json", request.url)
+                    return SharedHttpResponse(
+                        finalUrl = request.url,
+                        statusCode = 200,
+                        body = """[{"bookSourceUrl":"https://runtime-sub.test","bookSourceName":"Runtime Sub"}]"""
+                    )
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+        val sub = runtime.upsertRuleSub(
+            SharedRuleSub(
+                id = 1,
+                name = "Runtime Books",
+                url = "https://runtime-sub.test/books.json",
+                type = 0,
+                autoUpdate = true
+            )
+        )
+
+        val result = runtime.updateRuleSub(sub, nowMillis = 10L)
+        val autoResults = runtime.updateAutoRuleSubs(nowMillis = 11L)
+
+        assertEquals(1, result.importedCount)
+        assertEquals("Runtime Sub", runtime.loadBookSources().single().bookSourceName)
+        assertEquals(listOf(11L), autoResults.map { it.ruleSub.update })
     }
 
     @Test
