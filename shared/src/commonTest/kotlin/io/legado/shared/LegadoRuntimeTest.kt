@@ -298,6 +298,50 @@ class LegadoRuntimeTest {
     }
 
     @Test
+    fun upsertsSingleReplaceRuleJsonWithoutReplacingOtherRules() {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    error("No network expected")
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+        runtime.importAndSaveReplaceRules(
+            """
+            [
+              {"id":1,"name":"Keep","pattern":"a","replacement":"b"},
+              {"id":2,"name":"Old","pattern":"x","replacement":"y"}
+            ]
+            """.trimIndent()
+        )
+
+        val saved = runtime.upsertReplaceRuleJson(
+            """
+            {
+              "id":2,
+              "name":"Edited",
+              "group":"Clean",
+              "pattern":"old",
+              "replacement":"new",
+              "scopeTitle":true,
+              "scopeContent":false,
+              "isRegex":false,
+              "isEnabled":false,
+              "timeoutMillisecond":99,
+              "order":7
+            }
+            """.trimIndent()
+        )
+
+        assertEquals("Edited", saved.name)
+        assertEquals(false, saved.enabled)
+        assertEquals(listOf("Keep", "Edited"), runtime.loadReplaceRules().map { it.name })
+        assertEquals(false, runtime.loadReplaceRules().first { it.id == 2L }.regex)
+        assertEquals(true, runtime.loadReplaceRules().first { it.id == 2L }.scopeTitle)
+    }
+
+    @Test
     fun importsRssSourcesAndReplaceRulesFromRemoteUrl() = runBlocking {
         val runtime = LegadoRuntime(
             httpFetcher = object : HttpFetcher {

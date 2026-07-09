@@ -212,6 +212,23 @@ final class AppState: ObservableObject {
         message = "Exported \(replaceRules.count) rule(s)"
     }
 
+    func saveReplaceRuleJson(_ json: String) -> Bool {
+        let rawJson = json.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Replace rule JSON is empty"
+            return false
+        }
+        do {
+            _ = try runtime.upsertReplaceRuleJson(json: rawJson)
+            refreshLibrary()
+            message = "Saved replace rule"
+            return true
+        } catch {
+            message = error.localizedDescription
+            return false
+        }
+    }
+
     func importReplaceRulesFromUrl(replace: Bool = false) async {
         let url = replaceRuleImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !url.isEmpty else {

@@ -473,6 +473,11 @@ open class LegadoRuntime(
         return replacementRepository.upsert(rule)
     }
 
+    @Throws(IllegalArgumentException::class)
+    fun upsertReplaceRuleJson(json: String): SharedReplaceRule {
+        return replacementRepository.upsertJson(json)
+    }
+
     fun setReplaceRuleEnabled(id: Long, enabled: Boolean): SharedReplaceRule? {
         return replacementRepository.setEnabled(id, enabled)
     }

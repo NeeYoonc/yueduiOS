@@ -60,6 +60,7 @@
 		E10000000000000000000001 /* SourceLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000002 /* SourceLoginView.swift */; };
 		E10000000000000000000003 /* SearchBookCacheView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000004 /* SearchBookCacheView.swift */; };
 		F10000000000000000000001 /* BookSourceFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000002 /* BookSourceFormView.swift */; };
+		F10000000000000000000003 /* ReplaceRuleFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000004 /* ReplaceRuleFormView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -117,6 +118,7 @@
 		E10000000000000000000002 /* SourceLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SourceLoginView.swift; sourceTree = "<group>"; };
 		E10000000000000000000004 /* SearchBookCacheView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SearchBookCacheView.swift; sourceTree = "<group>"; };
 		F10000000000000000000002 /* BookSourceFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/BookSourceFormView.swift; sourceTree = "<group>"; };
+		F10000000000000000000004 /* ReplaceRuleFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ReplaceRuleFormView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -164,6 +166,7 @@
 				D10000000000000000000018 /* RssStarListView.swift */,
 				B1000000000000000000001B /* SettingsHomeView.swift */,
 				C10000000000000000000011 /* ReplaceRuleListView.swift */,
+				F10000000000000000000004 /* ReplaceRuleFormView.swift */,
 				C10000000000000000000012 /* ReplaceRuleEditorView.swift */,
 				C10000000000000000000013 /* BackupView.swift */,
 				C10000000000000000000014 /* DictRuleListView.swift */,
@@ -334,6 +337,7 @@
 				D10000000000000000000006 /* RssSourceEditorView.swift in Sources */,
 				D10000000000000000000008 /* RssStarListView.swift in Sources */,
 				C10000000000000000000001 /* ReplaceRuleListView.swift in Sources */,
+				F10000000000000000000003 /* ReplaceRuleFormView.swift in Sources */,
 				C10000000000000000000002 /* ReplaceRuleEditorView.swift in Sources */,
 				C10000000000000000000003 /* BackupView.swift in Sources */,
 				C10000000000000000000004 /* DictRuleListView.swift in Sources */,

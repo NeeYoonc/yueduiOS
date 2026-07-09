@@ -58,6 +58,12 @@ class ReplacementRepository(
         return list()
     }
 
+    fun upsertJson(rawJson: String): SharedReplaceRule {
+        val imported = decodeRules(rawJson)
+        require(imported.size == 1) { "Replace rule editor JSON must contain exactly one rule" }
+        return upsert(imported.single())
+    }
+
     fun exportJson(): String {
         return json.encodeToString(list())
     }
