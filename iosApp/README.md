@@ -1,13 +1,14 @@
 # Legado iOS Migration
 
-This iOS target is under a full Android-to-iOS migration. It currently proves the KMP/Xcode build path and will be replaced by a full SwiftUI app that matches the Android product workflows.
+This iOS target is the SwiftUI front end for the Android-to-iOS migration. It is backed by the shared KMP runtime and is built by CI into an unsigned IPA artifact.
 
 Current state:
 
-- The app imports the `LegadoShared` KMP framework.
-- The shared runtime has early source import/search/detail/TOC/content services.
-- The iOS UI is not product-complete and must not be treated as a usable reader.
-- The fake JSON API template has been removed from the default product path.
+- The app imports the `LegadoShared` KMP framework and persists data through the shared snapshot store.
+- Bookshelf, search, explore, detail, TOC, reader, reader settings/search/bookmarks/read records, book groups, source switching, and refresh/update checks are available.
+- Book source, RSS source, replace rule, dictionary rule, HTTP TTS, TXT TOC, server/WebDAV, keyboard assist, rule subscription, raw config, cookie, and cache management all have import/export/edit flows.
+- Universal import, URL import, QR import, backup files, WebDAV backup, local TXT/document import, file manager, RSS reader/star/read records, RSS media playback, source login cookie capture, logs, and about/privacy screens are available.
+- The fake JSON API template has been removed from the default product path; first launch imports bundled default data where present.
 
 Full migration scope is tracked in:
 
