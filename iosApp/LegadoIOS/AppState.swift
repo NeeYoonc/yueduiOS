@@ -825,7 +825,7 @@ final class AppState: ObservableObject {
             chapters = detail.chapters as? [SharedBookChapter] ?? []
             currentChapter = nil
             currentContent = ""
-            changeSourceCandidates = runtime.loadChangeSourceCandidates(book: detail.book) as? [SharedSearchBook] ?? []
+            changeSourceCandidates = runtime.loadChangeSourceCandidates(book: detail.book, key: "") as? [SharedSearchBook] ?? []
             refreshLibrary()
             message = chapters.isEmpty ? "No chapters" : nil
         } catch {
@@ -840,7 +840,7 @@ final class AppState: ObservableObject {
             activeSource = nil
             currentChapter = nil
             currentContent = ""
-            changeSourceCandidates = runtime.loadChangeSourceCandidates(book: book) as? [SharedSearchBook] ?? []
+            changeSourceCandidates = runtime.loadChangeSourceCandidates(book: book, key: "") as? [SharedSearchBook] ?? []
             message = chapters.isEmpty ? "Source not found" : nil
             return
         }
@@ -865,7 +865,7 @@ final class AppState: ObservableObject {
             currentChapter = nil
             currentContent = ""
             if let selected = selectedBook {
-                changeSourceCandidates = runtime.loadChangeSourceCandidates(book: selected) as? [SharedSearchBook] ?? []
+                changeSourceCandidates = runtime.loadChangeSourceCandidates(book: selected, key: "") as? [SharedSearchBook] ?? []
             }
             refreshLibrary()
             message = chapters.isEmpty ? "No chapters" : nil
@@ -929,7 +929,7 @@ final class AppState: ObservableObject {
             message = "No book selected"
             return
         }
-        changeSourceCandidates = runtime.loadChangeSourceCandidates(book: book) as? [SharedSearchBook] ?? []
+        changeSourceCandidates = runtime.loadChangeSourceCandidates(book: book, key: "") as? [SharedSearchBook] ?? []
         message = changeSourceCandidates.isEmpty ? "No change source candidates" : nil
     }
 
