@@ -433,6 +433,23 @@ final class AppState: ObservableObject {
         message = "Exported \(txtTocRules.count) TXT TOC rule(s)"
     }
 
+    func saveTxtTocRuleJson(_ json: String) -> Bool {
+        let rawJson = json.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "TXT TOC rule JSON is empty"
+            return false
+        }
+        do {
+            _ = try runtime.upsertTxtTocRuleJson(json: rawJson)
+            refreshLibrary()
+            message = "Saved TXT TOC rule"
+            return true
+        } catch {
+            message = error.localizedDescription
+            return false
+        }
+    }
+
     func importTxtTocRulesFromUrl(replace: Bool = false) async {
         let url = txtTocRuleImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !url.isEmpty else {
@@ -481,6 +498,23 @@ final class AppState: ObservableObject {
         message = "Exported \(servers.count) server(s)"
     }
 
+    func saveServerJson(_ json: String) -> Bool {
+        let rawJson = json.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Server JSON is empty"
+            return false
+        }
+        do {
+            _ = try runtime.upsertServerJson(json: rawJson)
+            refreshLibrary()
+            message = "Saved server"
+            return true
+        } catch {
+            message = error.localizedDescription
+            return false
+        }
+    }
+
     func importServersFromUrl(replace: Bool = false) async {
         let url = serverImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !url.isEmpty else {
@@ -524,6 +558,23 @@ final class AppState: ObservableObject {
         message = "Exported \(keyboardAssists.count) keyboard assist(s)"
     }
 
+    func saveKeyboardAssistJson(_ json: String) -> Bool {
+        let rawJson = json.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Keyboard assist JSON is empty"
+            return false
+        }
+        do {
+            _ = try runtime.upsertKeyboardAssistJson(json: rawJson)
+            refreshLibrary()
+            message = "Saved keyboard assist"
+            return true
+        } catch {
+            message = error.localizedDescription
+            return false
+        }
+    }
+
     func importKeyboardAssistsFromUrl(replace: Bool = false) async {
         let url = keyboardAssistImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !url.isEmpty else {
@@ -565,6 +616,23 @@ final class AppState: ObservableObject {
     func exportRuleSubsToEditor() {
         ruleSubJson = runtime.exportRuleSubsJson()
         message = "Exported \(ruleSubs.count) rule subscription(s)"
+    }
+
+    func saveRuleSubJson(_ json: String) -> Bool {
+        let rawJson = json.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Rule subscription JSON is empty"
+            return false
+        }
+        do {
+            _ = try runtime.upsertRuleSubJson(json: rawJson)
+            refreshLibrary()
+            message = "Saved rule subscription"
+            return true
+        } catch {
+            message = error.localizedDescription
+            return false
+        }
     }
 
     func importRuleSubsFromUrl(replace: Bool = false) async {
@@ -642,6 +710,23 @@ final class AppState: ObservableObject {
         message = "Exported \(rawConfigs.count) raw config(s)"
     }
 
+    func saveRawConfigJson(_ json: String) -> Bool {
+        let rawJson = json.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Raw config JSON is empty"
+            return false
+        }
+        do {
+            _ = try runtime.upsertRawConfigJson(json: rawJson)
+            refreshLibrary()
+            message = "Saved raw config"
+            return true
+        } catch {
+            message = error.localizedDescription
+            return false
+        }
+    }
+
     func importRawConfigsFromUrl(replace: Bool = false) async {
         let url = rawConfigImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !url.isEmpty else {
@@ -683,6 +768,23 @@ final class AppState: ObservableObject {
     func exportCookiesToEditor() {
         cookieJson = runtime.exportCookiesJson()
         message = "Exported \(cookies.count) cookie(s)"
+    }
+
+    func saveCookieJson(_ json: String) -> Bool {
+        let rawJson = json.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Cookie JSON is empty"
+            return false
+        }
+        do {
+            _ = try runtime.upsertCookieJson(json: rawJson)
+            refreshLibrary()
+            message = "Saved cookie"
+            return true
+        } catch {
+            message = error.localizedDescription
+            return false
+        }
     }
 
     func importCookiesFromUrl(replace: Bool = false) async {
@@ -731,6 +833,23 @@ final class AppState: ObservableObject {
     func exportCacheEntriesToEditor() {
         cacheJson = runtime.exportCacheEntriesJson()
         message = "Exported \(cacheEntries.count) cache entry(s)"
+    }
+
+    func saveCacheEntryJson(_ json: String) -> Bool {
+        let rawJson = json.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Cache JSON is empty"
+            return false
+        }
+        do {
+            _ = try runtime.upsertCacheEntryJson(json: rawJson)
+            refreshLibrary()
+            message = "Saved cache entry"
+            return true
+        } catch {
+            message = error.localizedDescription
+            return false
+        }
     }
 
     func importCacheEntriesFromUrl(replace: Bool = false) async {

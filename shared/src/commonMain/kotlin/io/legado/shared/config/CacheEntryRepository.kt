@@ -66,6 +66,12 @@ class CacheEntryRepository(
         return list()
     }
 
+    fun upsertJson(rawJson: String): SharedCacheEntry {
+        val imported = decodeEntries(rawJson)
+        require(imported.size == 1) { "Cache editor JSON must contain exactly one cache entry" }
+        return upsert(imported.single())
+    }
+
     fun exportJson(): String {
         return json.encodeToString(list())
     }

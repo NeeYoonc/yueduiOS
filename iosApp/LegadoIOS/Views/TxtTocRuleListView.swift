@@ -14,7 +14,19 @@ struct TxtTocRuleListView: View {
                 Section {
                     ForEach(app.txtTocRules.indices, id: \.self) { index in
                         let rule = app.txtTocRules[index]
-                        TxtTocRuleRow(rule: rule)
+                        NavigationLink {
+                            TxtTocRuleFormView(rule: rule)
+                        } label: {
+                            TxtTocRuleRow(rule: rule)
+                        }
+                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                            Button {
+                                app.setTxtTocRuleEnabled(rule, enabled: !rule.enable)
+                            } label: {
+                                Label(rule.enable ? "Disable" : "Enable", systemImage: rule.enable ? "pause.circle" : "play.circle")
+                            }
+                            .tint(rule.enable ? .orange : .green)
+                        }
                     }
                     .onDelete { offsets in
                         offsets
@@ -28,24 +40,30 @@ struct TxtTocRuleListView: View {
         }
         .navigationTitle("TXT TOC Rules")
         .toolbar {
-            NavigationLink {
-                TxtTocRuleEditorView()
-            } label: {
-                Image(systemName: "doc.text")
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                NavigationLink {
+                    TxtTocRuleEditorView()
+                } label: {
+                    Image(systemName: "doc.text")
+                }
+
+                NavigationLink {
+                    TxtTocRuleFormView()
+                } label: {
+                    Image(systemName: "plus")
+                }
             }
         }
     }
 }
 
 private struct TxtTocRuleRow: View {
-    @EnvironmentObject private var app: AppState
     let rule: SharedTxtTocRule
 
     var body: some View {
-        Toggle(isOn: Binding(
-            get: { rule.enable },
-            set: { app.setTxtTocRuleEnabled(rule, enabled: $0) }
-        )) {
+        HStack(spacing: 12) {
+            Image(systemName: rule.enable ? "checkmark.circle.fill" : "pause.circle")
+                .foregroundStyle(rule.enable ? .green : .secondary)
             VStack(alignment: .leading, spacing: 5) {
                 HStack {
                     Text(rule.name)
@@ -73,7 +91,7 @@ private struct TxtTocRuleRow: View {
                         .lineLimit(1)
                 }
             }
-            .padding(.vertical, 4)
         }
+        .padding(.vertical, 4)
     }
 }

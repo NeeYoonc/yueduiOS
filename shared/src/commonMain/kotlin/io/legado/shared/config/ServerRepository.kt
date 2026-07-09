@@ -44,6 +44,12 @@ class ServerRepository(
         return list()
     }
 
+    fun upsertJson(rawJson: String): SharedServer {
+        val imported = decodeServers(rawJson)
+        require(imported.size == 1) { "Server editor JSON must contain exactly one server" }
+        return upsert(imported.single())
+    }
+
     fun exportJson(): String {
         return json.encodeToString(list())
     }

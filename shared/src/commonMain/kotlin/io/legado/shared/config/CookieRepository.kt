@@ -49,6 +49,12 @@ class CookieRepository(
         return list()
     }
 
+    fun upsertJson(rawJson: String): SharedCookie {
+        val imported = decodeCookies(rawJson)
+        require(imported.size == 1) { "Cookie editor JSON must contain exactly one cookie" }
+        return upsert(imported.single())
+    }
+
     fun exportJson(): String {
         return json.encodeToString(list())
     }

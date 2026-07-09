@@ -422,6 +422,85 @@ class LegadoRuntimeTest {
     }
 
     @Test
+    fun upsertsSingleConfigJsonWithoutReplacingOtherEntries() {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    error("No network expected")
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+
+        runtime.importAndSaveTxtTocRules(
+            """
+            [
+              {"id":1,"name":"Keep TXT","rule":"^keep$","serialNumber":1},
+              {"id":2,"name":"Old TXT","rule":"^old$","serialNumber":2}
+            ]
+            """.trimIndent()
+        )
+        val txt = runtime.upsertTxtTocRuleJson("""{"id":2,"name":"Old TXT","rule":"^chapter (\\d+)$","replacement":"Chapter $1","enable":false,"serialNumber":9}""")
+        assertEquals("^chapter (\\d+)$", txt.rule)
+        assertEquals(false, txt.enable)
+        assertEquals(listOf("Keep TXT", "Old TXT"), runtime.loadTxtTocRules().map { it.name })
+
+        runtime.importAndSaveServers(
+            """
+            [
+              {"id":1,"name":"Keep Server","type":"WEBDAV","config":"{}","sortNumber":1},
+              {"id":2,"name":"Old Server","type":"WEBDAV","config":"{}","sortNumber":2}
+            ]
+            """.trimIndent()
+        )
+        val server = runtime.upsertServerJson("""{"id":2,"name":"Old Server","type":"SFTP","config":"{\"host\":\"example.test\"}","sortNumber":7}""")
+        assertEquals("SFTP", server.type)
+        assertEquals(listOf("Keep Server", "Old Server"), runtime.loadServers().map { it.name })
+
+        runtime.importAndSaveKeyboardAssists(
+            """
+            [
+              {"type":1,"key":"keep","value":"Keep","serialNo":1},
+              {"type":1,"key":"old","value":"Old","serialNo":2}
+            ]
+            """.trimIndent()
+        )
+        val assist = runtime.upsertKeyboardAssistJson("""{"type":1,"key":"old","value":"Updated","serialNo":8}""")
+        assertEquals("Updated", assist.value)
+        assertEquals(listOf("keep", "old"), runtime.loadKeyboardAssists().map { it.key })
+
+        runtime.importAndSaveRuleSubs(
+            """
+            [
+              {"id":1,"name":"Keep Sub","url":"https://keep.test/rules.json","customOrder":1},
+              {"id":2,"name":"Old Sub","url":"https://old.test/rules.json","customOrder":2}
+            ]
+            """.trimIndent()
+        )
+        val sub = runtime.upsertRuleSubJson("""{"id":2,"name":"Old Sub","url":"https://new.test/rules.json","type":1,"autoUpdate":true,"customOrder":6}""")
+        assertEquals("https://new.test/rules.json", sub.url)
+        assertEquals(true, sub.autoUpdate)
+        assertEquals(listOf("Keep Sub", "Old Sub"), runtime.loadRuleSubs().map { it.name })
+
+        runtime.importAndSaveRawConfigs("""{"keep":"one","theme":"old"}""")
+        val raw = runtime.upsertRawConfigJson("""{"key":"theme","value":"new"}""")
+        assertEquals("theme", raw.key)
+        assertEquals("new", raw.value)
+        assertEquals(listOf("keep", "theme"), runtime.loadRawConfigs().map { it.key })
+
+        runtime.importAndSaveCookies("""[{"url":"https://keep.test","cookie":"k=v"},{"url":"https://old.test","cookie":"old=v"}]""")
+        val cookie = runtime.upsertCookieJson("""{"url":"https://old.test","cookie":"new=v"}""")
+        assertEquals("new=v", cookie.cookie)
+        assertEquals(listOf("https://keep.test", "https://old.test"), runtime.loadCookies().map { it.url })
+
+        runtime.importAndSaveCacheEntries("""[{"key":"keep","value":"one","deadline":0},{"key":"old","value":"old","deadline":0}]""")
+        val cache = runtime.upsertCacheEntryJson("""{"key":"old","value":"new","deadline":1234}""")
+        assertEquals("new", cache.value)
+        assertEquals(1234L, cache.deadline)
+        assertEquals(listOf("keep", "old"), runtime.loadCacheEntries().map { it.key })
+    }
+
+    @Test
     fun importsRssSourcesAndReplaceRulesFromRemoteUrl() = runBlocking {
         val runtime = LegadoRuntime(
             httpFetcher = object : HttpFetcher {

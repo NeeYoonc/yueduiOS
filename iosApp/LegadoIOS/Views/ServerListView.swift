@@ -14,7 +14,11 @@ struct ServerListView: View {
                 Section {
                     ForEach(app.servers.indices, id: \.self) { index in
                         let server = app.servers[index]
-                        ServerRow(server: server)
+                        NavigationLink {
+                            ServerFormView(server: server)
+                        } label: {
+                            ServerRow(server: server)
+                        }
                     }
                     .onDelete { offsets in
                         offsets
@@ -28,10 +32,18 @@ struct ServerListView: View {
         }
         .navigationTitle("Remote Servers")
         .toolbar {
-            NavigationLink {
-                ServerEditorView()
-            } label: {
-                Image(systemName: "doc.text")
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                NavigationLink {
+                    ServerEditorView()
+                } label: {
+                    Image(systemName: "doc.text")
+                }
+
+                NavigationLink {
+                    ServerFormView()
+                } label: {
+                    Image(systemName: "plus")
+                }
             }
         }
     }

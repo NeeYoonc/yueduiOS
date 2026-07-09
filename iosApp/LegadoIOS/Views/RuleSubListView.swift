@@ -14,17 +14,28 @@ struct RuleSubListView: View {
                 Section {
                     ForEach(app.ruleSubs.indices, id: \.self) { index in
                         let ruleSub = app.ruleSubs[index]
-                        RuleSubRow(ruleSub: ruleSub)
-                            .swipeActions(edge: .leading, allowsFullSwipe: true) {
-                                Button {
-                                    Task {
-                                        await app.updateRuleSub(ruleSub)
-                                    }
-                                } label: {
-                                    Label("Update", systemImage: "arrow.triangle.2.circlepath")
+                        NavigationLink {
+                            RuleSubFormView(ruleSub: ruleSub)
+                        } label: {
+                            RuleSubRow(ruleSub: ruleSub)
+                        }
+                        .swipeActions(edge: .leading, allowsFullSwipe: true) {
+                            Button {
+                                Task {
+                                    await app.updateRuleSub(ruleSub)
                                 }
-                                .tint(.blue)
+                            } label: {
+                                Label("Update", systemImage: "arrow.triangle.2.circlepath")
                             }
+                            .tint(.blue)
+
+                            Button {
+                                app.setRuleSubAutoUpdate(ruleSub, autoUpdate: !ruleSub.autoUpdate)
+                            } label: {
+                                Label(ruleSub.autoUpdate ? "Manual" : "Auto", systemImage: ruleSub.autoUpdate ? "pause.circle" : "clock.arrow.circlepath")
+                            }
+                            .tint(ruleSub.autoUpdate ? .orange : .green)
+                        }
                     }
                     .onDelete { offsets in
                         offsets
@@ -38,33 +49,39 @@ struct RuleSubListView: View {
         }
         .navigationTitle("Rule Subscriptions")
         .toolbar {
-            Button {
-                Task {
-                    await app.updateAutoRuleSubs()
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                Button {
+                    Task {
+                        await app.updateAutoRuleSubs()
+                    }
+                } label: {
+                    Image(systemName: "arrow.triangle.2.circlepath")
                 }
-            } label: {
-                Image(systemName: "arrow.triangle.2.circlepath")
-            }
-            .disabled(app.isLoading)
+                .disabled(app.isLoading)
 
-            NavigationLink {
-                RuleSubEditorView()
-            } label: {
-                Image(systemName: "doc.text")
+                NavigationLink {
+                    RuleSubEditorView()
+                } label: {
+                    Image(systemName: "doc.text")
+                }
+
+                NavigationLink {
+                    RuleSubFormView()
+                } label: {
+                    Image(systemName: "plus")
+                }
             }
         }
     }
 }
 
 private struct RuleSubRow: View {
-    @EnvironmentObject private var app: AppState
     let ruleSub: SharedRuleSub
 
     var body: some View {
-        Toggle(isOn: Binding(
-            get: { ruleSub.autoUpdate },
-            set: { app.setRuleSubAutoUpdate(ruleSub, autoUpdate: $0) }
-        )) {
+        HStack(spacing: 12) {
+            Image(systemName: ruleSub.autoUpdate ? "clock.arrow.circlepath" : "pause.circle")
+                .foregroundStyle(ruleSub.autoUpdate ? .green : .secondary)
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
                     Text(ruleSub.name)
@@ -94,7 +111,7 @@ private struct RuleSubRow: View {
                 .font(.caption.monospacedDigit())
                 .foregroundStyle(.secondary)
             }
-            .padding(.vertical, 4)
         }
+        .padding(.vertical, 4)
     }
 }

@@ -76,7 +76,11 @@ struct CookieListView: View {
                 Section {
                     ForEach(app.cookies.indices, id: \.self) { index in
                         let cookie = app.cookies[index]
-                        CookieRow(cookie: cookie)
+                        NavigationLink {
+                            CookieFormView(cookie: cookie)
+                        } label: {
+                            CookieRow(cookie: cookie)
+                        }
                     }
                     .onDelete { offsets in
                         offsets
@@ -89,6 +93,13 @@ struct CookieListView: View {
             }
         }
         .navigationTitle("Cookies")
+        .toolbar {
+            NavigationLink {
+                CookieFormView()
+            } label: {
+                Image(systemName: "plus")
+            }
+        }
     }
 }
 

@@ -14,7 +14,11 @@ struct KeyboardAssistListView: View {
                 Section {
                     ForEach(app.keyboardAssists.indices, id: \.self) { index in
                         let assist = app.keyboardAssists[index]
-                        KeyboardAssistRow(assist: assist)
+                        NavigationLink {
+                            KeyboardAssistFormView(assist: assist)
+                        } label: {
+                            KeyboardAssistRow(assist: assist)
+                        }
                     }
                     .onDelete { offsets in
                         offsets
@@ -28,10 +32,18 @@ struct KeyboardAssistListView: View {
         }
         .navigationTitle("Keyboard Assists")
         .toolbar {
-            NavigationLink {
-                KeyboardAssistEditorView()
-            } label: {
-                Image(systemName: "doc.text")
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                NavigationLink {
+                    KeyboardAssistEditorView()
+                } label: {
+                    Image(systemName: "doc.text")
+                }
+
+                NavigationLink {
+                    KeyboardAssistFormView()
+                } label: {
+                    Image(systemName: "plus")
+                }
             }
         }
     }

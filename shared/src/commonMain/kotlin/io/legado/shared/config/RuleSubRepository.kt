@@ -56,6 +56,12 @@ class RuleSubRepository(
         return list()
     }
 
+    fun upsertJson(rawJson: String): SharedRuleSub {
+        val imported = decodeRuleSubs(rawJson)
+        require(imported.size == 1) { "Rule subscription editor JSON must contain exactly one subscription" }
+        return upsert(imported.single())
+    }
+
     fun exportJson(): String {
         return json.encodeToString(list())
     }

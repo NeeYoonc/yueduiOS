@@ -49,6 +49,20 @@ class RawConfigRepository(
         return list()
     }
 
+    fun upsertJson(rawJson: String): SharedRawConfigEntry {
+        val trimmed = rawJson.trim()
+        require(trimmed.isNotEmpty()) { "Raw config JSON is empty" }
+        val element = json.parseToJsonElement(trimmed)
+        val entry = if (element is JsonObject && element.containsKey("key")) {
+            json.decodeFromString<SharedRawConfigEntry>(trimmed)
+        } else {
+            val imported = decodeEntries(trimmed)
+            require(imported.size == 1) { "Raw config editor JSON must contain exactly one config" }
+            imported.single()
+        }
+        return upsert(entry.key, entry.value)
+    }
+
     fun exportJson(): String {
         return json.encodeToString(
             MapSerializer(String.serializer(), String.serializer()),

@@ -392,6 +392,16 @@ open class LegadoRuntime(
         return cacheEntryRepository.importJson(json, replace)
     }
 
+    @Throws(IllegalArgumentException::class)
+    fun upsertCookieJson(json: String): SharedCookie {
+        return cookieRepository.upsertJson(json)
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun upsertCacheEntryJson(json: String): SharedCacheEntry {
+        return cacheEntryRepository.upsertJson(json)
+    }
+
     suspend fun importCacheEntriesFromUrl(url: String, replace: Boolean = false): List<SharedCacheEntry> {
         return cacheEntryRepository.importJson(fetchRemoteJson(url, "Cache URL is empty"), replace)
     }
@@ -551,6 +561,11 @@ open class LegadoRuntime(
         return txtTocRuleRepository.importJson(json, replace)
     }
 
+    @Throws(IllegalArgumentException::class)
+    fun upsertTxtTocRuleJson(json: String): SharedTxtTocRule {
+        return txtTocRuleRepository.upsertJson(json)
+    }
+
     suspend fun importTxtTocRulesFromUrl(url: String, replace: Boolean = false): List<SharedTxtTocRule> {
         return txtTocRuleRepository.importJson(fetchRemoteJson(url, "TXT TOC rule URL is empty"), replace)
     }
@@ -576,6 +591,11 @@ open class LegadoRuntime(
         return serverRepository.importJson(json, replace)
     }
 
+    @Throws(IllegalArgumentException::class)
+    fun upsertServerJson(json: String): SharedServer {
+        return serverRepository.upsertJson(json)
+    }
+
     suspend fun importServersFromUrl(url: String, replace: Boolean = false): List<SharedServer> {
         return serverRepository.importJson(fetchRemoteJson(url, "Server URL is empty"), replace)
     }
@@ -597,6 +617,11 @@ open class LegadoRuntime(
         return keyboardAssistRepository.importJson(json, replace)
     }
 
+    @Throws(IllegalArgumentException::class)
+    fun upsertKeyboardAssistJson(json: String): SharedKeyboardAssist {
+        return keyboardAssistRepository.upsertJson(json)
+    }
+
     suspend fun importKeyboardAssistsFromUrl(url: String, replace: Boolean = false): List<SharedKeyboardAssist> {
         return keyboardAssistRepository.importJson(fetchRemoteJson(url, "Keyboard assist URL is empty"), replace)
     }
@@ -616,6 +641,11 @@ open class LegadoRuntime(
     @Throws(IllegalArgumentException::class)
     fun importAndSaveRuleSubs(json: String, replace: Boolean = false): List<SharedRuleSub> {
         return ruleSubRepository.importJson(json, replace)
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun upsertRuleSubJson(json: String): SharedRuleSub {
+        return ruleSubRepository.upsertJson(json)
     }
 
     suspend fun importRuleSubsFromUrl(url: String, replace: Boolean = false): List<SharedRuleSub> {
@@ -649,6 +679,11 @@ open class LegadoRuntime(
     @Throws(IllegalArgumentException::class)
     fun importAndSaveRawConfigs(json: String, replace: Boolean = false): List<SharedRawConfigEntry> {
         return rawConfigRepository.importJson(json, replace)
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun upsertRawConfigJson(json: String): SharedRawConfigEntry {
+        return rawConfigRepository.upsertJson(json)
     }
 
     suspend fun importRawConfigsFromUrl(url: String, replace: Boolean = false): List<SharedRawConfigEntry> {

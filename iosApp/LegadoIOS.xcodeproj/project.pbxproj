@@ -63,6 +63,13 @@
 		F10000000000000000000003 /* ReplaceRuleFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000004 /* ReplaceRuleFormView.swift */; };
 		F10000000000000000000005 /* HttpTtsFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000006 /* HttpTtsFormView.swift */; };
 		F10000000000000000000007 /* DictRuleFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10000000000000000000008 /* DictRuleFormView.swift */; };
+		G10000000000000000000001 /* TxtTocRuleFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G10000000000000000000002 /* TxtTocRuleFormView.swift */; };
+		G10000000000000000000003 /* ServerFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G10000000000000000000004 /* ServerFormView.swift */; };
+		G10000000000000000000005 /* KeyboardAssistFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G10000000000000000000006 /* KeyboardAssistFormView.swift */; };
+		G10000000000000000000007 /* RuleSubFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G10000000000000000000008 /* RuleSubFormView.swift */; };
+		G10000000000000000000009 /* RawConfigFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1000000000000000000000A /* RawConfigFormView.swift */; };
+		G1000000000000000000000B /* CookieFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1000000000000000000000C /* CookieFormView.swift */; };
+		G1000000000000000000000D /* CacheEntryFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1000000000000000000000E /* CacheEntryFormView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -123,6 +130,13 @@
 		F10000000000000000000004 /* ReplaceRuleFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ReplaceRuleFormView.swift; sourceTree = "<group>"; };
 		F10000000000000000000006 /* HttpTtsFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/HttpTtsFormView.swift; sourceTree = "<group>"; };
 		F10000000000000000000008 /* DictRuleFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/DictRuleFormView.swift; sourceTree = "<group>"; };
+		G10000000000000000000002 /* TxtTocRuleFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/TxtTocRuleFormView.swift; sourceTree = "<group>"; };
+		G10000000000000000000004 /* ServerFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ServerFormView.swift; sourceTree = "<group>"; };
+		G10000000000000000000006 /* KeyboardAssistFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/KeyboardAssistFormView.swift; sourceTree = "<group>"; };
+		G10000000000000000000008 /* RuleSubFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RuleSubFormView.swift; sourceTree = "<group>"; };
+		G1000000000000000000000A /* RawConfigFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RawConfigFormView.swift; sourceTree = "<group>"; };
+		G1000000000000000000000C /* CookieFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CookieFormView.swift; sourceTree = "<group>"; };
+		G1000000000000000000000E /* CacheEntryFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CacheEntryFormView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -184,17 +198,24 @@
 				D10000000000000000000017 /* ReadRecordListView.swift */,
 				C10000000000000000000019 /* BookGroupListView.swift */,
 				C1000000000000000000001B /* TxtTocRuleListView.swift */,
+				G10000000000000000000002 /* TxtTocRuleFormView.swift */,
 				C1000000000000000000001C /* TxtTocRuleEditorView.swift */,
 				C1000000000000000000001D /* ServerListView.swift */,
+				G10000000000000000000004 /* ServerFormView.swift */,
 				C1000000000000000000001E /* ServerEditorView.swift */,
 				C1000000000000000000001F /* KeyboardAssistListView.swift */,
+				G10000000000000000000006 /* KeyboardAssistFormView.swift */,
 				C10000000000000000000020 /* KeyboardAssistEditorView.swift */,
 				C10000000000000000000021 /* RuleSubListView.swift */,
+				G10000000000000000000008 /* RuleSubFormView.swift */,
 				C10000000000000000000022 /* RuleSubEditorView.swift */,
 				D10000000000000000000013 /* RawConfigListView.swift */,
+				G1000000000000000000000A /* RawConfigFormView.swift */,
 				D10000000000000000000014 /* RawConfigEditorView.swift */,
 				D10000000000000000000019 /* CookieListView.swift */,
+				G1000000000000000000000C /* CookieFormView.swift */,
 				D1000000000000000000001A /* CacheEntryListView.swift */,
+				G1000000000000000000000E /* CacheEntryFormView.swift */,
 				E10000000000000000000004 /* SearchBookCacheView.swift */,
 				B1000000000000000000001C /* SourceListView.swift */,
 				F10000000000000000000002 /* BookSourceFormView.swift */,
@@ -357,17 +378,24 @@
 				D10000000000000000000007 /* ReadRecordListView.swift in Sources */,
 				C10000000000000000000009 /* BookGroupListView.swift in Sources */,
 				C1000000000000000000000B /* TxtTocRuleListView.swift in Sources */,
+				G10000000000000000000001 /* TxtTocRuleFormView.swift in Sources */,
 				C1000000000000000000000C /* TxtTocRuleEditorView.swift in Sources */,
 				C1000000000000000000000D /* ServerListView.swift in Sources */,
+				G10000000000000000000003 /* ServerFormView.swift in Sources */,
 				C1000000000000000000000E /* ServerEditorView.swift in Sources */,
 				C1000000000000000000000F /* KeyboardAssistListView.swift in Sources */,
+				G10000000000000000000005 /* KeyboardAssistFormView.swift in Sources */,
 				C10000000000000000000010 /* KeyboardAssistEditorView.swift in Sources */,
 				D10000000000000000000001 /* RuleSubListView.swift in Sources */,
+				G10000000000000000000007 /* RuleSubFormView.swift in Sources */,
 				D10000000000000000000002 /* RuleSubEditorView.swift in Sources */,
 				D10000000000000000000003 /* RawConfigListView.swift in Sources */,
+				G10000000000000000000009 /* RawConfigFormView.swift in Sources */,
 				D10000000000000000000004 /* RawConfigEditorView.swift in Sources */,
 				D10000000000000000000009 /* CookieListView.swift in Sources */,
+				G1000000000000000000000B /* CookieFormView.swift in Sources */,
 				D1000000000000000000000A /* CacheEntryListView.swift in Sources */,
+				G1000000000000000000000D /* CacheEntryFormView.swift in Sources */,
 				E10000000000000000000003 /* SearchBookCacheView.swift in Sources */,
 				D1000000000000000000000B /* BookEditView.swift in Sources */,
 			);

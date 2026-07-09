@@ -83,7 +83,11 @@ struct CacheEntryListView: View {
                 Section {
                     ForEach(app.cacheEntries.indices, id: \.self) { index in
                         let entry = app.cacheEntries[index]
-                        CacheEntryRow(entry: entry)
+                        NavigationLink {
+                            CacheEntryFormView(entry: entry)
+                        } label: {
+                            CacheEntryRow(entry: entry)
+                        }
                     }
                     .onDelete { offsets in
                         offsets
@@ -96,6 +100,13 @@ struct CacheEntryListView: View {
             }
         }
         .navigationTitle("Cache")
+        .toolbar {
+            NavigationLink {
+                CacheEntryFormView()
+            } label: {
+                Image(systemName: "plus")
+            }
+        }
     }
 }
 

@@ -14,7 +14,11 @@ struct RawConfigListView: View {
                 Section {
                     ForEach(app.rawConfigs.indices, id: \.self) { index in
                         let entry = app.rawConfigs[index]
-                        RawConfigRow(entry: entry)
+                        NavigationLink {
+                            RawConfigFormView(entry: entry)
+                        } label: {
+                            RawConfigRow(entry: entry)
+                        }
                     }
                     .onDelete { offsets in
                         offsets
@@ -28,10 +32,18 @@ struct RawConfigListView: View {
         }
         .navigationTitle("Raw Configs")
         .toolbar {
-            NavigationLink {
-                RawConfigEditorView()
-            } label: {
-                Image(systemName: "doc.text")
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                NavigationLink {
+                    RawConfigEditorView()
+                } label: {
+                    Image(systemName: "doc.text")
+                }
+
+                NavigationLink {
+                    RawConfigFormView()
+                } label: {
+                    Image(systemName: "plus")
+                }
             }
         }
     }
