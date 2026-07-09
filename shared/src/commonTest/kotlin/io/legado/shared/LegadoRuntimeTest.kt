@@ -650,6 +650,60 @@ class LegadoRuntimeTest {
     }
 
     @Test
+    fun refreshesBookshelfBooksAndReportsNewChapters() = runBlocking {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    assertEquals("https://update.test/toc", request.url)
+                    return SharedHttpResponse(
+                        finalUrl = request.url,
+                        statusCode = 200,
+                        body = """
+                            <a class="chapter" href="/c1">Chapter 1</a>
+                            <a class="chapter" href="/c2">Chapter 2</a>
+                        """.trimIndent()
+                    )
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+        runtime.importAndSaveBookSources(
+            """
+            {
+              "bookSourceUrl":"https://update.test",
+              "bookSourceName":"Updater",
+              "ruleToc":{
+                "chapterList":"<a class=\"chapter\" href=\"([^\"]+)\">([^<]+)</a>",
+                "chapterUrl":"${'$'}1",
+                "chapterName":"${'$'}2"
+              }
+            }
+            """.trimIndent()
+        )
+        runtime.saveBooks(
+            listOf(
+                SharedBook(
+                    name = "Updating Book",
+                    bookUrl = "https://update.test/book",
+                    tocUrl = "https://update.test/toc",
+                    origin = "https://update.test",
+                    originName = "Updater",
+                    latestChapterTitle = "Chapter 1",
+                    totalChapterNum = 1
+                )
+            )
+        )
+
+        val results = runtime.refreshUpdatableBooks(nowMillis = 42L)
+
+        assertEquals(1, results.size)
+        assertEquals(1, results.single().newChapterCount)
+        assertEquals("Chapter 2", runtime.loadBooks().single().latestChapterTitle)
+        assertEquals(42L, runtime.loadBooks().single().lastCheckTime)
+        assertEquals(2, runtime.loadBookChapters(runtime.loadBooks().single()).size)
+    }
+
+    @Test
     fun importsRssSourcesAndReplaceRulesFromRemoteUrl() = runBlocking {
         val runtime = LegadoRuntime(
             httpFetcher = object : HttpFetcher {

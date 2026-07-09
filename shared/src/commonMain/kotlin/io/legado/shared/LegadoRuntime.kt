@@ -30,6 +30,8 @@ import io.legado.shared.model.SharedTxtTocRule
 import io.legado.shared.book.BookDetailCoordinator
 import io.legado.shared.book.BookDetailResult
 import io.legado.shared.book.BookGroupRepository
+import io.legado.shared.book.BookUpdateResult
+import io.legado.shared.book.BookUpdateService
 import io.legado.shared.book.BookshelfService
 import io.legado.shared.book.CachedChapterReadResult
 import io.legado.shared.book.ChapterReadResult
@@ -140,6 +142,7 @@ open class LegadoRuntime(
     val readRecordRepository: ReadRecordRepository = ReadRecordRepository(libraryStore)
     val searchCoordinator: SearchCoordinator = SearchCoordinator(client, libraryStore)
     val bookDetailCoordinator: BookDetailCoordinator = BookDetailCoordinator(client, bookshelfService, libraryStore)
+    val bookUpdateService: BookUpdateService = BookUpdateService(libraryStore, bookDetailCoordinator)
     val chapterRepository: ChapterRepository = ChapterRepository(client, libraryStore, bookshelfService)
     val sourceRepository: SourceRepository = SourceRepository(libraryStore)
     val sourceLoginService: SourceLoginService = SourceLoginService(cookieRepository)
@@ -948,6 +951,10 @@ open class LegadoRuntime(
         nowMillis: Long = 0L
     ): SearchCoordinatorResult {
         return searchCoordinator.search(loadBookSources(), key, page, nowMillis)
+    }
+
+    suspend fun refreshUpdatableBooks(nowMillis: Long = 0L): List<BookUpdateResult> {
+        return bookUpdateService.refreshBooks(loadBookSources(), nowMillis)
     }
 
     fun importAndSaveDefaultData(payload: DefaultDataPayload) {

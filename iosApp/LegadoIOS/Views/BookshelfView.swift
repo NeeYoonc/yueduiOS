@@ -54,6 +54,33 @@ struct BookshelfView: View {
                         }
                     }
                 }
+
+                if !app.bookUpdateResults.isEmpty {
+                    Section("Update Results") {
+                        ForEach(app.bookUpdateResults.indices, id: \.self) { index in
+                            let result = app.bookUpdateResults[index]
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(result.book.name)
+                                    .font(.headline)
+                                if let error = result.errorMessage, !error.isEmpty {
+                                    Text(error)
+                                        .font(.footnote)
+                                        .foregroundStyle(.red)
+                                } else {
+                                    Text("\(result.newChapterCount) new chapter(s)")
+                                        .font(.footnote)
+                                        .foregroundStyle(.secondary)
+                                    if let latest = result.latestChapterTitle, !latest.isEmpty {
+                                        Text(latest)
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                            }
+                            .padding(.vertical, 3)
+                        }
+                    }
+                }
             }
             .navigationTitle("Legado")
             .toolbar {
@@ -63,6 +90,15 @@ struct BookshelfView: View {
                     } label: {
                         Image(systemName: "doc.badge.plus")
                     }
+
+                    Button {
+                        Task {
+                            await app.refreshBookshelfUpdates()
+                        }
+                    } label: {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                    }
+                    .disabled(app.isLoading)
 
                     Button {
                         app.refreshLibrary()

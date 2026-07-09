@@ -31,8 +31,7 @@ class BookDetailCoordinator(
         val savedBook = bookshelfService.upsertBook(
             resolvedBook.copy(
                 totalChapterNum = chapters.size,
-                latestChapterTitle = resolvedBook.latestChapterTitle
-                    ?: chapters.lastOrNull { !it.isVolume }?.title
+                latestChapterTitle = chapters.lastOrNull { !it.isVolume }?.title
                     ?: resolvedBook.latestChapterTitle,
                 lastCheckTime = nowMillis
             )
@@ -64,8 +63,7 @@ class BookDetailCoordinator(
         val savedBook = bookshelfService.upsertBook(
             resolvedBook.copy(
                 totalChapterNum = chapters.size,
-                latestChapterTitle = resolvedBook.latestChapterTitle
-                    ?: chapters.lastOrNull { !it.isVolume }?.title
+                latestChapterTitle = chapters.lastOrNull { !it.isVolume }?.title
                     ?: resolvedBook.latestChapterTitle,
                 lastCheckTime = nowMillis
             )

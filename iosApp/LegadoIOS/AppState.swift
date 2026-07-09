@@ -38,6 +38,7 @@ final class AppState: ObservableObject {
     @Published private(set) var sources: [SharedBookSource] = []
     @Published private(set) var books: [SharedBook] = []
     @Published private(set) var visibleBooks: [SharedBook] = []
+    @Published private(set) var bookUpdateResults: [BookUpdateResult] = []
     @Published private(set) var bookGroups: [SharedBookGroup] = []
     @Published private(set) var visibleBookGroups: [SharedBookGroup] = []
     @Published private(set) var selectableBookGroups: [SharedBookGroup] = []
@@ -1489,6 +1490,29 @@ final class AppState: ObservableObject {
             }
             refreshLibrary()
             message = chapters.isEmpty ? "No chapters" : nil
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func refreshBookshelfUpdates() async {
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            bookUpdateResults = try await runtime.refreshUpdatableBooks(nowMillis: nowMillis()) as? [BookUpdateResult] ?? []
+            refreshLibrary()
+            let errors = bookUpdateResults.filter { $0.errorMessage != nil }.count
+            let newChapters = bookUpdateResults.reduce(0) { total, result in
+                total + Int(result.newChapterCount)
+            }
+            if bookUpdateResults.isEmpty {
+                message = "No updateable books"
+            } else if errors > 0 {
+                message = "Updated \(bookUpdateResults.count) book(s), \(newChapters) new chapter(s), \(errors) error(s)"
+            } else {
+                message = "Updated \(bookUpdateResults.count) book(s), \(newChapters) new chapter(s)"
+            }
         } catch {
             message = error.localizedDescription
         }
