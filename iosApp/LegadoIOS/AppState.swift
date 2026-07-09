@@ -883,6 +883,25 @@ final class AppState: ObservableObject {
         searchKeywords = runtime.clearSearchKeywords() as? [SharedSearchKeyword] ?? []
     }
 
+    func deleteSearchBook(_ searchBook: SharedSearchBook) {
+        searchBooks = runtime.deleteSearchBook(bookUrl: searchBook.bookUrl) as? [SharedSearchBook] ?? []
+        changeSourceCandidates.removeAll { $0.bookUrl == searchBook.bookUrl }
+        refreshLibrary()
+    }
+
+    func clearSearchBooks() {
+        searchBooks = runtime.clearSearchBooks() as? [SharedSearchBook] ?? []
+        changeSourceCandidates = []
+        refreshLibrary()
+    }
+
+    func clearExpiredSearchBooks(days: Int = 30) {
+        let cutoff = nowMillis() - Int64(days) * 24 * 60 * 60 * 1000
+        searchBooks = runtime.clearExpiredSearchBooks(beforeMillis: cutoff) as? [SharedSearchBook] ?? []
+        refreshLibrary()
+        message = "Cleared search books older than \(days) day(s)"
+    }
+
     func openSearchResult(_ searchBook: SharedSearchBook) async {
         guard let source = source(for: searchBook) else {
             message = "Source not found"

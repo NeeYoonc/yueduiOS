@@ -58,6 +58,7 @@
 		D1000000000000000000000A /* CacheEntryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1000000000000000000001A /* CacheEntryListView.swift */; };
 		D1000000000000000000000B /* BookEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1000000000000000000001B /* BookEditView.swift */; };
 		E10000000000000000000001 /* SourceLoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000002 /* SourceLoginView.swift */; };
+		E10000000000000000000003 /* SearchBookCacheView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E10000000000000000000004 /* SearchBookCacheView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -113,6 +114,7 @@
 		D1000000000000000000001A /* CacheEntryListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CacheEntryListView.swift; sourceTree = "<group>"; };
 		D1000000000000000000001B /* BookEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/BookEditView.swift; sourceTree = "<group>"; };
 		E10000000000000000000002 /* SourceLoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SourceLoginView.swift; sourceTree = "<group>"; };
+		E10000000000000000000004 /* SearchBookCacheView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SearchBookCacheView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */

@@ -141,6 +141,12 @@ struct SettingsHomeView: View {
                     } label: {
                         Label("Cache", systemImage: "archivebox")
                     }
+
+                    NavigationLink {
+                        SearchBookCacheView()
+                    } label: {
+                        Label("Search books", systemImage: "books.vertical")
+                    }
                 }
 
                 Section("Data") {
