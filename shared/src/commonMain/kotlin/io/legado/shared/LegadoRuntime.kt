@@ -87,6 +87,31 @@ import io.legado.shared.source.SharedSourceLoginRequest
 import io.legado.shared.source.SourceLoginService
 import io.legado.shared.source.SourceRepository
 import io.legado.shared.storage.SharedLibraryStore
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+
+data class SharedImportSummary(
+    val bookSources: Int = 0,
+    val rssSources: Int = 0,
+    val replaceRules: Int = 0,
+    val dictRules: Int = 0,
+    val httpTts: Int = 0,
+    val txtTocRules: Int = 0,
+    val servers: Int = 0,
+    val keyboardAssists: Int = 0,
+    val ruleSubs: Int = 0,
+    val rawConfigs: Int = 0,
+    val cookies: Int = 0,
+    val cacheEntries: Int = 0,
+    val backup: Boolean = false
+) {
+    val total: Int
+        get() = bookSources + rssSources + replaceRules + dictRules + httpTts + txtTocRules +
+            servers + keyboardAssists + ruleSubs + rawConfigs + cookies + cacheEntries
+}
 
 open class LegadoRuntime(
     private val httpFetcher: HttpFetcher,
@@ -733,6 +758,94 @@ open class LegadoRuntime(
         return dataBackupService.importJson(json)
     }
 
+    @Throws(IllegalArgumentException::class)
+    fun importAnyConfigJson(json: String, replace: Boolean = false): SharedImportSummary {
+        val rawJson = json.trim()
+        require(rawJson.isNotEmpty()) { "Import JSON is empty" }
+        val element = smartImportJson.parseToJsonElement(rawJson)
+        val probe = element.firstObjectForImport()
+        if (element is JsonObject && element.isBackupSnapshot()) {
+            val snapshot = dataBackupService.importJson(rawJson)
+            return SharedImportSummary(
+                bookSources = snapshot.bookSources.size,
+                rssSources = snapshot.rssSources.size,
+                replaceRules = snapshot.replaceRules.size,
+                dictRules = snapshot.dictRules.size,
+                httpTts = snapshot.httpTts.size,
+                txtTocRules = snapshot.txtTocRules.size,
+                servers = snapshot.servers.size,
+                keyboardAssists = snapshot.keyboardAssists.size,
+                ruleSubs = snapshot.ruleSubs.size,
+                rawConfigs = snapshot.rawConfigs.size,
+                cookies = snapshot.cookies.size,
+                cacheEntries = snapshot.caches.size,
+                backup = true
+            )
+        }
+
+        val count = element.importElementCount()
+        val keys = probe.keys
+        return when {
+            "bookSourceUrl" in keys || "bookSourceName" in keys -> {
+                sourceRepository.importJson(rawJson, replace)
+                SharedImportSummary(bookSources = count)
+            }
+            "sourceUrl" in keys && ("sourceName" in keys || "ruleArticles" in keys || "ruleContent" in keys) -> {
+                rssSourceRepository.importJson(rawJson, replace)
+                SharedImportSummary(rssSources = count)
+            }
+            "pattern" in keys && ("replacement" in keys || "scopeTitle" in keys || "scopeContent" in keys) -> {
+                replacementRepository.importJson(rawJson, replace)
+                SharedImportSummary(replaceRules = count)
+            }
+            "urlRule" in keys && "showRule" in keys -> {
+                dictRuleRepository.importJson(rawJson, replace)
+                SharedImportSummary(dictRules = count)
+            }
+            "cookie" in keys && "url" in keys -> {
+                cookieRepository.importJson(rawJson, replace)
+                SharedImportSummary(cookies = count)
+            }
+            "deadline" in keys && "key" in keys -> {
+                cacheEntryRepository.importJson(rawJson, replace)
+                SharedImportSummary(cacheEntries = count)
+            }
+            "key" in keys && "value" in keys && ("type" in keys || "serialNo" in keys) -> {
+                keyboardAssistRepository.importJson(rawJson, replace)
+                SharedImportSummary(keyboardAssists = count)
+            }
+            "key" in keys && "value" in keys -> {
+                rawConfigRepository.importJson(rawJson, replace)
+                SharedImportSummary(rawConfigs = count)
+            }
+            "contentType" in keys || "enabledCookieJar" in keys && "url" in keys && "name" in keys -> {
+                httpTtsRepository.importJson(rawJson, replace)
+                SharedImportSummary(httpTts = count)
+            }
+            "rule" in keys && "name" in keys -> {
+                txtTocRuleRepository.importJson(rawJson, replace)
+                SharedImportSummary(txtTocRules = count)
+            }
+            "config" in keys && "name" in keys -> {
+                serverRepository.importJson(rawJson, replace)
+                SharedImportSummary(servers = count)
+            }
+            "url" in keys && "name" in keys -> {
+                ruleSubRepository.importJson(rawJson, replace)
+                SharedImportSummary(ruleSubs = count)
+            }
+            element is JsonObject && element.values.all { it is JsonPrimitive } -> {
+                rawConfigRepository.importJson(rawJson, replace)
+                SharedImportSummary(rawConfigs = element.size)
+            }
+            else -> throw IllegalArgumentException("Unsupported Legado import JSON shape")
+        }
+    }
+
+    suspend fun importAnyConfigFromUrl(url: String, replace: Boolean = false): SharedImportSummary {
+        return importAnyConfigJson(fetchRemoteJson(url, "Import URL is empty"), replace)
+    }
+
     fun saveBooks(books: List<SharedBook>) {
         libraryStore.saveBooks(books)
     }
@@ -942,6 +1055,47 @@ open class LegadoRuntime(
         require(requestUrl.isNotEmpty()) { emptyMessage }
         return httpFetcher.fetch(SharedRequestBuilder.build(requestUrl)).body
     }
+}
+
+private val smartImportJson = Json {
+    ignoreUnknownKeys = true
+    isLenient = true
+    explicitNulls = false
+}
+
+private fun JsonElement.firstObjectForImport(): JsonObject {
+    return when (this) {
+        is JsonObject -> this
+        is JsonArray -> firstOrNull() as? JsonObject
+        else -> null
+    } ?: throw IllegalArgumentException("Import JSON must be an object or object array")
+}
+
+private fun JsonElement.importElementCount(): Int {
+    return when (this) {
+        is JsonArray -> size
+        is JsonObject -> 1
+        else -> 0
+    }
+}
+
+private fun JsonObject.isBackupSnapshot(): Boolean {
+    return listOf(
+        "bookSources",
+        "rssSources",
+        "replaceRules",
+        "dictRules",
+        "httpTts",
+        "txtTocRules",
+        "servers",
+        "keyboardAssists",
+        "ruleSubs",
+        "rawConfigs",
+        "cookies",
+        "caches",
+        "books",
+        "chapters"
+    ).any { key -> this[key] != null }
 }
 
 private fun SharedBookSource.loginInfoKey(): String = "userInfo_$bookSourceUrl"

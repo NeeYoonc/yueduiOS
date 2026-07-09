@@ -28,6 +28,8 @@ final class AppState: ObservableObject {
     @Published var cookieImportUrl: String = ""
     @Published var cacheJson: String = ""
     @Published var cacheImportUrl: String = ""
+    @Published var smartImportJson: String = ""
+    @Published var smartImportUrl: String = ""
     @Published var webDavBackupFileName: String = "legado-backup.json"
     @Published var keyword: String = ""
     @Published var dictionaryKeyword: String = ""
@@ -998,6 +1000,57 @@ final class AppState: ObservableObject {
         }
     }
 
+    func importSmartConfig(replace: Bool = false) {
+        let rawJson = smartImportJson.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !rawJson.isEmpty else {
+            message = "Import JSON is empty"
+            return
+        }
+        do {
+            let summary = try runtime.importAnyConfigJson(json: rawJson, replace: replace)
+            selectedBook = nil
+            selectedSearchBook = nil
+            selectedRssSource = nil
+            selectedRssArticle = nil
+            chapters = []
+            currentChapter = nil
+            currentContent = ""
+            rssArticles = []
+            rssContent = ""
+            refreshLibrary()
+            message = smartImportMessage(summary)
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
+    func importSmartConfigFromUrl(replace: Bool = false) async {
+        let url = smartImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !url.isEmpty else {
+            message = "Import URL is empty"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            let summary = try await runtime.importAnyConfigFromUrl(url: url, replace: replace)
+            selectedBook = nil
+            selectedSearchBook = nil
+            selectedRssSource = nil
+            selectedRssArticle = nil
+            chapters = []
+            currentChapter = nil
+            currentContent = ""
+            rssArticles = []
+            rssContent = ""
+            refreshLibrary()
+            message = smartImportMessage(summary, suffix: " from URL")
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
     func uploadBackupToWebDav() async {
         guard let server = servers.first(where: { $0.type.uppercased() == "WEBDAV" }) else {
             message = "No WebDAV server configured"
@@ -1624,6 +1677,31 @@ final class AppState: ObservableObject {
 
     private func sameRssArticle(_ lhs: SharedRssArticle, _ rhs: SharedRssArticle) -> Bool {
         return lhs.origin == rhs.origin && lhs.sort == rhs.sort && lhs.link == rhs.link
+    }
+
+    private func smartImportMessage(_ summary: SharedImportSummary, suffix: String = "") -> String {
+        var parts: [String] = []
+        if summary.bookSources > 0 { parts.append("\(summary.bookSources) source(s)") }
+        if summary.rssSources > 0 { parts.append("\(summary.rssSources) RSS source(s)") }
+        if summary.replaceRules > 0 { parts.append("\(summary.replaceRules) replace rule(s)") }
+        if summary.dictRules > 0 { parts.append("\(summary.dictRules) dictionary rule(s)") }
+        if summary.httpTts > 0 { parts.append("\(summary.httpTts) HTTP TTS engine(s)") }
+        if summary.txtTocRules > 0 { parts.append("\(summary.txtTocRules) TXT TOC rule(s)") }
+        if summary.servers > 0 { parts.append("\(summary.servers) server(s)") }
+        if summary.keyboardAssists > 0 { parts.append("\(summary.keyboardAssists) keyboard assist(s)") }
+        if summary.ruleSubs > 0 { parts.append("\(summary.ruleSubs) rule subscription(s)") }
+        if summary.rawConfigs > 0 { parts.append("\(summary.rawConfigs) raw config(s)") }
+        if summary.cookies > 0 { parts.append("\(summary.cookies) cookie(s)") }
+        if summary.cacheEntries > 0 { parts.append("\(summary.cacheEntries) cache entry(s)") }
+
+        if summary.backup {
+            let detail = parts.isEmpty ? "" : ": \(parts.joined(separator: ", "))"
+            return "Imported backup\(suffix)\(detail)"
+        }
+        guard !parts.isEmpty else {
+            return "No usable Legado config\(suffix)"
+        }
+        return "Imported \(summary.total) item(s)\(suffix): \(parts.joined(separator: ", "))"
     }
 
     private func nowMillis() -> Int64 {

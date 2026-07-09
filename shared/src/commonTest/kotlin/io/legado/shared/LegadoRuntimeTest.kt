@@ -543,6 +543,86 @@ class LegadoRuntimeTest {
     }
 
     @Test
+    fun importsSmartConfigJsonByAndroidLegadoShape() {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    error("No network expected")
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+
+        val sourceSummary = runtime.importAnyConfigJson(
+            """
+            [
+              {"bookSourceUrl":"https://source.test","bookSourceName":"Source","searchUrl":"https://source.test/search?q={{key}}"}
+            ]
+            """.trimIndent()
+        )
+        assertEquals(1, sourceSummary.bookSources)
+        assertEquals(listOf("Source"), runtime.loadBookSources().map { it.bookSourceName })
+
+        val rssSummary = runtime.importAnyConfigJson("""{"sourceUrl":"https://rss.test","sourceName":"RSS","ruleArticles":"$.items"}""")
+        assertEquals(1, rssSummary.rssSources)
+        assertEquals(listOf("RSS"), runtime.loadRssSources().map { it.sourceName })
+
+        val replaceSummary = runtime.importAnyConfigJson("""{"pattern":"bad","replacement":"good","name":"Replace"}""")
+        assertEquals(1, replaceSummary.replaceRules)
+        assertEquals(listOf("Replace"), runtime.loadReplaceRules().map { it.name })
+
+        val ttsSummary = runtime.importAnyConfigJson("""{"name":"TTS","url":"https://tts.test?s={{speakText}}","contentType":"audio/.*"}""")
+        assertEquals(1, ttsSummary.httpTts)
+        assertEquals(listOf("TTS"), runtime.loadHttpTts().map { it.name })
+
+        val ruleSubSummary = runtime.importAnyConfigJson("""{"name":"Sub","url":"https://rules.test/all.json","autoUpdate":true}""")
+        assertEquals(1, ruleSubSummary.ruleSubs)
+        assertEquals(listOf("Sub"), runtime.loadRuleSubs().map { it.name })
+
+        val rawSummary = runtime.importAnyConfigJson("""{"readConfig":"{\"fontSize\":20}"}""")
+        assertEquals(1, rawSummary.rawConfigs)
+        assertEquals(listOf("readConfig"), runtime.loadRawConfigs().map { it.key })
+
+        val backupSummary = runtime.importAnyConfigJson(
+            """
+            {
+              "bookSources":[{"bookSourceUrl":"https://backup-source.test","bookSourceName":"Backup Source"}],
+              "rssSources":[{"sourceUrl":"https://backup-rss.test","sourceName":"Backup RSS"}],
+              "cookies":[{"url":"https://backup-source.test","cookie":"a=b"}]
+            }
+            """.trimIndent(),
+            replace = true
+        )
+        assertEquals(1, backupSummary.bookSources)
+        assertEquals(1, backupSummary.rssSources)
+        assertEquals(1, backupSummary.cookies)
+        assertEquals(listOf("Backup Source"), runtime.loadBookSources().map { it.bookSourceName })
+        assertEquals(listOf("Backup RSS"), runtime.loadRssSources().map { it.sourceName })
+    }
+
+    @Test
+    fun importsSmartConfigJsonFromRemoteUrl() = runBlocking {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    assertEquals("https://share.test/source.json", request.url)
+                    return SharedHttpResponse(
+                        finalUrl = request.url,
+                        statusCode = 200,
+                        body = """{"bookSourceUrl":"https://remote-source.test","bookSourceName":"Remote Source"}"""
+                    )
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+
+        val summary = runtime.importAnyConfigFromUrl("https://share.test/source.json")
+
+        assertEquals(1, summary.bookSources)
+        assertEquals(listOf("Remote Source"), runtime.loadBookSources().map { it.bookSourceName })
+    }
+
+    @Test
     fun importsRssSourcesAndReplaceRulesFromRemoteUrl() = runBlocking {
         val runtime = LegadoRuntime(
             httpFetcher = object : HttpFetcher {

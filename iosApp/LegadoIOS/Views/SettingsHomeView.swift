@@ -151,6 +151,12 @@ struct SettingsHomeView: View {
 
                 Section("Data") {
                     NavigationLink {
+                        SmartImportView()
+                    } label: {
+                        Label("Universal import", systemImage: "square.and.arrow.down.on.square")
+                    }
+
+                    NavigationLink {
                         BackupView()
                     } label: {
                         Label("Backup and restore", systemImage: "externaldrive")

@@ -71,6 +71,7 @@
 		G1000000000000000000000B /* CookieFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1000000000000000000000C /* CookieFormView.swift */; };
 		G1000000000000000000000D /* CacheEntryFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G1000000000000000000000E /* CacheEntryFormView.swift */; };
 		G1000000000000000000000F /* RssSourceFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = G10000000000000000000010 /* RssSourceFormView.swift */; };
+		H10000000000000000000001 /* SmartImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H10000000000000000000002 /* SmartImportView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -139,6 +140,7 @@
 		G1000000000000000000000C /* CookieFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CookieFormView.swift; sourceTree = "<group>"; };
 		G1000000000000000000000E /* CacheEntryFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/CacheEntryFormView.swift; sourceTree = "<group>"; };
 		G10000000000000000000010 /* RssSourceFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/RssSourceFormView.swift; sourceTree = "<group>"; };
+		H10000000000000000000002 /* SmartImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SmartImportView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -189,6 +191,7 @@
 				C10000000000000000000011 /* ReplaceRuleListView.swift */,
 				F10000000000000000000004 /* ReplaceRuleFormView.swift */,
 				C10000000000000000000012 /* ReplaceRuleEditorView.swift */,
+				H10000000000000000000002 /* SmartImportView.swift */,
 				C10000000000000000000013 /* BackupView.swift */,
 				C10000000000000000000014 /* DictRuleListView.swift */,
 				F10000000000000000000008 /* DictRuleFormView.swift */,
@@ -370,6 +373,7 @@
 				C10000000000000000000001 /* ReplaceRuleListView.swift in Sources */,
 				F10000000000000000000003 /* ReplaceRuleFormView.swift in Sources */,
 				C10000000000000000000002 /* ReplaceRuleEditorView.swift in Sources */,
+				H10000000000000000000001 /* SmartImportView.swift in Sources */,
 				C10000000000000000000003 /* BackupView.swift in Sources */,
 				C10000000000000000000004 /* DictRuleListView.swift in Sources */,
 				F10000000000000000000007 /* DictRuleFormView.swift in Sources */,
