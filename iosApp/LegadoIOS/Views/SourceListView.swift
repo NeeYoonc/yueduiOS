@@ -35,11 +35,18 @@ struct SourceListView: View {
                             .tint(source.enabled ? .orange : .green)
                         }
                     }
+                    .onMove { offsets, destination in
+                        app.moveSource(from: offsets, to: destination)
+                    }
                 }
             }
         }
         .navigationTitle("Sources")
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                EditButton()
+            }
+
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 NavigationLink {
                     SourceEditorView()

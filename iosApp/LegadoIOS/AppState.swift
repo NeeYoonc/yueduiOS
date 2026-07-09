@@ -1120,6 +1120,19 @@ final class AppState: ObservableObject {
         refreshLibrary()
     }
 
+    func moveSource(from offsets: IndexSet, to destination: Int) {
+        guard let sourceIndex = offsets.first, sources.indices.contains(sourceIndex) else {
+            return
+        }
+        let source = sources[sourceIndex]
+        let adjustedDestination = destination > sourceIndex ? destination - 1 : destination
+        sources = runtime.moveBookSource(
+            bookSourceUrl: source.bookSourceUrl,
+            toIndex: Int32(adjustedDestination)
+        ) as? [SharedBookSource] ?? sources
+        refreshLibrary()
+    }
+
     func deleteSource(_ source: SharedBookSource) {
         _ = runtime.deleteBookSource(bookSourceUrl: source.bookSourceUrl)
         refreshLibrary()

@@ -50,6 +50,22 @@ class SourceRepository(
         return updated
     }
 
+    fun move(bookSourceUrl: String, toIndex: Int): List<SharedBookSource> {
+        val sources = list().toMutableList()
+        val fromIndex = sources.indexOfFirst { it.bookSourceUrl == bookSourceUrl }
+        if (fromIndex < 0) {
+            return sources
+        }
+        val source = sources.removeAt(fromIndex)
+        sources.add(toIndex.coerceIn(0, sources.size), source)
+        libraryStore.saveBookSources(
+            sources.mapIndexed { index, item ->
+                item.copy(customOrder = index)
+            }
+        )
+        return list()
+    }
+
     fun delete(bookSourceUrl: String): List<SharedBookSource> {
         val remaining = libraryStore.loadBookSources()
             .filterNot { it.bookSourceUrl == bookSourceUrl }

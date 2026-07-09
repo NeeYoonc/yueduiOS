@@ -472,6 +472,10 @@ open class LegadoRuntime(
         return sourceRepository.setEnabled(bookSourceUrl, enabled)
     }
 
+    fun moveBookSource(bookSourceUrl: String, toIndex: Int): List<SharedBookSource> {
+        return sourceRepository.move(bookSourceUrl, toIndex)
+    }
+
     fun deleteBookSource(bookSourceUrl: String): List<SharedBookSource> {
         return sourceRepository.delete(bookSourceUrl)
     }

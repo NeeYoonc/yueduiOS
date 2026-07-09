@@ -704,6 +704,32 @@ class LegadoRuntimeTest {
     }
 
     @Test
+    fun reordersBookSourcesByCustomOrder() {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    error("No network expected")
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+        runtime.importAndSaveBookSources(
+            """
+            [
+              {"bookSourceUrl":"https://a.test","bookSourceName":"A"},
+              {"bookSourceUrl":"https://b.test","bookSourceName":"B"},
+              {"bookSourceUrl":"https://c.test","bookSourceName":"C"}
+            ]
+            """.trimIndent()
+        )
+
+        val reordered = runtime.moveBookSource("https://c.test", 0)
+
+        assertEquals(listOf("C", "A", "B"), reordered.map { it.bookSourceName })
+        assertEquals(listOf(0, 1, 2), reordered.map { it.customOrder })
+    }
+
+    @Test
     fun importsRssSourcesAndReplaceRulesFromRemoteUrl() = runBlocking {
         val runtime = LegadoRuntime(
             httpFetcher = object : HttpFetcher {
