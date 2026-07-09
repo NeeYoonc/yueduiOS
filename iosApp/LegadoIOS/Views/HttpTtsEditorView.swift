@@ -5,6 +5,31 @@ struct HttpTtsEditorView: View {
 
     var body: some View {
         Form {
+            Section("Import from URL") {
+                TextField("https://example.com/httpTts.json", text: $app.httpTtsImportUrl)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .keyboardType(.URL)
+
+                Button {
+                    Task {
+                        await app.importHttpTtsFromUrl()
+                    }
+                } label: {
+                    Label("Fetch and import", systemImage: "link.badge.plus")
+                }
+                .disabled(app.isLoading || app.httpTtsImportUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                Button(role: .destructive) {
+                    Task {
+                        await app.importHttpTtsFromUrl(replace: true)
+                    }
+                } label: {
+                    Label("Fetch and replace all", systemImage: "arrow.triangle.2.circlepath")
+                }
+                .disabled(app.isLoading || app.httpTtsImportUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+
             Section {
                 TextEditor(text: $app.httpTtsJson)
                     .font(.system(.body, design: .monospaced))

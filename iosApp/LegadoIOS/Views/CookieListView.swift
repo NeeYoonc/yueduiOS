@@ -6,6 +6,31 @@ struct CookieListView: View {
 
     var body: some View {
         List {
+            Section("Import from URL") {
+                TextField("https://example.com/cookies.json", text: $app.cookieImportUrl)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .keyboardType(.URL)
+
+                Button {
+                    Task {
+                        await app.importCookiesFromUrl()
+                    }
+                } label: {
+                    Label("Fetch and import", systemImage: "link.badge.plus")
+                }
+                .disabled(app.isLoading || app.cookieImportUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                Button(role: .destructive) {
+                    Task {
+                        await app.importCookiesFromUrl(replace: true)
+                    }
+                } label: {
+                    Label("Fetch and replace all", systemImage: "arrow.triangle.2.circlepath")
+                }
+                .disabled(app.isLoading || app.cookieImportUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+
             Section {
                 TextEditor(text: $app.cookieJson)
                     .font(.system(.body, design: .monospaced))

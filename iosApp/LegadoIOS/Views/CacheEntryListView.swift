@@ -6,6 +6,31 @@ struct CacheEntryListView: View {
 
     var body: some View {
         List {
+            Section("Import from URL") {
+                TextField("https://example.com/cacheEntries.json", text: $app.cacheImportUrl)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .keyboardType(.URL)
+
+                Button {
+                    Task {
+                        await app.importCacheEntriesFromUrl()
+                    }
+                } label: {
+                    Label("Fetch and import", systemImage: "link.badge.plus")
+                }
+                .disabled(app.isLoading || app.cacheImportUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                Button(role: .destructive) {
+                    Task {
+                        await app.importCacheEntriesFromUrl(replace: true)
+                    }
+                } label: {
+                    Label("Fetch and replace all", systemImage: "arrow.triangle.2.circlepath")
+                }
+                .disabled(app.isLoading || app.cacheImportUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+
             Section {
                 TextEditor(text: $app.cacheJson)
                     .font(.system(.body, design: .monospaced))

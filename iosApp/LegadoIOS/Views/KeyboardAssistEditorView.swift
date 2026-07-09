@@ -5,6 +5,31 @@ struct KeyboardAssistEditorView: View {
 
     var body: some View {
         Form {
+            Section("Import from URL") {
+                TextField("https://example.com/keyboardAssists.json", text: $app.keyboardAssistImportUrl)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .keyboardType(.URL)
+
+                Button {
+                    Task {
+                        await app.importKeyboardAssistsFromUrl()
+                    }
+                } label: {
+                    Label("Fetch and import", systemImage: "link.badge.plus")
+                }
+                .disabled(app.isLoading || app.keyboardAssistImportUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                Button(role: .destructive) {
+                    Task {
+                        await app.importKeyboardAssistsFromUrl(replace: true)
+                    }
+                } label: {
+                    Label("Fetch and replace all", systemImage: "arrow.triangle.2.circlepath")
+                }
+                .disabled(app.isLoading || app.keyboardAssistImportUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+
             Section {
                 TextEditor(text: $app.keyboardAssistJson)
                     .font(.system(.body, design: .monospaced))

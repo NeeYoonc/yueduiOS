@@ -9,16 +9,25 @@ final class AppState: ObservableObject {
     @Published var replaceRuleImportUrl: String = ""
     @Published var backupJson: String = ""
     @Published var dictRuleJson: String = ""
+    @Published var dictRuleImportUrl: String = ""
     @Published var httpTtsJson: String = ""
+    @Published var httpTtsImportUrl: String = ""
     @Published var txtTocRuleJson: String = ""
+    @Published var txtTocRuleImportUrl: String = ""
     @Published var serverJson: String = ""
+    @Published var serverImportUrl: String = ""
     @Published var keyboardAssistJson: String = ""
+    @Published var keyboardAssistImportUrl: String = ""
     @Published var ruleSubJson: String = ""
+    @Published var ruleSubImportUrl: String = ""
     @Published var rawConfigJson: String = ""
+    @Published var rawConfigImportUrl: String = ""
     @Published var rssSourceJson: String = ""
     @Published var rssSourceImportUrl: String = ""
     @Published var cookieJson: String = ""
+    @Published var cookieImportUrl: String = ""
     @Published var cacheJson: String = ""
+    @Published var cacheImportUrl: String = ""
     @Published var webDavBackupFileName: String = "legado-backup.json"
     @Published var keyword: String = ""
     @Published var dictionaryKeyword: String = ""
@@ -229,6 +238,24 @@ final class AppState: ObservableObject {
         message = "Exported \(dictRules.count) dictionary rule(s)"
     }
 
+    func importDictRulesFromUrl(replace: Bool = false) async {
+        let url = dictRuleImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !url.isEmpty else {
+            message = "Dictionary rule URL is empty"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            dictRules = try await runtime.importDictRulesFromUrl(url: url, replace: replace) as? [SharedDictRule] ?? []
+            refreshLibrary()
+            message = dictRules.isEmpty ? "No usable dictionary rules" : "Imported \(dictRules.count) dictionary rule(s) from URL"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
     func setDictRuleEnabled(_ rule: SharedDictRule, enabled: Bool) {
         _ = runtime.setDictRuleEnabled(name: rule.name, enabled: enabled)
         refreshLibrary()
@@ -287,6 +314,24 @@ final class AppState: ObservableObject {
         message = "Exported \(httpTts.count) HTTP TTS engine(s)"
     }
 
+    func importHttpTtsFromUrl(replace: Bool = false) async {
+        let url = httpTtsImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !url.isEmpty else {
+            message = "HTTP TTS URL is empty"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            httpTts = try await runtime.importHttpTtsFromUrl(url: url, replace: replace) as? [SharedHttpTts] ?? []
+            refreshLibrary()
+            message = httpTts.isEmpty ? "No usable HTTP TTS engines" : "Imported \(httpTts.count) HTTP TTS engine(s) from URL"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
     func deleteHttpTts(_ engine: SharedHttpTts) {
         _ = runtime.deleteHttpTts(id: engine.id)
         refreshLibrary()
@@ -310,6 +355,24 @@ final class AppState: ObservableObject {
     func exportTxtTocRulesToEditor() {
         txtTocRuleJson = runtime.exportTxtTocRulesJson()
         message = "Exported \(txtTocRules.count) TXT TOC rule(s)"
+    }
+
+    func importTxtTocRulesFromUrl(replace: Bool = false) async {
+        let url = txtTocRuleImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !url.isEmpty else {
+            message = "TXT TOC rule URL is empty"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            txtTocRules = try await runtime.importTxtTocRulesFromUrl(url: url, replace: replace) as? [SharedTxtTocRule] ?? []
+            refreshLibrary()
+            message = txtTocRules.isEmpty ? "No usable TXT TOC rules" : "Imported \(txtTocRules.count) TXT TOC rule(s) from URL"
+        } catch {
+            message = error.localizedDescription
+        }
     }
 
     func setTxtTocRuleEnabled(_ rule: SharedTxtTocRule, enabled: Bool) {
@@ -342,6 +405,24 @@ final class AppState: ObservableObject {
         message = "Exported \(servers.count) server(s)"
     }
 
+    func importServersFromUrl(replace: Bool = false) async {
+        let url = serverImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !url.isEmpty else {
+            message = "Server URL is empty"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            servers = try await runtime.importServersFromUrl(url: url, replace: replace) as? [SharedServer] ?? []
+            refreshLibrary()
+            message = servers.isEmpty ? "No usable servers" : "Imported \(servers.count) server(s) from URL"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
     func deleteServer(_ server: SharedServer) {
         servers = runtime.deleteServer(id: server.id) as? [SharedServer] ?? []
         refreshLibrary()
@@ -367,6 +448,24 @@ final class AppState: ObservableObject {
         message = "Exported \(keyboardAssists.count) keyboard assist(s)"
     }
 
+    func importKeyboardAssistsFromUrl(replace: Bool = false) async {
+        let url = keyboardAssistImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !url.isEmpty else {
+            message = "Keyboard assist URL is empty"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            keyboardAssists = try await runtime.importKeyboardAssistsFromUrl(url: url, replace: replace) as? [SharedKeyboardAssist] ?? []
+            refreshLibrary()
+            message = keyboardAssists.isEmpty ? "No usable keyboard assists" : "Imported \(keyboardAssists.count) keyboard assist(s) from URL"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
     func deleteKeyboardAssist(_ assist: SharedKeyboardAssist) {
         keyboardAssists = runtime.deleteKeyboardAssist(type: assist.type, key: assist.key) as? [SharedKeyboardAssist] ?? []
         refreshLibrary()
@@ -390,6 +489,24 @@ final class AppState: ObservableObject {
     func exportRuleSubsToEditor() {
         ruleSubJson = runtime.exportRuleSubsJson()
         message = "Exported \(ruleSubs.count) rule subscription(s)"
+    }
+
+    func importRuleSubsFromUrl(replace: Bool = false) async {
+        let url = ruleSubImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !url.isEmpty else {
+            message = "Rule subscription URL is empty"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            ruleSubs = try await runtime.importRuleSubsFromUrl(url: url, replace: replace) as? [SharedRuleSub] ?? []
+            refreshLibrary()
+            message = ruleSubs.isEmpty ? "No usable rule subscriptions" : "Imported \(ruleSubs.count) rule subscription(s) from URL"
+        } catch {
+            message = error.localizedDescription
+        }
     }
 
     func setRuleSubAutoUpdate(_ ruleSub: SharedRuleSub, autoUpdate: Bool) {
@@ -449,6 +566,24 @@ final class AppState: ObservableObject {
         message = "Exported \(rawConfigs.count) raw config(s)"
     }
 
+    func importRawConfigsFromUrl(replace: Bool = false) async {
+        let url = rawConfigImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !url.isEmpty else {
+            message = "Raw config URL is empty"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            rawConfigs = try await runtime.importRawConfigsFromUrl(url: url, replace: replace) as? [SharedRawConfigEntry] ?? []
+            refreshLibrary()
+            message = rawConfigs.isEmpty ? "No usable raw configs" : "Imported \(rawConfigs.count) raw config(s) from URL"
+        } catch {
+            message = error.localizedDescription
+        }
+    }
+
     func deleteRawConfig(_ entry: SharedRawConfigEntry) {
         rawConfigs = runtime.deleteRawConfig(key: entry.key) as? [SharedRawConfigEntry] ?? []
         refreshLibrary()
@@ -472,6 +607,24 @@ final class AppState: ObservableObject {
     func exportCookiesToEditor() {
         cookieJson = runtime.exportCookiesJson()
         message = "Exported \(cookies.count) cookie(s)"
+    }
+
+    func importCookiesFromUrl(replace: Bool = false) async {
+        let url = cookieImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !url.isEmpty else {
+            message = "Cookie URL is empty"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            cookies = try await runtime.importCookiesFromUrl(url: url, replace: replace) as? [SharedCookie] ?? []
+            refreshLibrary()
+            message = cookies.isEmpty ? "No usable cookies" : "Imported \(cookies.count) cookie(s) from URL"
+        } catch {
+            message = error.localizedDescription
+        }
     }
 
     func deleteCookie(_ cookie: SharedCookie) {
@@ -502,6 +655,24 @@ final class AppState: ObservableObject {
     func exportCacheEntriesToEditor() {
         cacheJson = runtime.exportCacheEntriesJson()
         message = "Exported \(cacheEntries.count) cache entry(s)"
+    }
+
+    func importCacheEntriesFromUrl(replace: Bool = false) async {
+        let url = cacheImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !url.isEmpty else {
+            message = "Cache URL is empty"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            cacheEntries = try await runtime.importCacheEntriesFromUrl(url: url, replace: replace) as? [SharedCacheEntry] ?? []
+            refreshLibrary()
+            message = cacheEntries.isEmpty ? "No usable cache entries" : "Imported \(cacheEntries.count) cache entry(s) from URL"
+        } catch {
+            message = error.localizedDescription
+        }
     }
 
     func deleteCacheEntry(_ entry: SharedCacheEntry) {

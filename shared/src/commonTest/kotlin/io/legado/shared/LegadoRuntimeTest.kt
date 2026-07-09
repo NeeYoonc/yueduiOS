@@ -256,6 +256,103 @@ class LegadoRuntimeTest {
     }
 
     @Test
+    fun importsConfigRulesCookiesAndCachesFromRemoteUrl() = runBlocking {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    return when (request.url) {
+                        "https://remote-config.test/dict.json" -> SharedHttpResponse(
+                            finalUrl = request.url,
+                            statusCode = 200,
+                            body = """[{"name":"Remote Dict","urlRule":"https://dict.test/{{word}}","showRule":"text"}]"""
+                        )
+
+                        "https://remote-config.test/tts.json" -> SharedHttpResponse(
+                            finalUrl = request.url,
+                            statusCode = 200,
+                            body = """[{"id":2,"name":"Remote TTS","url":"https://tts.test/speak?text={{text}}"}]"""
+                        )
+
+                        "https://remote-config.test/txt-toc.json" -> SharedHttpResponse(
+                            finalUrl = request.url,
+                            statusCode = 200,
+                            body = """[{"id":3,"name":"Remote TXT","rule":"^第.+章"}]"""
+                        )
+
+                        "https://remote-config.test/servers.json" -> SharedHttpResponse(
+                            finalUrl = request.url,
+                            statusCode = 200,
+                            body = """[{"id":4,"name":"Remote WebDAV","type":"WEBDAV","config":"{\"url\":\"https://dav.test\"}"}]"""
+                        )
+
+                        "https://remote-config.test/keyboard.json" -> SharedHttpResponse(
+                            finalUrl = request.url,
+                            statusCode = 200,
+                            body = """[{"type":1,"key":"volumeUp","value":"next"}]"""
+                        )
+
+                        "https://remote-config.test/subs.json" -> SharedHttpResponse(
+                            finalUrl = request.url,
+                            statusCode = 200,
+                            body = """[{"id":5,"name":"Remote Sub","url":"https://sub.test/books.json","type":0}]"""
+                        )
+
+                        "https://remote-config.test/raw.json" -> SharedHttpResponse(
+                            finalUrl = request.url,
+                            statusCode = 200,
+                            body = """{"theme":"dark","readAloud":"on"}"""
+                        )
+
+                        "https://remote-config.test/cookies.json" -> SharedHttpResponse(
+                            finalUrl = request.url,
+                            statusCode = 200,
+                            body = """[{"url":"https://cookie.test","cookie":"sid=1"}]"""
+                        )
+
+                        "https://remote-config.test/cache.json" -> SharedHttpResponse(
+                            finalUrl = request.url,
+                            statusCode = 200,
+                            body = """[{"key":"remote-cache","value":"cached","deadline":99}]"""
+                        )
+
+                        else -> error("Unexpected ${request.url}")
+                    }
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+
+        val dictRules = runtime.importDictRulesFromUrl("https://remote-config.test/dict.json")
+        val httpTts = runtime.importHttpTtsFromUrl("https://remote-config.test/tts.json")
+        val txtTocRules = runtime.importTxtTocRulesFromUrl("https://remote-config.test/txt-toc.json")
+        val servers = runtime.importServersFromUrl("https://remote-config.test/servers.json")
+        val keyboardAssists = runtime.importKeyboardAssistsFromUrl("https://remote-config.test/keyboard.json")
+        val ruleSubs = runtime.importRuleSubsFromUrl("https://remote-config.test/subs.json")
+        val rawConfigs = runtime.importRawConfigsFromUrl("https://remote-config.test/raw.json")
+        val cookies = runtime.importCookiesFromUrl("https://remote-config.test/cookies.json")
+        val cacheEntries = runtime.importCacheEntriesFromUrl("https://remote-config.test/cache.json")
+
+        assertEquals(listOf("Remote Dict"), dictRules.map { it.name })
+        assertEquals(listOf("Remote TTS"), httpTts.map { it.name })
+        assertEquals(listOf("Remote TXT"), txtTocRules.map { it.name })
+        assertEquals(listOf("Remote WebDAV"), servers.map { it.name })
+        assertEquals(listOf("volumeUp"), keyboardAssists.map { it.key })
+        assertEquals(listOf("Remote Sub"), ruleSubs.map { it.name })
+        assertEquals(listOf("readAloud", "theme"), rawConfigs.map { it.key })
+        assertEquals(listOf("https://cookie.test"), cookies.map { it.url })
+        assertEquals(listOf("remote-cache"), cacheEntries.map { it.key })
+        assertEquals(dictRules, runtime.loadDictRules())
+        assertEquals(httpTts, runtime.loadHttpTts())
+        assertEquals(txtTocRules, runtime.loadTxtTocRules())
+        assertEquals(servers, runtime.loadServers())
+        assertEquals(keyboardAssists, runtime.loadKeyboardAssists())
+        assertEquals(ruleSubs, runtime.loadRuleSubs())
+        assertEquals(rawConfigs, runtime.loadRawConfigs())
+        assertEquals(cookies, runtime.loadCookies())
+        assertEquals(cacheEntries, runtime.loadCacheEntries())
+    }
+
+    @Test
     fun exposesSourceWebLoginRequestAndStoresSourceCookie() {
         val runtime = LegadoRuntime(
             httpFetcher = object : HttpFetcher {

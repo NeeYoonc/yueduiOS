@@ -360,6 +360,10 @@ open class LegadoRuntime(
         return cookieRepository.importJson(json, replace)
     }
 
+    suspend fun importCookiesFromUrl(url: String, replace: Boolean = false): List<SharedCookie> {
+        return cookieRepository.importJson(fetchRemoteJson(url, "Cookie URL is empty"), replace)
+    }
+
     fun exportCookiesJson(): String {
         return cookieRepository.exportJson()
     }
@@ -383,6 +387,10 @@ open class LegadoRuntime(
     @Throws(IllegalArgumentException::class)
     fun importAndSaveCacheEntries(json: String, replace: Boolean = false): List<SharedCacheEntry> {
         return cacheEntryRepository.importJson(json, replace)
+    }
+
+    suspend fun importCacheEntriesFromUrl(url: String, replace: Boolean = false): List<SharedCacheEntry> {
+        return cacheEntryRepository.importJson(fetchRemoteJson(url, "Cache URL is empty"), replace)
     }
 
     fun exportCacheEntriesJson(): String {
@@ -474,6 +482,10 @@ open class LegadoRuntime(
         return dictRuleRepository.importJson(json, replace)
     }
 
+    suspend fun importDictRulesFromUrl(url: String, replace: Boolean = false): List<SharedDictRule> {
+        return dictRuleRepository.importJson(fetchRemoteJson(url, "Dictionary rule URL is empty"), replace)
+    }
+
     fun setDictRuleEnabled(name: String, enabled: Boolean): SharedDictRule? {
         return dictRuleRepository.setEnabled(name, enabled)
     }
@@ -495,6 +507,10 @@ open class LegadoRuntime(
         return httpTtsRepository.importJson(json, replace)
     }
 
+    suspend fun importHttpTtsFromUrl(url: String, replace: Boolean = false): List<SharedHttpTts> {
+        return httpTtsRepository.importJson(fetchRemoteJson(url, "HTTP TTS URL is empty"), replace)
+    }
+
     fun deleteHttpTts(id: Long): List<SharedHttpTts> {
         return httpTtsRepository.delete(id)
     }
@@ -506,6 +522,10 @@ open class LegadoRuntime(
     @Throws(IllegalArgumentException::class)
     fun importAndSaveTxtTocRules(json: String, replace: Boolean = false): List<SharedTxtTocRule> {
         return txtTocRuleRepository.importJson(json, replace)
+    }
+
+    suspend fun importTxtTocRulesFromUrl(url: String, replace: Boolean = false): List<SharedTxtTocRule> {
+        return txtTocRuleRepository.importJson(fetchRemoteJson(url, "TXT TOC rule URL is empty"), replace)
     }
 
     fun upsertTxtTocRule(rule: SharedTxtTocRule): SharedTxtTocRule {
@@ -529,6 +549,10 @@ open class LegadoRuntime(
         return serverRepository.importJson(json, replace)
     }
 
+    suspend fun importServersFromUrl(url: String, replace: Boolean = false): List<SharedServer> {
+        return serverRepository.importJson(fetchRemoteJson(url, "Server URL is empty"), replace)
+    }
+
     fun upsertServer(server: SharedServer): SharedServer {
         return serverRepository.upsert(server)
     }
@@ -546,6 +570,10 @@ open class LegadoRuntime(
         return keyboardAssistRepository.importJson(json, replace)
     }
 
+    suspend fun importKeyboardAssistsFromUrl(url: String, replace: Boolean = false): List<SharedKeyboardAssist> {
+        return keyboardAssistRepository.importJson(fetchRemoteJson(url, "Keyboard assist URL is empty"), replace)
+    }
+
     fun upsertKeyboardAssist(assist: SharedKeyboardAssist): SharedKeyboardAssist {
         return keyboardAssistRepository.upsert(assist)
     }
@@ -561,6 +589,10 @@ open class LegadoRuntime(
     @Throws(IllegalArgumentException::class)
     fun importAndSaveRuleSubs(json: String, replace: Boolean = false): List<SharedRuleSub> {
         return ruleSubRepository.importJson(json, replace)
+    }
+
+    suspend fun importRuleSubsFromUrl(url: String, replace: Boolean = false): List<SharedRuleSub> {
+        return ruleSubRepository.importJson(fetchRemoteJson(url, "Rule subscription URL is empty"), replace)
     }
 
     fun upsertRuleSub(ruleSub: SharedRuleSub): SharedRuleSub {
@@ -590,6 +622,10 @@ open class LegadoRuntime(
     @Throws(IllegalArgumentException::class)
     fun importAndSaveRawConfigs(json: String, replace: Boolean = false): List<SharedRawConfigEntry> {
         return rawConfigRepository.importJson(json, replace)
+    }
+
+    suspend fun importRawConfigsFromUrl(url: String, replace: Boolean = false): List<SharedRawConfigEntry> {
+        return rawConfigRepository.importJson(fetchRemoteJson(url, "Raw config URL is empty"), replace)
     }
 
     fun upsertRawConfig(key: String, value: String): SharedRawConfigEntry {
