@@ -131,13 +131,15 @@ struct BookSourceFormView: View {
                 TextField("Variable comment", text: $variableComment, axis: .vertical)
             }
 
-            Section("Rules") {
+            Section {
                 LabeledEditor(title: "Explore rule JSON", text: $ruleExploreJson, minHeight: 130)
                 LabeledEditor(title: "Search rule JSON", text: $ruleSearchJson, minHeight: 130)
                 LabeledEditor(title: "Book info rule JSON", text: $ruleBookInfoJson, minHeight: 150)
                 LabeledEditor(title: "TOC rule JSON", text: $ruleTocJson, minHeight: 150)
                 LabeledEditor(title: "Content rule JSON", text: $ruleContentJson, minHeight: 150)
                 LabeledEditor(title: "Review rule JSON", text: $ruleReviewJson, minHeight: 150)
+            } header: {
+                Text("Rules")
             } footer: {
                 Text("Rule sections use the same JSON objects as Android Legado exports, so complex rule fields are preserved instead of being reduced to a template.")
             }
@@ -247,7 +249,6 @@ struct BookSourceFormView: View {
     private static func ruleJson(_ rule: SharedBookInfoRule?) -> String {
         guard let rule = rule else { return "" }
         var object: [String: Any] = [:]
-        add(&object, "init", rule.init_)
         add(&object, "name", rule.name)
         add(&object, "author", rule.author)
         add(&object, "kind", rule.kind)
