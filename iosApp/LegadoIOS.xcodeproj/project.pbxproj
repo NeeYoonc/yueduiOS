@@ -184,6 +184,7 @@
 				D10000000000000000000014 /* RawConfigEditorView.swift */,
 				D10000000000000000000019 /* CookieListView.swift */,
 				D1000000000000000000001A /* CacheEntryListView.swift */,
+				E10000000000000000000004 /* SearchBookCacheView.swift */,
 				B1000000000000000000001C /* SourceListView.swift */,
 				B1000000000000000000001D /* SourceEditorView.swift */,
 				B1000000000000000000001E /* SourceDebugView.swift */,
@@ -351,6 +352,7 @@
 				D10000000000000000000004 /* RawConfigEditorView.swift in Sources */,
 				D10000000000000000000009 /* CookieListView.swift in Sources */,
 				D1000000000000000000000A /* CacheEntryListView.swift in Sources */,
+				E10000000000000000000003 /* SearchBookCacheView.swift in Sources */,
 				D1000000000000000000000B /* BookEditView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
