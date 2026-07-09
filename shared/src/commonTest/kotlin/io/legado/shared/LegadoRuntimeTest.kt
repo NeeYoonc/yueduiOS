@@ -222,6 +222,40 @@ class LegadoRuntimeTest {
     }
 
     @Test
+    fun importsRssSourcesAndReplaceRulesFromRemoteUrl() = runBlocking {
+        val runtime = LegadoRuntime(
+            httpFetcher = object : HttpFetcher {
+                override suspend fun fetch(request: SharedHttpRequest): SharedHttpResponse {
+                    return when (request.url) {
+                        "https://remote-source.test/rssSources.json" -> SharedHttpResponse(
+                            finalUrl = request.url,
+                            statusCode = 200,
+                            body = """[{"sourceUrl":"https://remote-rss.test/feed","sourceName":"Remote RSS"}]"""
+                        )
+
+                        "https://remote-source.test/replaceRules.json" -> SharedHttpResponse(
+                            finalUrl = request.url,
+                            statusCode = 200,
+                            body = """[{"id":10,"name":"Remote Replace","pattern":"x","replacement":"y"}]"""
+                        )
+
+                        else -> error("Unexpected ${request.url}")
+                    }
+                }
+            },
+            cacheStore = InMemoryCacheStore()
+        )
+
+        val rss = runtime.importRssSourcesFromUrl("https://remote-source.test/rssSources.json")
+        val replace = runtime.importReplaceRulesFromUrl("https://remote-source.test/replaceRules.json")
+
+        assertEquals(listOf("Remote RSS"), rss.map { it.sourceName })
+        assertEquals(listOf("Remote Replace"), replace.map { it.name })
+        assertEquals(rss, runtime.loadRssSources())
+        assertEquals(replace, runtime.loadReplaceRules())
+    }
+
+    @Test
     fun exposesSourceWebLoginRequestAndStoresSourceCookie() {
         val runtime = LegadoRuntime(
             httpFetcher = object : HttpFetcher {

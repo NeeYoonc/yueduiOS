@@ -154,10 +154,7 @@ open class LegadoRuntime(
     }
 
     suspend fun importBookSourcesFromUrl(url: String, replace: Boolean = false): List<SharedBookSource> {
-        val requestUrl = url.trim()
-        require(requestUrl.isNotEmpty()) { "Book source URL is empty" }
-        val response = httpFetcher.fetch(SharedRequestBuilder.build(requestUrl))
-        return sourceRepository.importJson(response.body, replace)
+        return sourceRepository.importJson(fetchRemoteJson(url, "Book source URL is empty"), replace)
     }
 
     fun loadBookSources(): List<SharedBookSource> {
@@ -166,6 +163,10 @@ open class LegadoRuntime(
 
     fun loadRssSources(): List<SharedRssSource> {
         return rssSourceRepository.list()
+    }
+
+    suspend fun importRssSourcesFromUrl(url: String, replace: Boolean = false): List<SharedRssSource> {
+        return rssSourceRepository.importJson(fetchRemoteJson(url, "RSS source URL is empty"), replace)
     }
 
     fun loadExploreSources(): List<SharedBookSource> {
@@ -446,6 +447,10 @@ open class LegadoRuntime(
     @Throws(IllegalArgumentException::class)
     fun importAndSaveReplaceRules(json: String, replace: Boolean = false): List<SharedReplaceRule> {
         return replacementRepository.importJson(json, replace)
+    }
+
+    suspend fun importReplaceRulesFromUrl(url: String, replace: Boolean = false): List<SharedReplaceRule> {
+        return replacementRepository.importJson(fetchRemoteJson(url, "Replace rule URL is empty"), replace)
     }
 
     fun upsertReplaceRule(rule: SharedReplaceRule): SharedReplaceRule {
@@ -827,6 +832,12 @@ open class LegadoRuntime(
                 libraryStore.saveChapterContent(book, chapter, content)
             }
         }
+    }
+
+    private suspend fun fetchRemoteJson(url: String, emptyMessage: String): String {
+        val requestUrl = url.trim()
+        require(requestUrl.isNotEmpty()) { emptyMessage }
+        return httpFetcher.fetch(SharedRequestBuilder.build(requestUrl)).body
     }
 }
 

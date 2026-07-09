@@ -5,6 +5,31 @@ struct ReplaceRuleEditorView: View {
 
     var body: some View {
         Form {
+            Section("Import from URL") {
+                TextField("https://example.com/replaceRules.json", text: $app.replaceRuleImportUrl)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .keyboardType(.URL)
+
+                Button {
+                    Task {
+                        await app.importReplaceRulesFromUrl()
+                    }
+                } label: {
+                    Label("Fetch and import", systemImage: "link.badge.plus")
+                }
+                .disabled(app.isLoading || app.replaceRuleImportUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                Button(role: .destructive) {
+                    Task {
+                        await app.importReplaceRulesFromUrl(replace: true)
+                    }
+                } label: {
+                    Label("Fetch and replace all", systemImage: "arrow.triangle.2.circlepath")
+                }
+                .disabled(app.isLoading || app.replaceRuleImportUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+
             Section {
                 TextEditor(text: $app.replaceRuleJson)
                     .font(.system(.body, design: .monospaced))

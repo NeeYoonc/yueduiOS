@@ -6,6 +6,7 @@ final class AppState: ObservableObject {
     @Published var sourceJson: String = DefaultSource.json
     @Published var sourceImportUrl: String = ""
     @Published var replaceRuleJson: String = ""
+    @Published var replaceRuleImportUrl: String = ""
     @Published var backupJson: String = ""
     @Published var dictRuleJson: String = ""
     @Published var httpTtsJson: String = ""
@@ -15,6 +16,7 @@ final class AppState: ObservableObject {
     @Published var ruleSubJson: String = ""
     @Published var rawConfigJson: String = ""
     @Published var rssSourceJson: String = ""
+    @Published var rssSourceImportUrl: String = ""
     @Published var cookieJson: String = ""
     @Published var cacheJson: String = ""
     @Published var webDavBackupFileName: String = "legado-backup.json"
@@ -182,6 +184,24 @@ final class AppState: ObservableObject {
     func exportReplaceRulesToEditor() {
         replaceRuleJson = runtime.exportReplaceRulesJson()
         message = "Exported \(replaceRules.count) rule(s)"
+    }
+
+    func importReplaceRulesFromUrl(replace: Bool = false) async {
+        let url = replaceRuleImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !url.isEmpty else {
+            message = "Replace rule URL is empty"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            replaceRules = try await runtime.importReplaceRulesFromUrl(url: url, replace: replace) as? [SharedReplaceRule] ?? []
+            refreshLibrary()
+            message = replaceRules.isEmpty ? "No usable replace rules" : "Imported \(replaceRules.count) replace rule(s) from URL"
+        } catch {
+            message = error.localizedDescription
+        }
     }
 
     func exportBackupToEditor() {
@@ -517,6 +537,24 @@ final class AppState: ObservableObject {
     func exportRssSourcesToEditor() {
         rssSourceJson = runtime.exportRssSourcesJson()
         message = "Exported \(rssSources.count) RSS source(s)"
+    }
+
+    func importRssSourcesFromUrl(replace: Bool = false) async {
+        let url = rssSourceImportUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !url.isEmpty else {
+            message = "RSS source URL is empty"
+            return
+        }
+        isLoading = true
+        defer { isLoading = false }
+
+        do {
+            rssSources = try await runtime.importRssSourcesFromUrl(url: url, replace: replace) as? [SharedRssSource] ?? []
+            refreshLibrary()
+            message = rssSources.isEmpty ? "No usable RSS sources" : "Imported \(rssSources.count) RSS source(s) from URL"
+        } catch {
+            message = error.localizedDescription
+        }
     }
 
     func setRssSourceEnabled(_ source: SharedRssSource, enabled: Bool) {

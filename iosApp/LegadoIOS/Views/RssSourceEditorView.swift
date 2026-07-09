@@ -5,6 +5,31 @@ struct RssSourceEditorView: View {
 
     var body: some View {
         Form {
+            Section("Import from URL") {
+                TextField("https://example.com/rssSources.json", text: $app.rssSourceImportUrl)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .keyboardType(.URL)
+
+                Button {
+                    Task {
+                        await app.importRssSourcesFromUrl()
+                    }
+                } label: {
+                    Label("Fetch and import", systemImage: "link.badge.plus")
+                }
+                .disabled(app.isLoading || app.rssSourceImportUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+
+                Button(role: .destructive) {
+                    Task {
+                        await app.importRssSourcesFromUrl(replace: true)
+                    }
+                } label: {
+                    Label("Fetch and replace all", systemImage: "arrow.triangle.2.circlepath")
+                }
+                .disabled(app.isLoading || app.rssSourceImportUrl.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+
             Section("RSS Source JSON") {
                 TextEditor(text: $app.rssSourceJson)
                     .font(.system(.body, design: .monospaced))
